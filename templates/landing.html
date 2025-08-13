@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Milo's Residence • Cozy Riverside Airbnb</title>
+    <meta
+      name="description"
+      content="A cozy riverside Airbnb with modern comforts, fast Wi‑Fi, and stunning views. Sleeps 3. Walk to cafes and trails. Book your getaway."
+    />
+
+    <!-- Open Graph -->
+    <meta
+      property="og:title"
+      content="Milo's Residence • Cozy Riverside Airbnb"
+    />
+    <meta
+      property="og:description"
+      content="Modern comforts, river views, sleeps 3, walk to cafes and trails."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://placehold.co/1200x630/jpg?text=The+Willow+Loft"
+    />
+    <meta property="og:url" content="https://example.com/" />
+
+    <!-- Bootstrap 5 (latest v5) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Tiny custom styles -->
+    <style>
+      :root {
+        --accent: #4f7cac;
+      }
+      /* * {
+        border: 1px dotted red;
+      } */
+      .btn-accent {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-accent:hover {
+        background: #3d6488;
+        color: #fff;
+      }
+      .hero {
+        background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.45),
+            rgba(0, 0, 0, 0.45)
+          ),
+          url("../static/images/hero-milo.png") center/cover no-repeat;
+        min-height: 100vh;
+        display: grid;
+        place-items: start;
+        padding-top: 1.5em;
+        color: #fff;
+      }
+      .amenity i {
+        font-size: 1.4rem;
+        color: var(--accent);
+      }
+      .badge-pill {
+        border-radius: 9999px;
+      }
+      .shadow-soft {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+      .rounded-4 {
+        border-radius: 1rem !important;
+      }
+      #gallery .carousel-item img {
+        height: 400px;
+        object-fit: cover;
+      }
+      .rating i {
+        color: #f5c518;
+      }
+      .map-embed {
+        min-height: 360px;
+      }
+      .footer-link {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+      }
+      .footer-link:hover {
+        color: #fff;
+        text-decoration: underline;
+      }
+    </style>
+
+    <!-- JSON-LD (schema.org VacationRental) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "VacationRental",
+        "name": "Milo's Residence",
+        "description": "Cozy riverside Airbnb with modern comforts, fast Wi‑Fi, and stunning views. Sleeps 3.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Mohawk",
+          "addressRegion": "NY",
+          "addressCountry": "US"
+        },
+        "amenityFeature": [
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Fast Wi‑Fi",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Free parking",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Washer & dryer",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Self check‑in",
+            "value": true
+          }
+        ],
+        "maximumAttendeeCapacity": 3
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Nav -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+      <div class="container">
+        <a class="navbar-brand fw-semibold" href="/">
+          <i class="bi bi-house-heart me-2 text-primary"></i>Milo's Residence
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#nav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="nav" class="collapse navbar-collapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+            <li class="nav-item">
+              <a class="nav-link" href="#photos">Photos</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Rooms
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="/rooms/room1">Room 1</a></li>
+                <li><a class="dropdown-item" href="/rooms/room2">Room 2</a></li>
+                <li><a class="dropdown-item" href="/rooms/room3">Room 3</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#amenities">Amenities</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#location">Location</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#reviews">Reviews</a>
+            </li>
+          </ul>
+          <a href="#book" class="btn btn-accent ms-lg-3">Check Availability</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Hero -->
+    <header class="hero">
+      <div class="container text-end">
+        <span
+          class="badge bg-light text-dark badge-pill px-3 py-2 mb-3 shadow-soft"
+          >Riverside • Sleeps 3 • Superhost</span
+        >
+        <h1 class="display-4 fw-bold">Milo's Residence</h1>
+        <p class="lead mb-4">
+          Modern comfort, sunlit views, and steps from trails & cafés.
+        </p>
+        <div class="d-flex gap-2 justify-content-end">
+          <a href="#book" class="btn btn-accent btn-lg">
+            <i class="bi bi-calendar2-check me-2"></i>Check Availability
+          </a>
+          <a href="#photos" class="btn btn-outline-light btn-lg">
+            <i class="bi bi-images me-2"></i>View Photos
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Highlights -->
+    <section class="py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-3">
+            <div class="p-4 border rounded-4 shadow-soft h-100">
+              <div class="amenity mb-2"><i class="bi bi-wifi"></i></div>
+              <h6 class="fw-semibold mb-1">Fast Wi‑Fi</h6>
+              <p class="mb-0 text-secondary">
+                Perfect for remote work and streaming.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="p-4 border rounded-4 shadow-soft h-100">
+              <div class="amenity mb-2"><i class="bi bi-geo-alt"></i></div>
+              <h6 class="fw-semibold mb-1">Walkable</h6>
+              <p class="mb-0 text-secondary">
+                5 min to river trail, cafés, and market.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="p-4 border rounded-4 shadow-soft h-100">
+              <div class="amenity mb-2"><i class="bi bi-door-open"></i></div>
+              <h6 class="fw-semibold mb-1">Self Check‑in</h6>
+              <p class="mb-0 text-secondary">
+                Smart lock for effortless arrivals.
+              </p>
+            </div>
+          </div>
+          <div class="col-md-3">
+            <div class="p-4 border rounded-4 shadow-soft h-100">
+              <div class="amenity mb-2"><i class="bi bi-car-front"></i></div>
+              <h6 class="fw-semibold mb-1">Free Parking</h6>
+              <p class="mb-0 text-secondary">On‑site private space included.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Photos / Carousel -->
+    <section id="photos" class="py-5 bg-light">
+      <div class="container">
+        <div class="row align-items-center g-4">
+          <div class="col-lg-6">
+            <div
+              id="gallery"
+              class="carousel carousel-fade rounded-4 overflow-hidden shadow-soft"
+              data-bs-ride="carousel"
+            >
+              <div class="carousel-inner">
+                <div class="carousel-item active">
+                  <img
+                    src="../static/images/carousel-img1.png"
+                    class="d-block w-100"
+                    alt="Bright living room with large windows"
+                  />
+                </div>
+                <div class="carousel-item">
+                  <img
+                    src="../static/images/carousel-img2.png"
+                    class="d-block w-100"
+                    alt="Cozy bedroom with neutral tones"
+                  />
+                </div>
+                <div class="carousel-item">
+                  <img
+                    src="../static/images/carousel-img3.png"
+                    class="d-block w-100"
+                    alt="Modern kitchen with island seating"
+                  />
+                </div>
+              </div>
+              <button
+                class="carousel-control-prev"
+                type="button"
+                data-bs-target="#gallery"
+                data-bs-slide="prev"
+              >
+                <span
+                  class="carousel-control-prev-icon"
+                  aria-hidden="true"
+                ></span>
+                <span class="visually-hidden">Previous</span>
+              </button>
+              <button
+                class="carousel-control-next"
+                type="button"
+                data-bs-target="#gallery"
+                data-bs-slide="next"
+              >
+                <span
+                  class="carousel-control-next-icon"
+                  aria-hidden="true"
+                ></span>
+                <span class="visually-hidden">Next</span>
+              </button>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <h2 class="fw-bold mb-3">Designed for unwinding</h2>
+            <p class="text-secondary">
+              Sun‑drenched loft with river views, thoughtfully stocked kitchen,
+              plush bedding, and a serene workspace. Ideal for weekend escapes
+              or longer stays.
+            </p>
+            <ul class="list-unstyled small">
+              <li class="mb-2">
+                <i class="bi bi-check2-circle text-success me-2"></i>Queen bed +
+                sleeper sofa (sleeps 4)
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check2-circle text-success me-2"></i>Washer &
+                dryer • Full kitchen
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check2-circle text-success me-2"></i>55” 4K TV •
+                Streaming apps
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-check2-circle text-success me-2"></i>Dedicated
+                workspace • 300 Mbps Wi‑Fi
+              </li>
+            </ul>
+            <a href="#book" class="btn btn-accent"
+              ><i class="bi bi-calendar2-week me-2"></i>See Dates</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Amenities grid -->
+    <section id="amenities" class="py-5">
+      <div class="container">
+        <h2 class="fw-bold mb-4">Amenities</h2>
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3">
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-wifi me-2 text-primary"></i>Fast Wi‑Fi
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-thermometer-sun me-2 text-primary"></i>AC &
+              heating
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-cup-hot me-2 text-primary"></i>Coffee & tea
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-droplet me-2 text-primary"></i>Rainfall shower
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-tv me-2 text-primary"></i>4K TV
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-shield-lock me-2 text-primary"></i>Self check‑in
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-basket2 me-2 text-primary"></i>Laundry
+            </div>
+          </div>
+          <div class="col">
+            <div class="p-3 border rounded-4 h-100">
+              <i class="bi bi-car-front me-2 text-primary"></i>Free parking
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Booking / Availability -->
+    <section id="book" class="py-5 bg-light">
+      <div class="container">
+        <div class="row g-4 align-items-stretch">
+          <div class="col-lg-7">
+            <div class="p-4 bg-white border rounded-4 h-100">
+              <h3 class="fw-bold mb-3">Check availability</h3>
+              <form class="row g-3" oninput="updateQuote()">
+                <div class="col-md-4">
+                  <label class="form-label">Check‑in</label>
+                  <input type="date" id="in" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Check‑out</label>
+                  <input type="date" id="out" class="form-control" required />
+                </div>
+                <div class="col-md-4">
+                  <label class="form-label">Guests</label>
+                  <input
+                    type="number"
+                    id="guests"
+                    class="form-control"
+                    value="2"
+                    min="1"
+                    max="4"
+                  />
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Message (optional)</label>
+                  <textarea
+                    class="form-control"
+                    rows="3"
+                    placeholder="Tell us about your trip (arrival time, purpose, etc.)"
+                  ></textarea>
+                </div>
+                <div
+                  class="col-12 d-flex align-items-center justify-content-between"
+                >
+                  <div>
+                    <div class="small text-secondary">Est. total</div>
+                    <div id="quote" class="fs-4 fw-bold">$—</div>
+                  </div>
+                  <a
+                    class="btn btn-accent btn-lg"
+                    href="https://www.airbnb.com/"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <i class="bi bi-airplane-engines me-2"></i>Request to Book
+                  </a>
+                </div>
+                <p class="small text-secondary mt-2 mb-0">
+                  <i class="bi bi-shield-check me-1 text-success"></i>Secure
+                  booking handled on Airbnb.
+                </p>
+              </form>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div
+              class="p-4 bg-white border rounded-4 h-100 d-flex flex-column justify-content-between"
+            >
+              <div>
+                <h4 class="fw-bold">House rules</h4>
+                <ul class="small text-secondary mb-4">
+                  <li>No smoking • No parties</li>
+                  <li>Quiet hours 10pm–8am</li>
+                  <li>Pets on request (fee may apply)</li>
+                </ul>
+                <h4 class="fw-bold">At a glance</h4>
+                <ul class="small text-secondary">
+                  <li>
+                    Avg. nightly: <strong>$149</strong> • Cleaning:
+                    <strong>$40</strong>
+                  </li>
+                  <li>2‑night minimum • Weekly discount 10%</li>
+                  <li>Flexible self check‑in after 3pm</li>
+                </ul>
+              </div>
+              <div class="d-flex align-items-center gap-2">
+                <img
+                  src="https://placehold.co/64x64/png?text=SH"
+                  class="rounded-circle"
+                  alt="Host avatar"
+                  width="48"
+                  height="48"
+                />
+                <div class="small">
+                  <strong>Hosted by Milo</strong><br />
+                  <span class="text-secondary"
+                    >Superhost • 4.9 ★ (128 reviews)</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Location -->
+    <section id="location" class="py-5">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-lg-6">
+            <h2 class="fw-bold">Central & quiet</h2>
+            <p class="text-secondary">
+              Nestled by the river, a short stroll to cafés, bakeries, and the
+              weekend farmers’ market. Trail access is 2 minutes from the door.
+            </p>
+            <ul class="list-unstyled small">
+              <li class="mb-2">
+                <i class="bi bi-geo me-2 text-primary"></i>123 River St, Mohawk,
+                NY
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-train-front me-2 text-primary"></i>15 min to
+                Amtrak • 10 min to I‑90
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-tree me-2 text-primary"></i>Steps to scenic
+                riverwalk
+              </li>
+            </ul>
+          </div>
+          <div class="col-lg-6">
+            <div
+              class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-soft map-embed"
+            >
+              <iframe
+                title="Map to Milo's Residence"
+                src="https://www.google.com/maps?q=Mohawk,NY&output=embed"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reviews -->
+    <section id="reviews" class="py-5 bg-light">
+      <div class="container">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h2 class="fw-bold mb-0">Guest reviews</h2>
+          <div class="rating" aria-label="Average rating 4.9 out of 5">
+            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+            <i class="bi bi-star-half"></i>
+            <span class="ms-2 small text-secondary">4.9 (128)</span>
+          </div>
+        </div>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="p-4 bg-white border rounded-4 h-100">
+              <p class="mb-2">
+                “Bright, spotless, and a perfect location. Check‑in was a
+                breeze.”
+              </p>
+              <div class="small text-secondary">— Alex, July 2025</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 bg-white border rounded-4 h-100">
+              <p class="mb-2">
+                “The river trail is steps away. Wi‑Fi was fast for work calls.”
+              </p>
+              <div class="small text-secondary">— Morgan, June 2025</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-4 bg-white border rounded-4 h-100">
+              <p class="mb-2">
+                “Stylish space and super comfy bed. We’ll be back!”
+              </p>
+              <div class="small text-secondary">— Priya, May 2025</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="py-5">
+      <div class="container">
+        <h2 class="fw-bold mb-4">FAQ</h2>
+        <div class="accordion" id="faq">
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="q1">
+              <button
+                class="accordion-button"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#a1"
+                aria-expanded="true"
+                aria-controls="a1"
+              >
+                Is parking included?
+              </button>
+            </h2>
+            <div
+              id="a1"
+              class="accordion-collapse collapse show"
+              data-bs-parent="#faq"
+            >
+              <div class="accordion-body">
+                Yes—one private on‑site space is included at no charge.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="q2">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#a2"
+                aria-controls="a2"
+              >
+                Do you allow pets?
+              </button>
+            </h2>
+            <div
+              id="a2"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faq"
+            >
+              <div class="accordion-body">
+                Small pets may be allowed with prior approval. A cleaning fee
+                may apply.
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header" id="q3">
+              <button
+                class="accordion-button collapsed"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#a3"
+                aria-controls="a3"
+              >
+                What’s your cancellation policy?
+              </button>
+            </h2>
+            <div
+              id="a3"
+              class="accordion-collapse collapse"
+              data-bs-parent="#faq"
+            >
+              <div class="accordion-body">
+                Standard Airbnb moderate policy applies. See details during
+                booking.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-5" style="background: #0b1c2c; color: #fff">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-semibold">Milo's Residence</h5>
+            <p class="text-white-50 mb-2">
+              A cozy riverside stay in Mohawk, NY.
+            </p>
+            <div class="d-flex gap-3">
+              <a class="footer-link" href="#"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a class="footer-link" href="#"><i class="bi bi-facebook"></i></a>
+              <a class="footer-link" href="#"><i class="bi bi-envelope"></i></a>
+            </div>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <div class="small text-white-50">
+              © <span id="year"></span> Milo's Residence. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Tiny availability/quote helper -->
+    <!-- <script>
+    const nightly = 149, cleaning = 40, taxRate = 0.08;
+    function nightsBetween(inDate, outDate) {
+      if(!inDate || !outDate) return 0;
+      const a = new Date(inDate), b = new Date(outDate);
+      const ms = b - a;
+      return ms > 0 ? Math.ceil(ms / (1000*60*60*24)) : 0;
+    }
+    function updateQuote() {
+      const n = nightsBetween(in.value, out.value);
+      if (n === 0) { quote.textContent = '—'; return; }
+      const subtotal = (n * nightly) + cleaning;
+      const total = subtotal * (1 + taxRate);
+      quote.textContent = `$${total.toFixed(2)} for ${n} night${n>1?'s':''}`;
+    }
+    year.textContent = new Date().getFullYear();
+  </script> -->
+  </body>
+</html>
