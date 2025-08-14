@@ -320,6 +320,18 @@
         // ...options
       });
 
+      // SweetAlert2 Logic
+      document
+        .getElementById("alert-demo")
+        .addEventListener("click", function () {
+          notifyModal(
+            "title",
+            "<em>hello, world</em>",
+            "success",
+            "My text for the button"
+          );
+        });
+
       function notify(msg, msgType) {
         notie.alert({
           type: msgType,
@@ -327,17 +339,14 @@
         });
       }
 
-      // SweetAlert2 Logic
-      document
-        .getElementById("alert-demo")
-        .addEventListener("click", function () {
-          Swal.fire({
-            title: "Error!",
-            text: "Do you want to continue",
-            icon: "error",
-            confirmButtonText: "Cool",
-          });
+      function notifyModal(title, html, icon, confirmButtonText) {
+        Swal.fire({
+          title: title,
+          html: html,
+          icon: icon,
+          confirmButtonText: confirmButtonText,
         });
+      }
     </script>
   </body>
 </html>
