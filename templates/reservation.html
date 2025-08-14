@@ -46,6 +46,13 @@
       href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker.min.css"
     />
 
+    <!-- Notie -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/notie/dist/notie.min.css"
+    />
+
     <!-- Tiny custom styles -->
     <style>
       :root {
@@ -101,6 +108,9 @@
       .footer-link:hover {
         color: #fff;
         text-decoration: underline;
+      }
+      .notie-container {
+        box-shadow: none;
       }
     </style>
 
@@ -271,6 +281,9 @@
     <!-- Vanillajs DateRangePicker -->
     <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
 
+    <!-- Notie -->
+    <script src="https://unpkg.com/notie"></script>
+
     <script>
       (() => {
         "use strict";
@@ -300,6 +313,13 @@
       const rangepicker = new DateRangePicker(elem, {
         // ...options
       });
+
+      function notify(msg, msgType) {
+        notie.alert({
+          type: msgType,
+          text: msg,
+        });
+      }
     </script>
   </body>
 </html>
