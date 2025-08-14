@@ -244,6 +244,9 @@
             <button type="submit" class="btn btn-primary">
               Search Availability
             </button>
+            <button type="submit" class="btn btn-primary" id="alert-demo">
+              SweetAlert2 Demo
+            </button>
           </form>
         </div>
       </div>
@@ -284,6 +287,9 @@
     <!-- Notie -->
     <script src="https://unpkg.com/notie"></script>
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
       (() => {
         "use strict";
@@ -308,7 +314,7 @@
         });
       })();
 
-      // Call DateRangePicker
+      // DateRangePicker Logic
       const elem = document.getElementById("reservation-dates");
       const rangepicker = new DateRangePicker(elem, {
         // ...options
@@ -320,6 +326,18 @@
           text: msg,
         });
       }
+
+      // SweetAlert2 Logic
+      document
+        .getElementById("alert-demo")
+        .addEventListener("click", function () {
+          Swal.fire({
+            title: "Error!",
+            text: "Do you want to continue",
+            icon: "error",
+            confirmButtonText: "Cool",
+          });
+        });
     </script>
   </body>
 </html>
