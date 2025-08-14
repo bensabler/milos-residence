@@ -291,6 +291,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+      let attention = Prompt();
       (() => {
         "use strict";
 
@@ -324,12 +325,13 @@
       document
         .getElementById("alert-demo")
         .addEventListener("click", function () {
-          notifyModal(
-            "title",
-            "<em>hello, world</em>",
-            "success",
-            "My text for the button"
-          );
+          // notifyModal(
+          //   "title",
+          //   "<em>hello, world</em>",
+          //   "success",
+          //   "My text for the button"
+          // );
+          attention.toast();
         });
 
       function notify(msg, msgType) {
@@ -346,6 +348,22 @@
           icon: icon,
           confirmButtonText: confirmButtonText,
         });
+      }
+
+      // js module demo
+      function Prompt() {
+        let toast = function () {
+          console.log("clicked button and got toast");
+        };
+
+        let success = function () {
+          console.log("clicked button and got sucess");
+        };
+
+        return {
+          toast: toast,
+          success: success,
+        };
       }
     </script>
   </body>
