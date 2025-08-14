@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Milo's Residence • Cozy Riverside Airbnb</title>
+    <meta
+      name="description"
+      content="A cozy riverside Airbnb with modern comforts, fast Wi‑Fi, and stunning views. Sleeps 3. Walk to cafes and trails. Book your getaway."
+    />
+
+    <!-- Open Graph -->
+    <meta
+      property="og:title"
+      content="Milo's Residence • Cozy Riverside Airbnb"
+    />
+    <meta
+      property="og:description"
+      content="Modern comforts, river views, sleeps 3, walk to cafes and trails."
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:image"
+      content="https://placehold.co/1200x630/jpg?text=The+Willow+Loft"
+    />
+    <meta property="og:url" content="https://example.com/" />
+
+    <!-- Bootstrap 5 (latest v5) -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-LN+7fdVzj6u52u30Kp6M/trliBMCMKTyK833zpbD+pXdCLuTusPj697FH4R/5mcr"
+      crossorigin="anonymous"
+    />
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
+
+    <!-- Tiny custom styles -->
+    <style>
+      :root {
+        --accent: #4f7cac;
+      }
+      .btn-accent {
+        background: var(--accent);
+        color: #fff;
+      }
+      .btn-accent:hover {
+        background: #3d6488;
+        color: #fff;
+      }
+      .hero {
+        background: linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, 0.45),
+            rgba(0, 0, 0, 0.45)
+          ),
+          url("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1920&auto=format&fit=crop")
+            center/cover no-repeat;
+        min-height: 74vh;
+        display: grid;
+        place-items: center;
+        color: #fff;
+      }
+      .amenity i {
+        font-size: 1.4rem;
+        color: var(--accent);
+      }
+      .badge-pill {
+        border-radius: 9999px;
+      }
+      .shadow-soft {
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+      }
+      .rounded-4 {
+        border-radius: 1rem !important;
+      }
+      .gallery img {
+        object-fit: cover;
+      }
+      .rating i {
+        color: #f5c518;
+      }
+      .map-embed {
+        min-height: 360px;
+      }
+      .footer-link {
+        color: rgba(255, 255, 255, 0.85);
+        text-decoration: none;
+      }
+      .footer-link:hover {
+        color: #fff;
+        text-decoration: underline;
+      }
+    </style>
+
+    <!-- JSON-LD (schema.org VacationRental) -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "VacationRental",
+        "name": "Milo's Residence",
+        "description": "Cozy riverside Airbnb with modern comforts, fast Wi‑Fi, and stunning views. Sleeps 3.",
+        "address": {
+          "@type": "PostalAddress",
+          "addressLocality": "Mohawk",
+          "addressRegion": "NY",
+          "addressCountry": "US"
+        },
+        "amenityFeature": [
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Fast Wi‑Fi",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Free parking",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Washer & dryer",
+            "value": true
+          },
+          {
+            "@type": "LocationFeatureSpecification",
+            "name": "Self check‑in",
+            "value": true
+          }
+        ],
+        "maximumAttendeeCapacity": 3
+      }
+    </script>
+  </head>
+  <body>
+    <!-- Nav -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+      <div class="container">
+        <a class="navbar-brand fw-semibold" href="/">
+          <i class="bi bi-house-heart me-2 text-primary"></i>Milo's Residence
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#nav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="nav" class="collapse navbar-collapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+            <li class="nav-item">
+              <a class="nav-link" href="#photos">Photos</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Rooms
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="/rooms/room1">Room 1</a></li>
+                <li><a class="dropdown-item" href="/rooms/room2">Room 2</a></li>
+                <li><a class="dropdown-item" href="/rooms/room3">Room 3</a></li>
+              </ul>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#amenities">Amenities</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#location">Location</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#reviews">Reviews</a>
+            </li>
+          </ul>
+          <a href="#book" class="btn btn-accent ms-lg-3">Check Availability</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Make Reservation Form-->
+    <div class="container">
+      <div class="row">
+        <div class="col">
+          <h1>Make Reservation</h1>
+
+          <form method="POST" action="" class="needs-validation" novalidate>
+            <div class="form-group mt-5">
+              <label for="first_name">First Name</label>
+              <input
+                type="text"
+                name="first_name"
+                id="first_name"
+                class="form-control"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label for="last_name">Last Name</label>
+              <input
+                type="text"
+                name="last_name"
+                id="last_name"
+                class="form-control"
+                required
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email</label>
+              <input
+                type="email"
+                name="email"
+                id="email"
+                class="form-control"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <div class="form-group">
+              <label for="last_name">Phone Number</label>
+              <input
+                type="text"
+                name="phone"
+                id="phone"
+                class="form-control"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <hr />
+            <input
+              type="submit"
+              class="btn btn-primary"
+              value="Make Reservation"
+            />
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-5" style="background: #0b1c2c; color: #fff">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-semibold">Milo's Residence</h5>
+            <p class="text-white-50 mb-2">
+              A cozy riverside stay in Mohawk, NY.
+            </p>
+            <div class="d-flex gap-3">
+              <a class="footer-link" href="#"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a class="footer-link" href="#"><i class="bi bi-facebook"></i></a>
+              <a class="footer-link" href="#"><i class="bi bi-envelope"></i></a>
+            </div>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <div class="small text-white-50">
+              © <span id="year"></span> Milo's Residence. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
