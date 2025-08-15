@@ -1,0 +1,72 @@
+:root {
+  --accent: #4f7cac;
+}
+.btn-accent {
+  background: var(--accent);
+  color: #fff;
+}
+.btn-accent:hover {
+  background: #3d6488;
+  color: #fff;
+}
+.hero {
+  /* Fallback color */
+  background-color: #000;
+
+  /* Two layers: gradient on top of image */
+  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45))
+      no-repeat,
+    url("/static/images/hero-milo.png") center/cover no-repeat;
+
+  /* Viewport height tweaks */
+  min-height: 74vh; /* fallback */
+  min-height: 74dvh; /* better on mobile browsers */
+
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.amenity i {
+  font-size: 1.4rem;
+  color: var(--accent);
+}
+.badge-pill {
+  border-radius: 9999px;
+}
+.shadow-soft {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+.rounded-4 {
+  border-radius: 1rem !important;
+}
+#gallery .carousel-item img {
+  height: 400px;
+  object-fit: cover;
+}
+
+.rating i {
+  color: #f5c518;
+}
+.map-embed {
+  min-height: 360px;
+}
+.footer-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-decoration: none;
+}
+.footer-link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+.notie-container {
+  box-shadow: none;
+}
+/* Allow absolutely-positioned widgets (like the datepicker) to escape */
+.swal2-html-container {
+  overflow: visible !important;
+}
+/* Make sure the picker sits above the footer buttons */
+.swal2-container .datepicker {
+  z-index: 1070; /* > SweetAlert popup (1060) */
+}
+

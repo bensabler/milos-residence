@@ -1,14 +1,93 @@
 :root {
-  --accent: #4f7cac;
+  /* My Colors */
+  --ink: #292f36;
+  --accent-1: #fdc5f5;
+  --accent-2: #f7aef8;
+  --accent-3: #b388eb;
+  --accent-4: #8093f1;
+
+  /* Bootstrap theme hooks */
+  --bs-body-color: var(--ink);
+  --bs-body-bg: #ffffff;
+  --bs-link-color: var(--accent-4);
+  --bs-primary: var(--accent-4);
+  --bs-secondary: var(--accent-3);
+
+  /* Optional utility */
+  --radius: 14px;
+  --shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
-.btn-accent {
-  background: var(--accent);
+
+html,
+body {
+  color: var(--ink);
+  background: var(--surface);
+  font-family: Roboto, sans-serif;
+  line-height: 1.5;
+  word-spacing: 0.03em;
+  letter-spacing: 0.03em;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1rem;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  border: none;
+  border-radius: 999px;
+  padding: 0.65rem 1rem;
+  cursor: pointer;
+  font-weight: 600;
+}
+.btn:focus {
+  outline: 3px solid #000022;
+  outline-offset: 2px;
+}
+
+/* Primary: dark bg + white text (accessible) */
+.btn--primary {
+  background: var(--ink);
   color: #fff;
 }
-.btn-accent:hover {
-  background: #3d6488;
-  color: #fff;
+.btn--primary:hover {
+  filter: brightness(1.06);
 }
+
+/* Accent buttons use pastel bg + dark text (for contrast) */
+.btn--accent {
+  background: var(--accent); /* try --accent for a lavender version */
+  color: var(--ink);
+  border: 1px solid var(--line);
+}
+.btn--accent:hover {
+  filter: brightness(1.03);
+}
+
+/* Utility tags/chips on pastel backgrounds */
+.tag {
+  display: inline-block;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--muted-1); /* swap to muted-2 or 3 for variety */
+  color: var(--ink);
+  font-size: 0.9rem;
+}
+
+/* Links lean on brand color */
+a {
+  color: var(--brand);
+}
+a:hover {
+  filter: brightness(0.95);
+}
+
 .hero {
   /* Fallback color */
   background-color: #000;
@@ -26,46 +105,8 @@
   place-items: center;
   color: #fff;
 }
-.amenity i {
-  font-size: 1.4rem;
-  color: var(--accent);
-}
-.badge-pill {
-  border-radius: 9999px;
-}
-.shadow-soft {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-}
-.rounded-4 {
-  border-radius: 1rem !important;
-}
+
 #gallery .carousel-item img {
   height: 400px;
   object-fit: cover;
-}
-
-.rating i {
-  color: #f5c518;
-}
-.map-embed {
-  min-height: 360px;
-}
-.footer-link {
-  color: rgba(255, 255, 255, 0.85);
-  text-decoration: none;
-}
-.footer-link:hover {
-  color: #fff;
-  text-decoration: underline;
-}
-.notie-container {
-  box-shadow: none;
-}
-/* Allow absolutely-positioned widgets (like the datepicker) to escape */
-.swal2-html-container {
-  overflow: visible !important;
-}
-/* Make sure the picker sits above the footer buttons */
-.swal2-container .datepicker {
-  z-index: 1070; /* > SweetAlert popup (1060) */
 }
