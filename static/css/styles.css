@@ -10,14 +10,18 @@
   color: #fff;
 }
 .hero {
-  background: linear-gradient(
-      to bottom,
-      rgba(0, 0, 0, 0.45),
-      rgba(0, 0, 0, 0.45)
-    ),
-    url("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=1920&auto=format&fit=crop")
-      center/cover no-repeat;
-  min-height: 74vh;
+  /* Fallback color */
+  background-color: #000;
+
+  /* Two layers: gradient on top of image */
+  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45))
+      no-repeat,
+    url("/static/images/hero-milo.png") center/cover no-repeat;
+
+  /* Viewport height tweaks */
+  min-height: 74vh; /* fallback */
+  min-height: 74dvh; /* better on mobile browsers */
+
   display: grid;
   place-items: center;
   color: #fff;
@@ -35,9 +39,11 @@
 .rounded-4 {
   border-radius: 1rem !important;
 }
-.gallery img {
+#gallery .carousel-item img {
+  height: 400px;
   object-fit: cover;
 }
+
 .rating i {
   color: #f5c518;
 }

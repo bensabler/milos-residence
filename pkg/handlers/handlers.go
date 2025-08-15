@@ -48,3 +48,38 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 
 	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{StringMap: stringMap})
 }
+
+// Photos renders the photos page
+func (m *Repository) Photos(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "photos.page.tmpl", &models.TemplateData{})
+}
+
+// Reservation renders the make a reservation page and displays form
+func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "reservation.page.tmpl", &models.TemplateData{})
+}
+
+// Room1 renders the room 1 page
+func (m *Repository) Room1(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "room1.page.tmpl", &models.TemplateData{})
+}
+
+// Room2 renders the room 2 page
+func (m *Repository) Room2(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "room2.page.tmpl", &models.TemplateData{})
+}
+
+// Room3 renders the room 3 page
+func (m *Repository) Room3(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "room3.page.tmpl", &models.TemplateData{})
+}
+
+// Availability renders the search-availability page
+func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "search-availability.page.tmpl", &models.TemplateData{})
+}
+
+// Contact renders the photos page
+func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
+	render.RenderTemplate(w, "contact.page.tmpl", &models.TemplateData{})
+}

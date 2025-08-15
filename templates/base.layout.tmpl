@@ -2,9 +2,17 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <!-- Required meta -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Milo's Residence • Cozy Riverside Airbnb</title>
+    <meta
+      name="description"
+      content="A cozy riverside Airbnb with modern comforts, fast Wi‑Fi, and stunning views. Sleeps 3. Walk to cafes and trails. Book your getaway."
+    />
+
+    <!-- Bootstrap 5 (latest v5) -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -12,20 +20,280 @@
       crossorigin="anonymous"
     />
 
-    {{block "css" .}}
+    <!-- Bootstrap Icons -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.css"
+      rel="stylesheet"
+    />
 
-    {{
-      end
-    }}
+    <!-- Vanillajs DateRangePicker -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker.min.css"
+    />
+
+    <!-- Notie -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/notie/dist/notie.min.css"
+    />
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
+
   </head>
   <body>
+    <!-- Nav -->
+    <nav class="navbar navbar-expand-lg bg-body-tertiary sticky-top">
+      <div class="container">
+        <a class="navbar-brand fw-semibold" href="/">
+          <i class="bi bi-house-heart me-2 text-primary"></i>Milo's Residence
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#nav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div id="nav" class="collapse navbar-collapse">
+          <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+                      <li class="nav-item">
+              <a class="nav-link" href="/about">About</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="/photos">Photos</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Rooms
+              </a>
+              <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li><a class="dropdown-item" href="/room1">Room 1</a></li>
+                <li><a class="dropdown-item" href="/room2">Room 2</a></li>
+                <li><a class="dropdown-item" href="/room3">Room 3</a></li>
+              </ul>
+                        
+                                  <li class="nav-item">
+              <a class="nav-link" href="/search-availability">Check Availability</a>
+            </li>
+
+            </li>
+                                  <li class="nav-item">
+              <a class="nav-link" href="/contact">Contact</a>
+            </li>
+
+          </ul>
+        </div>
+      </div>
+    </nav>
+
     {{block "content" .}}
 
     {{ end }}
 
+
+    <!-- Footer -->
+    <footer class="mt-5 py-5" style="background: #0b1c2c; color: #fff">
+      <div class="container">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <h5 class="fw-semibold">Milo's Residence</h5>
+            <p class="text-white-50 mb-2">
+              A cozy riverside stay in Mohawk, NY.
+            </p>
+            <div class="d-flex gap-3">
+              <a class="footer-link" href="#"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a class="footer-link" href="#"><i class="bi bi-facebook"></i></a>
+              <a class="footer-link" href="#"><i class="bi bi-envelope"></i></a>
+            </div>
+          </div>
+          <div class="col-md-6 text-md-end">
+            <div class="small text-white-50">
+              © <span id="year"></span> Milo's Residence. All rights reserved.
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Vanillajs DateRangePicker -->
+    <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
+
+    <!-- Notie -->
+    <script src="https://unpkg.com/notie"></script>
+
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Custom JS -->
     {{block "js" .}}
 
     {{ end }}
+
+    <script>
+      let attention = Prompt();
+      (() => {
+        "use strict";
+
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll(".needs-validation");
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach((form) => {
+          form.addEventListener(
+            "submit",
+            (event) => {
+              if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+
+              form.classList.add("was-validated");
+            },
+            false
+          );
+        });
+      })();
+
+      // DateRangePicker Logic
+      const elem = document.getElementById("reservation-dates");
+      const rangepicker = new DateRangePicker(elem, {
+        // ...options
+      });
+
+      // SweetAlert2 Logic
+      document
+        .getElementById("alert-demo")
+        .addEventListener("click", function () {
+          let html = `
+      <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
+        <div id="modal-reservation-dates" class="row">
+          <div class="col">
+            <input required class="form-control" type="text" name="start" id="start" placeholder="Arrival" autocomplete="off" />
+          </div>
+          <div class="col">
+            <input required class="form-control" type="text" name="end" id="end" placeholder="Departure" autocomplete="off" />
+          </div>
+        </div>
+      </form>`;
+          attention.custom({ msg: html, title: "Choose Your Dates" });
+        });
+
+      function notify(msg, msgType) {
+        notie.alert({
+          type: msgType,
+          text: msg,
+        });
+      }
+
+      function notifyModal(title, html, icon, confirmButtonText) {
+        Swal.fire({
+          title: title,
+          html: html,
+          icon: icon,
+          confirmButtonText: confirmButtonText,
+        });
+      }
+
+      // Prompt is our JavaScript module for all alerts, notifications, and custom popup dialogs
+      function Prompt() {
+        let toast = function (c) {
+          const { msg = "", icon = "success", position = "top-end" } = c;
+          const Toast = Swal.mixin({
+            toast: true,
+            title: msg,
+            position: position,
+            icon: icon,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            },
+          });
+          Toast.fire({});
+        };
+
+        let success = function (c) {
+          const { msg = "", title = "", footer = "" } = c;
+          Swal.fire({
+            icon: "success",
+            title: title,
+            text: msg,
+            footer: footer,
+          });
+        };
+
+        let error = function (c) {
+          const { msg = "", title = "", footer = "" } = c;
+          Swal.fire({
+            icon: "error",
+            title: title,
+            text: msg,
+            footer: footer,
+          });
+        };
+
+        async function custom(c) {
+          const { msg = "", title = "" } = c;
+
+          const { value: formValues } = await Swal.fire({
+            title: title,
+            html: msg,
+            backdrop: false,
+            inputAutoFocus: false,
+            showCancelButton: true,
+            willOpen: () => {
+              const modalElem = document.getElementById(
+                "modal-reservation-dates"
+              );
+              new DateRangePicker(modalElem, {
+                format: "mm-dd-yyyy",
+                showOnFocus: true,
+                orientation: "top auto",
+                container: Swal.getHtmlContainer(),
+              });
+            },
+
+            preConfirm: () => {
+              return [
+                document.getElementById("start").value,
+                document.getElementById("end").value,
+              ];
+            },
+          });
+
+          if (formValues) {
+            Swal.fire(JSON.stringify(formValues));
+          }
+        }
+
+        return {
+          toast: toast,
+          success: success,
+          error: error,
+          custom: custom,
+        };
+      }
+    </script>
   </body>
 </html>
+
 {{ end }}
