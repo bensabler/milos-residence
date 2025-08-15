@@ -112,6 +112,14 @@
       .notie-container {
         box-shadow: none;
       }
+      /* Allow absolutely-positioned widgets (like the datepicker) to escape */
+      .swal2-html-container {
+        overflow: visible !important;
+      }
+      /* Make sure the picker sits above the footer buttons */
+      .swal2-container .datepicker {
+        z-index: 1070; /* > SweetAlert popup (1060) */
+      }
     </style>
 
     <!-- JSON-LD (schema.org VacationRental) -->
@@ -244,7 +252,7 @@
             <button type="submit" class="btn btn-primary">
               Search Availability
             </button>
-            <button type="submit" class="btn btn-primary" id="alert-demo">
+            <button type="button" class="btn btn-primary" id="alert-demo">
               SweetAlert2 Demo
             </button>
           </form>
@@ -325,7 +333,18 @@
       document
         .getElementById("alert-demo")
         .addEventListener("click", function () {
-          attention.error({ msg: "Hello, world!" });
+          let html = `
+      <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
+        <div id="modal-reservation-dates" class="row">
+          <div class="col">
+            <input required class="form-control" type="text" name="start" id="start" placeholder="Arrival" autocomplete="off" />
+          </div>
+          <div class="col">
+            <input required class="form-control" type="text" name="end" id="end" placeholder="Departure" autocomplete="off" />
+          </div>
+        </div>
+      </form>`;
+          attention.custom({ msg: html, title: "Choose Your Dates" });
         });
 
       function notify(msg, msgType) {
@@ -344,7 +363,7 @@
         });
       }
 
-      // js module demo
+      // Prompt is our JavaScript module for all alerts, notifications, and custom popup dialogs
       function Prompt() {
         let toast = function (c) {
           const { msg = "", icon = "success", position = "top-end" } = c;
@@ -384,10 +403,45 @@
           });
         };
 
+        async function custom(c) {
+          const { msg = "", title = "" } = c;
+
+          const { value: formValues } = await Swal.fire({
+            title: title,
+            html: msg,
+            backdrop: false,
+            inputAutoFocus: false,
+            showCancelButton: true,
+            willOpen: () => {
+              const modalElem = document.getElementById(
+                "modal-reservation-dates"
+              );
+              new DateRangePicker(modalElem, {
+                format: "mm-dd-yyyy",
+                showOnFocus: true,
+                orientation: "top auto",
+                container: Swal.getHtmlContainer(),
+              });
+            },
+
+            preConfirm: () => {
+              return [
+                document.getElementById("start").value,
+                document.getElementById("end").value,
+              ];
+            },
+          });
+
+          if (formValues) {
+            Swal.fire(JSON.stringify(formValues));
+          }
+        }
+
         return {
           toast: toast,
           success: success,
           error: error,
+          custom: custom,
         };
       }
     </script>
