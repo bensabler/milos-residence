@@ -1,23 +1,23 @@
 /* tokens.css */
-:root{
-  /* Fonts */
-  --font-base: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-heading: var(--font-base);
+:root {
+  /* Typography */
+  --font-base: "Crimson Pro", serif;
+  --font-heading: "Nunito", sans-serif;
 
-  /* Palette (Milo + rustic) */
-  --milo-gray-700:#626B73;
-  --milo-gray-500:#8A939B;
-  --milo-stripe:#F5F6F7;
-  --barn-red:#7B2D26;
-  --weathered-wood:#8D7B68;
-  --hay-gold:#DDB771;
-  --field-sage:#7A8F66;
-  --sky-dust:#9FB3C8;
+  /* Palette */
+  --milo-gray-700: #626b73;
+  --milo-gray-500: #8a939b;
+  --milo-stripe: #f5f6f7;
+  --barn-red: #7b2d26;
+  --weathered-wood: #8d7b68;
+  --hay-gold: #ddb771;
+  --field-sage: #7a8f66;
+  --sky-dust: #9fb3c8;
 
   /* Base */
-  --color-bg:#F5F2ED;
-  --color-ink:#1F2328;
-  --color-ink-soft:#4B5563;
+  --color-bg: #f5f2ed;
+  --color-ink: #1f2328;
+  --color-ink-soft: #4b5563;
 
   /* Map to Bootstrap */
   --bs-body-font-family: var(--font-base);

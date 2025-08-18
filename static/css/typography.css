@@ -1,0 +1,108 @@
+/* typography.css */
+
+/* 1) Global body defaults (serif copy) */
+:root {
+  /* Comfortable reading size for body text (≈17px) */
+  --bs-body-font-size: 1.0625rem;
+
+  /* Readability for long text */
+  --body-line-height: 1.65;
+  --body-letter-spacing: 0.03em; /* serif text usually needs no tracking */
+  --body-word-spacing: 0.02em; /* tiny openness for paragraph copy */
+
+  /* Headings rhythm */
+  --heading-line-height-tight: 1.15;
+  --heading-line-height: 1.2;
+  --heading-letter-spacing: -0.01em; /* slight tighten for rounded Nunito */
+
+  /* Let Bootstrap components inherit a consistent heading color */
+  --bs-heading-color: var(--color-ink);
+}
+
+/* Body text: Crimson Pro */
+html,
+body {
+  font-family: var(--font-base); /* "Crimson Pro", serif */
+  font-size: var(--bs-body-font-size);
+  line-height: var(--body-line-height);
+  letter-spacing: var(--body-letter-spacing);
+  word-spacing: var(--body-word-spacing);
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-kerning: normal;
+  font-feature-settings: "kern" 1;
+  font-optical-sizing: auto; /* safe if the font supports it */
+  text-wrap: pretty; /* progressive enhancement */
+}
+
+/* 2) Headings: Nunito, fluid sizes, tight line-height */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-heading); /* "Nunito", sans-serif */
+  color: var(--bs-heading-color);
+  letter-spacing: var(--heading-letter-spacing);
+  text-wrap: balance; /* nicer multi-line titles */
+  margin-top: 0; /* Bootstrap already manages margins */
+}
+
+/* Fluid, accessible sizes using clamp(min, vw, max) */
+h1 {
+  font-weight: 800;
+  line-height: 1.1;
+  font-size: clamp(2.25rem, 1.6rem + 2.2vw, 3rem); /* ~36→48px */
+}
+h2 {
+  font-weight: 800;
+  line-height: var(--heading-line-height-tight);
+  font-size: clamp(1.875rem, 1.4rem + 1.6vw, 2.5rem); /* ~30→40px */
+}
+h3 {
+  font-weight: 700;
+  line-height: var(--heading-line-height-tight);
+  font-size: clamp(1.5rem, 1.2rem + 0.8vw, 1.875rem); /* ~24→30px */
+}
+h4 {
+  font-weight: 700;
+  line-height: var(--heading-line-height);
+  font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem); /* ~20→24px */
+}
+h5 {
+  font-weight: 700;
+  line-height: var(--heading-line-height);
+  font-size: 1.125rem; /* 18px */
+}
+h6 {
+  font-weight: 700;
+  letter-spacing: 0; /* keep H6 neutral */
+  line-height: var(--heading-line-height);
+  font-size: 1rem; /* 16px */
+}
+
+/* 3) Links: readable & obviously clickable */
+a {
+  color: var(--bs-link-color); /* barn red */
+  text-decoration: underline;
+  text-underline-offset: 0.14em; /* lift the underline a bit */
+  text-decoration-thickness: 0.08em; /* slightly thicker underline */
+  transition: color 0.15s ease-in-out;
+}
+a:hover {
+  color: color-mix(in srgb, var(--bs-link-color) 85%, black);
+}
+
+/* 4) Small text & lead text */
+small,
+.small {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--color-ink-soft);
+}
+.lead {
+  font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem); /* ~18→22px */
+  line-height: 1.6;
+  color: var(--color-ink);
+}

@@ -1,4 +1,136 @@
 /* components.css */
+
+/* ===========================
+   NAVBAR
+   =========================== */
+.navbar {
+  /* Background & subtle divider */
+  background: var(--milo-stripe);
+  border-bottom: 1px solid color-mix(in srgb, var(--weathered-wood) 28%, #fff);
+
+  /* Spacing */
+  --bs-navbar-padding-y: 0.65rem;
+
+  /* Brand text */
+  --bs-navbar-brand-color: var(--color-ink);
+  --bs-navbar-brand-hover-color: var(--color-ink);
+
+  /* Nav links */
+  --bs-navbar-color: var(--barn-red);
+  --bs-navbar-hover-color: color-mix(in srgb, var(--barn-red) 85%, black);
+  --bs-navbar-active-color: color-mix(in srgb, var(--barn-red) 92%, black);
+
+  /* Toggler (hamburger) */
+  --bs-navbar-toggler-border-color: color-mix(
+    in srgb,
+    var(--barn-red) 30%,
+    black
+  );
+  --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(123,45,38)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+/* Brand gets Milo’s playful heading font */
+.navbar .navbar-brand {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+}
+
+/* Nav links: a touch of weight + underline on hover/focus for affordance */
+.navbar .nav-link {
+  font-weight: 600;
+  text-decoration: none;
+}
+.navbar .nav-link:hover,
+.navbar .nav-link:focus {
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+/* Keyboard focus (accessible) */
+.navbar a.nav-link:focus-visible,
+.navbar .navbar-brand:focus-visible,
+.navbar .dropdown-item:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--barn-red) 35%, transparent);
+  border-radius: 0.25rem;
+}
+
+/* Dropdown menu palette tuned to your theme */
+.navbar .dropdown-menu {
+  --bs-dropdown-link-active-color: #fff;
+  --bs-dropdown-link-active-bg: var(--barn-red);
+  --bs-dropdown-bg: var(--color-bg);
+  --bs-dropdown-border-color: color-mix(
+    in srgb,
+    var(--weathered-wood) 25%,
+    #fff
+  );
+  --bs-dropdown-link-color: var(--barn-red);
+  --bs-dropdown-link-hover-color: color-mix(
+    in srgb,
+    var(--barn-red) 85%,
+    black
+  );
+  --bs-dropdown-link-hover-bg: color-mix(in srgb, var(--barn-red) 9%, #fff);
+  border-radius: 0.75rem;
+}
+.navbar .dropdown-item.active,
+.navbar .dropdown-item:active {
+  color: #fff;
+  background-color: var(--barn-red);
+}
+
+/* ===========================
+   FOOTER
+   =========================== */
+footer {
+  /* Weathered wood, slightly darkened for contrast */
+  background: color-mix(in srgb, var(--weathered-wood) 85%, black 15%);
+  color: var(--milo-stripe);
+  border-top: 1px solid color-mix(in srgb, var(--weathered-wood) 35%, #fff);
+}
+
+/* Footer headings use Nunito to echo the brand */
+footer h5,
+footer .footer-title {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  margin-bottom: 0.5rem;
+}
+
+/* Body copy stays readable */
+footer p,
+footer .small {
+  color: color-mix(in srgb, var(--milo-stripe) 92%, #000);
+  line-height: 1.6;
+}
+
+/* Footer links/icons */
+.footer-link {
+  color: var(--milo-stripe);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 1.15rem;
+}
+.footer-link:hover,
+.footer-link:focus {
+  color: var(--hay-gold);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+.footer-link:focus-visible {
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 45%, transparent);
+  border-radius: 0.25rem;
+}
+
+/* ===========================
+   ETC
+   =========================== */
 .badge-pill {
   border-radius: 9999px;
 }
