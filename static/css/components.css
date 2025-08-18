@@ -1,0 +1,22 @@
+/* components.css */
+.badge-pill {
+  border-radius: 9999px;
+}
+.shadow-soft {
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+.rounded-4 {
+  border-radius: 1rem !important;
+}
+
+.notie-container {
+  box-shadow: none;
+}
+/* Allow absolutely-positioned widgets (like the datepicker) to escape */
+.swal2-html-container {
+  overflow: visible !important;
+}
+/* Make sure the picker sits above the footer buttons */
+.swal2-container .datepicker {
+  z-index: 1070; /* > SweetAlert popup (1060) */
+}
