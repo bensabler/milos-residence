@@ -12,8 +12,9 @@
   --bs-navbar-brand-color: var(--milo-gray-100);
   --bs-navbar-brand-hover-color: var(--hay-gold-200);
   --bs-navbar-color: var(--milo-gray-100);
-  --bs-navbar-hover-color: color-mix(in srgb, var(--hay-gold-200) 85%, black);
-  --bs-navbar-active-color: color-mix(in srgb, var(--barn-red-800) 92%, black);
+  --bs-navbar-nav-link-color: var(--hay-gold-700);
+  --bs-navbar-hover-color: var(--hay-gold-200);
+  --bs-navbar-active-color: color-mix(in srgb, var(--hay-gold-400) 92%, black);
 
   /* Toggler (note: data URLs can't read CSS vars) */
   --bs-navbar-toggler-border-color: color-mix(
@@ -31,7 +32,7 @@
   letter-spacing: 0.2px;
 }
 
-/* Links (common) */
+/* Links */
 .navbar .nav-link {
   font-family: var(--font-heading);
   font-weight: 600;
@@ -41,7 +42,7 @@
   transition: color 0.3s ease;
 }
 
-/* Underline animation (deduped) */
+/* Underline animation */
 .navbar .nav-link:not(.dropdown-toggle)::after,
 .navbar .nav-link.dropdown-toggle::before,
 .navbar .dropdown-menu .dropdown-item::after {
@@ -55,22 +56,31 @@
   transform-origin: left;
   transition: transform 0.35s ease;
 }
+
 .navbar .nav-link:not(.dropdown-toggle)::after,
 .navbar .nav-link.dropdown-toggle::before {
   bottom: -0.15em;
 }
+
 .navbar .dropdown-menu .dropdown-item::after {
   bottom: 0.15em;
   height: 1.5px;
   transition-duration: 0.25s;
 }
+
+/* Underline animation triggers — mouse hover + keyboard focus only */
 .navbar .nav-link:not(.dropdown-toggle):hover::after,
-.navbar .nav-link:not(.dropdown-toggle):focus::after,
+.navbar .nav-link:not(.dropdown-toggle):focus-visible::after,
 .navbar .nav-link.dropdown-toggle:hover::before,
-.navbar .nav-link.dropdown-toggle:focus::before,
+.navbar .nav-link.dropdown-toggle:focus-visible::before,
 .navbar .dropdown-menu .dropdown-item:hover::after,
-.navbar .dropdown-menu .dropdown-item:focus::after {
+.navbar .dropdown-menu .dropdown-item:focus-visible::after {
   transform: scaleX(1);
+}
+
+/* Safety: if an element has :focus but not :focus-visible (mouse click), keep underline off */
+.navbar .nav-link.dropdown-toggle:focus:not(:focus-visible)::before {
+  transform: scaleX(0);
 }
 
 /* Dropdown */
@@ -92,12 +102,14 @@
   --bs-dropdown-link-hover-bg: color-mix(in srgb, var(--barn-red) 9%, #fff);
   border-radius: 0.75rem;
 }
+
 .navbar .dropdown-menu .dropdown-item {
   position: relative;
   font-weight: 500;
   text-decoration: none;
   transition: color 0.3s ease;
 }
+
 :where(
     .navbar a.nav-link:focus-visible,
     .navbar .navbar-brand:focus-visible,
@@ -109,37 +121,48 @@
 }
 
 /* ========== FOOTER ========== */
+/* Footer — complementary/subdued band */
 footer {
-  background: color-mix(in srgb, var(--weathered-wood) 85%, black 15%);
-  color: var(--milo-stripe);
-  border-top: 1px solid color-mix(in srgb, var(--weathered-wood) 35%, #fff);
+  --footer-bg: var(--milo-gray-700);
+  --footer-border: color-mix(in srgb, var(--milo-gray-800) 35%, #fff);
+  --footer-text: var(--milo-gray-100);
+  --footer-link: var(--milo-gray-100);
+  --footer-link-hover: var(--hay-gold-200);
+  background: var(--footer-bg);
+  color: var(--footer-text);
+  border-top: 1px solid var(--footer-border);
 }
+
 footer h5,
 footer .footer-title {
+  color: var(--milo-gray-100);
   font-family: var(--font-heading);
   font-weight: 800;
   letter-spacing: 0.2px;
   margin-bottom: 0.5rem;
 }
+
 footer p,
 footer .small {
   color: color-mix(in srgb, var(--milo-stripe) 92%, #000);
   line-height: 1.6;
 }
+
 .footer-link {
-  color: var(--milo-stripe);
+  color: var(--footer-link);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   font-size: 1.15rem;
 }
+
 .footer-link:hover,
 .footer-link:focus {
-  color: var(--hay-gold);
+  color: var(--footer-link-hover);
   text-decoration: underline;
-  text-underline-offset: 0.16em;
 }
+
 .footer-link:focus-visible {
   outline: 0;
   box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 45%, transparent);
