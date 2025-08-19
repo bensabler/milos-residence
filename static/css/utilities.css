@@ -1,6 +1,10 @@
 /* utilities.css
    Purpose: small helper classes; keep names obvious and specificity low.
 */
+
+/* subtle brand border for cards/panels on light backgrounds */
+.border-subtle{ border-color: color-mix(in srgb, var(--weathered-wood-300) 55%, #fff) !important; }
+
 .badge-pill {
   border-radius: 9999px;
 }

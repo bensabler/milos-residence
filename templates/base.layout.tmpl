@@ -140,6 +140,31 @@
     {{ end }}
 
     <script>
+
+      // Simple quote estimator (example math)
+      function updateQuote(){
+        const inEl = document.getElementById('in');
+        const outEl = document.getElementById('out');
+        const guests = +document.getElementById('guests').value || 1;
+        const quoteEl = document.getElementById('quote');
+
+        const inDate = new Date(inEl.value);
+        const outDate = new Date(outEl.value);
+        if(isNaN(inDate) || isNaN(outDate) || outDate <= inDate){
+          quoteEl.textContent = '—';
+          return;
+        }
+
+        const nights = Math.round((outDate - inDate) / 86400000);
+        const nightly = 149;
+        const cleaning = 40;
+        const extraGuestFee = Math.max(guests - 2, 0) * 15 * nights; // example
+        const subtotal = nightly * nights + cleaning + extraGuestFee;
+        quoteEl.textContent = `$${subtotal.toLocaleString()}`;
+      }
+      // initialize on load
+      updateQuote();
+
       let attention = Prompt();
       (() => {
         "use strict";
