@@ -18,32 +18,9 @@
   z-index: 1070; /* > SweetAlert popup (1060) */
 }
 
-.hero {
-  /* Fallback color */
-  background-color: #000;
-
-  /* Two layers: gradient on top of image */
-  background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45))
-      no-repeat,
-    url("/static/images/hero-milo.png") center/cover no-repeat;
-
-  /* Viewport height tweaks */
-  min-height: 74vh; /* fallback */
-  min-height: 74dvh; /* better on mobile browsers */
-
-  display: grid;
-  place-items: center;
-  color: #fff;
-}
-
 #gallery .carousel-item img {
   height: 400px;
   object-fit: cover;
-}
-
-.amenity i {
-  font-size: 1.4rem;
-  color: var(--accent);
 }
 
 .map-embed {

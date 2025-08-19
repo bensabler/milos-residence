@@ -7,10 +7,8 @@
      ======================== */
 .navbar {
   background: var(--milo-gray-600);
-  border-bottom: 1px solid color-mix(in srgb, var(--milo-gray-700) 28%, #fff);
 
-  /* Bootstrap paddings & colors via vars */
-  --bs-navbar-padding-y: 0.65rem;
+  /* Bootstrap colors via vars */
   --bs-navbar-brand-color: var(--milo-gray-100);
   --bs-navbar-brand-hover-color: var(--hay-gold-200);
   --bs-navbar-color: var(--milo-gray-100);
@@ -18,7 +16,7 @@
   --bs-navbar-hover-color: var(--hay-gold-200);
   --bs-navbar-active-color: color-mix(in srgb, var(--hay-gold-400) 92%, black);
 
-  /* Toggler (note: data URLs can't read CSS vars) */
+  /* Toggler */
   --bs-navbar-toggler-border-color: color-mix(
     in srgb,
     var(--barn-red) 30%,
@@ -192,11 +190,78 @@ footer .small {
   padding: clamp(3rem, 6vw, 6rem) 0;
   border-bottom: 1px solid color-mix(in srgb, var(--milo-gray-800) 35%, #fff);
 }
+
 .hero .badge {
   background: color-mix(in srgb, var(--milo-gray-700) 82%, black 18%);
   color: var(--milo-gray-100);
   border: 1px solid
     color-mix(in srgb, var(--milo-gray-200) 20%, var(--milo-gray-700));
+}
+
+.hero--room {
+  padding: clamp(2.5rem, 5vw, 5rem) 0 clamp(1rem, 2.5vw, 2rem);
+}
+
+.hero--room .hero-gallery {
+  height: clamp(320px, 52vh, 540px);
+  background: var(--milo-gray-800);
+}
+
+.hero--room .hero-gallery img {
+  object-fit: cover;
+  height: 100%;
+}
+
+@media (min-width: 992px) {
+  .hero--room .hero-copy {
+    inset: 1.25rem 0 auto 0;
+  }
+}
+
+.hero--room .carousel-control-prev-icon,
+.hero--room .carousel-control-next-icon {
+  filter: invert(1) grayscale(100%);
+  opacity: 0.85;
+}
+.hero--room .carousel-control-prev:hover .carousel-control-prev-icon,
+.hero--room .carousel-control-next:hover .carousel-control-next-icon {
+  opacity: 1;
+}
+
+/* Thumbnail band */
+.thumbstrip {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+.thumbstrip .thumb {
+  border: 1px solid color-mix(in srgb, var(--milo-gray-400) 60%, #fff);
+  background: #fff;
+  padding: 0;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  width: 92px;
+  height: 64px;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.thumbstrip .thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.thumbstrip .thumb:hover,
+.thumbstrip .thumb:focus-visible {
+  transform: translateY(-1px);
+  border-color: color-mix(in srgb, var(--hay-gold-400) 60%, #fff);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 28%, transparent);
+  outline: 0;
+}
+.thumbstrip .thumb.active {
+  border-color: var(--hay-gold);
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 32%, transparent);
 }
 
 /* ========================

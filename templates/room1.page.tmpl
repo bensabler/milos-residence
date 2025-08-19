@@ -1,11 +1,89 @@
-{{ template "base" .}}
+{{template "base" .}}
 
-{{ define "content"}}
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <h1>This is the Room 1 Page.</h1>
+{{define "content"}}
+  <!-- Hero with carousel -->
+  <header class="hero hero--room">
+    <div class="container position-relative">
+      <!-- Overlay copy -->
+      <div class="text-center text-lg-end">
+        <span class="badge rounded-pill px-3 py-2 mb-3 shadow-soft">Snooze Spot • Sunbeam Approved</span>
+        <h1 class="fw-bold mb-1">Golden Haybeam Loft</h1>
+        <p class="lead mb-4">A warm, whisper-quiet loft where afternoon sunbeams pool on soft hay — ideal for dignified dozing and gentle purring.</p>
+      </div>
+
+      <!-- Main gallery -->
+      <div id="roomGallery" class="carousel carousel-fade rounded-4 overflow-hidden shadow-soft hero-gallery" data-bs-ride="carousel" data-bs-interval="5000">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="/static/images/rooms/haybeam-1.jpg" class="d-block w-100"
+                 alt="Milo basking in a golden sunbeam atop a hay bale" loading="lazy" decoding="async">
+          </div>
+          <div class="carousel-item">
+            <img src="/static/images/rooms/haybeam-2.jpg" class="d-block w-100"
+                 alt="Close-up of soft hay with warm light and tiny dust motes" loading="lazy" decoding="async">
+          </div>
+          <div class="carousel-item">
+            <img src="/static/images/rooms/haybeam-3.jpg" class="d-block w-100"
+                 alt="Barn window casting stripes of light across a cozy loft" loading="lazy" decoding="async">
+          </div>
+        </div>
+
+        <!-- Prev/Next (subtle on hero) -->
+        <button class="carousel-control-prev" type="button" data-bs-target="#roomGallery" data-bs-slide="prev" aria-label="Previous">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#roomGallery" data-bs-slide="next" aria-label="Next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        </button>
+      </div>
+
+      <!-- Thumbnail band (controls the hero) -->
+      <div class="thumbstrip mt-3" aria-label="Additional photos">
+        <button class="thumb active" type="button" data-bs-target="#roomGallery" data-bs-slide-to="0" aria-current="true" aria-label="Slide 1">
+          <img src="/static/images/rooms/haybeam-1-thumb.jpg" alt="Milo on hay bale">
+        </button>
+        <button class="thumb" type="button" data-bs-target="#roomGallery" data-bs-slide-to="1" aria-label="Slide 2">
+          <img src="/static/images/rooms/haybeam-2-thumb.jpg" alt="Soft hay texture">
+        </button>
+        <button class="thumb" type="button" data-bs-target="#roomGallery" data-bs-slide-to="2" aria-label="Slide 3">
+          <img src="/static/images/rooms/haybeam-3-thumb.jpg" alt="Barn window stripes">
+        </button>
+      </div>
     </div>
-  </div>
-</div>
+  </header>
+
+  <!-- Body copy (concise, non-redundant) -->
+  <section class="py-5">
+    <div class="container">
+      <div class="row g-5 align-items-start">
+        <div class="col-lg-7">
+          <h2 class="fw-bold mb-3">About this snooze spot</h2>
+          <p class="text-secondary mb-3">
+            The Golden Haybeam Loft is Milo’s favorite mid-afternoon retreat: soft hay, a gentle barn breeze,
+            and sunbeams that stretch just long enough for an elegant loaf. It’s quiet, cozy, and perfect for
+            contemplative whisker twitching.
+          </p>
+          <ul class="list-unstyled small mb-0">
+            <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Warm sun from 1–4pm (prime nap window)</li>
+            <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Soft rustling hay — excellent kneading surface</li>
+            <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Window vantage for respectful birdwatching</li>
+            <li class="mb-2"><i class="bi bi-check2-circle text-success me-2"></i>Low foot traffic for uninterrupted snoozing</li>
+          </ul>
+        </div>
+        <div class="col-lg-5">
+          <div class="p-4 bg-white border border-subtle rounded-4">
+            <h5 class="fw-semibold mb-2">Good to know</h5>
+            <ul class="small text-secondary mb-4">
+              <li>Self check-in (cat flap) after 3pm</li>
+              <li>Fresh water bowl nearby</li>
+              <li>Optional blanket service (extra purrs)</li>
+            </ul>
+            <a href="/search-availability" class="btn btn-accent w-100">
+              <i class="bi bi-calendar2-check me-2"></i>Check Availability
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 {{end}}
