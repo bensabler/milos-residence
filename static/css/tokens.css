@@ -1,10 +1,18 @@
-/* tokens.css */
+/* tokens.css
+   Purpose: global design tokens and Bootstrap variable mapping.
+   No selectors beyond :root.
+*/
 :root {
-  /* Typography */
+  /* ========================
+     Typography families
+     ======================== */
   --font-base: "Crimson Pro", serif;
   --font-heading: "Nunito", sans-serif;
 
-  /* Palette: Milo Gray */
+  /* ========================
+     Color palettes
+     ======================== */
+  /* Milo Gray */
   --milo-gray-100: #f5f6f7;
   --milo-gray-200: #e4e7ea;
   --milo-gray-300: #cfd4d8;
@@ -15,7 +23,7 @@
   --milo-gray-800: #4f5960;
   --milo-gray-900: #3b4349;
 
-  /* Palette: Barn Red */
+  /* Barn Red */
   --barn-red-100: #f8eaea;
   --barn-red-200: #efc9c6;
   --barn-red-300: #e4a29e;
@@ -26,7 +34,7 @@
   --barn-red-800: #561d18;
   --barn-red-900: #36100d;
 
-  /* Palette: Weathered Wood */
+  /* Weathered Wood */
   --weathered-wood-100: #f3ece6;
   --weathered-wood-200: #e0d4c5;
   --weathered-wood-300: #c9b59f;
@@ -37,7 +45,7 @@
   --weathered-wood-800: #5e4b3e;
   --weathered-wood-900: #3b2e24;
 
-  /* Palette: Hay Gold */
+  /* Hay Gold */
   --hay-gold-100: #fff7e9;
   --hay-gold-200: #ffe8bb;
   --hay-gold-300: #ffdb94;
@@ -48,7 +56,7 @@
   --hay-gold-800: #7c6735;
   --hay-gold-900: #524521;
 
-  /* Palette: Field Sage */
+  /* Field Sage */
   --field-sage-100: #edf2e8;
   --field-sage-200: #d3ddc4;
   --field-sage-300: #b3c199;
@@ -59,7 +67,7 @@
   --field-sage-800: #3d472e;
   --field-sage-900: #2a311f;
 
-  /* Palette: Sky Dust */
+  /* Sky Dust */
   --sky-dust-100: #f0f4f9;
   --sky-dust-200: #d8e1ec;
   --sky-dust-300: #bfd0e2;
@@ -70,16 +78,52 @@
   --sky-dust-800: #495a67;
   --sky-dust-900: #2f3b45;
 
-  /* Base */
+  /* ========================
+     Semantic aliases
+     ======================== */
+  --barn-red: var(--barn-red-600);
+  --weathered-wood: var(--weathered-wood-600);
+  --hay-gold: var(--hay-gold-600);
+  --field-sage: var(--field-sage-600);
+  --sky-dust: var(--sky-dust-600);
+
+  /* Light text on dark surfaces (e.g., footer) */
+  --milo-stripe: var(--milo-gray-100);
+
+  /* ========================
+     Base colors
+     ======================== */
   --color-bg: #f5f2ed;
   --color-ink: #1f2328;
   --color-ink-soft: #4b5563;
 
-  /* Map to Bootstrap */
+  /* ========================
+     Type scale & rhythm
+     ======================== */
+  --bs-body-font-size: 1.0625rem; /* ~17px */
+  --body-line-height: 1.65;
+  --body-letter-spacing: 0.03em;
+  --body-word-spacing: 0.02em;
+
+  --heading-line-height-tight: 1.15;
+  --heading-line-height: 1.2;
+  --heading-letter-spacing: -0.01em;
+  --bs-heading-color: var(--color-ink);
+
+  /* ========================
+     Radii & shadows (for utilities)
+     ======================== */
+  --radius-lg: 1rem;
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+
+  /* ========================
+     Bootstrap mapping
+     ======================== */
   --bs-body-font-family: var(--font-base);
   --bs-body-color: var(--color-ink);
   --bs-body-bg: var(--color-bg);
   --bs-link-color: var(--barn-red);
+
   --bs-primary: var(--barn-red);
   --bs-secondary: var(--weathered-wood);
   --bs-success: var(--field-sage);

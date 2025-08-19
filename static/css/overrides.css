@@ -1,4 +1,23 @@
-/* home.css */
+/* overrides.css
+   Purpose: narrowly scoped fixes for third-party or one-off issues.
+   Periodically pay this file down.
+*/
+
+/* Notie: remove drop shadow */
+.notie-container {
+  box-shadow: none;
+}
+
+/* SweetAlert: allow content overflow */
+.swal2-html-container {
+  overflow: visible !important;
+}
+
+/* Datepicker above modal footer */
+.swal2-container .datepicker {
+  z-index: 1070; /* > SweetAlert popup (1060) */
+}
+
 .hero {
   /* Fallback color */
   background-color: #000;

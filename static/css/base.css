@@ -1,14 +1,30 @@
-/* base.css */
+/* base.css
+   Purpose: global, element-level defaults only.
+   No component classes here.
+*/
+
+/* Document/base text */
+html {
+  color-scheme: light;
+}
+
 html,
 body {
   font-family: var(--font-base);
+  font-size: var(--bs-body-font-size);
+  line-height: var(--body-line-height);
+  letter-spacing: var(--body-letter-spacing);
+  word-spacing: var(--body-word-spacing);
   color: var(--color-ink);
   background: var(--color-bg);
-  line-height: 1.5;
+  font-kerning: normal;
+  font-feature-settings: "kern" 1;
+  font-optical-sizing: auto;
+  text-wrap: pretty; /* progressive enhancement */
+  margin: 0;
 }
-a {
-  color: var(--barn-red);
-}
+
+/* Headings */
 h1,
 h2,
 h3,
@@ -16,4 +32,65 @@ h4,
 h5,
 h6 {
   font-family: var(--font-heading);
+  color: var(--bs-heading-color);
+  letter-spacing: var(--heading-letter-spacing);
+  text-wrap: balance;
+  margin-top: 0;
+}
+
+/* Fluid sizes & weights */
+h1 {
+  font-weight: 800;
+  line-height: 1.1;
+  font-size: clamp(2.25rem, 1.6rem + 2.2vw, 3rem);
+}
+h2 {
+  font-weight: 800;
+  line-height: var(--heading-line-height-tight);
+  font-size: clamp(1.875rem, 1.4rem + 1.6vw, 2.5rem);
+}
+h3 {
+  font-weight: 700;
+  line-height: var(--heading-line-height-tight);
+  font-size: clamp(1.5rem, 1.2rem + 0.8vw, 1.875rem);
+}
+h4 {
+  font-weight: 700;
+  line-height: var(--heading-line-height);
+  font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
+}
+h5 {
+  font-weight: 700;
+  line-height: var(--heading-line-height);
+  font-size: 1.125rem;
+}
+h6 {
+  font-weight: 700;
+  line-height: var(--heading-line-height);
+  font-size: 1rem;
+}
+
+/* Links */
+a {
+  color: var(--bs-link-color);
+  text-decoration: underline;
+  text-underline-offset: 0.14em;
+  text-decoration-thickness: 0.08em;
+  transition: color 0.15s ease-in-out;
+}
+a:hover {
+  color: color-mix(in srgb, var(--bs-link-color) 85%, black);
+}
+
+/* Text helpers bound to elements/utility classes that Bootstrap uses */
+small,
+.small {
+  font-size: 0.875rem;
+  line-height: 1.4;
+  color: var(--color-ink-soft);
+}
+.lead {
+  font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+  line-height: 1.6;
+  color: var(--color-ink);
 }

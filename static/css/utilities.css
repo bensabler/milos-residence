@@ -1,0 +1,12 @@
+/* utilities.css
+   Purpose: small helper classes; keep names obvious and specificity low.
+*/
+.badge-pill {
+  border-radius: 9999px;
+}
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+.rounded-4 {
+  border-radius: var(--radius-lg) !important;
+}

@@ -1,27 +1,21 @@
-/* ==================================================
-   COMPONENTS.CSS
-   ================================================== */
+/* components.css
+   Purpose: component classes (BEM-friendly), no element selectors except within component scope.
+*/
 
-/* ==================================================
-   NAVBAR
-   ================================================== */
-
-/* ===== Layout & Color Scheme ===== */
+/* ========== NAVBAR ========== */
 .navbar {
   background: var(--milo-gray-600);
   border-bottom: 1px solid color-mix(in srgb, var(--milo-gray-700) 28%, #fff);
 
-  /* Bootstrap padding override */
+  /* Bootstrap paddings & colors via vars */
   --bs-navbar-padding-y: 0.65rem;
-
-  /* Color Tokens */
   --bs-navbar-brand-color: var(--milo-gray-100);
   --bs-navbar-brand-hover-color: var(--hay-gold-200);
   --bs-navbar-color: var(--milo-gray-100);
   --bs-navbar-hover-color: color-mix(in srgb, var(--hay-gold-200) 85%, black);
   --bs-navbar-active-color: color-mix(in srgb, var(--barn-red-800) 92%, black);
 
-  /* Toggler button */
+  /* Toggler (note: data URLs can't read CSS vars) */
   --bs-navbar-toggler-border-color: color-mix(
     in srgb,
     var(--barn-red) 30%,
@@ -30,14 +24,14 @@
   --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgb(123,45,38)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
 }
 
-/* ===== Brand Styling ===== */
+/* Brand */
 .navbar .navbar-brand {
   font-family: var(--font-heading);
   font-weight: 800;
   letter-spacing: 0.2px;
 }
 
-/* ===== Nav Links (default, non-dropdown) ===== */
+/* Links (common) */
 .navbar .nav-link {
   font-family: var(--font-heading);
   font-weight: 600;
@@ -47,12 +41,13 @@
   transition: color 0.3s ease;
 }
 
-/* Underline animation (excluding dropdowns) */
-.navbar .nav-link:not(.dropdown-toggle)::after {
+/* Underline animation (deduped) */
+.navbar .nav-link:not(.dropdown-toggle)::after,
+.navbar .nav-link.dropdown-toggle::before,
+.navbar .dropdown-menu .dropdown-item::after {
   content: "";
   position: absolute;
   left: 0;
-  bottom: -0.15em;
   width: 100%;
   height: 2px;
   background-color: currentColor;
@@ -60,39 +55,25 @@
   transform-origin: left;
   transition: transform 0.35s ease;
 }
-
-.navbar .nav-link:not(.dropdown-toggle):hover::after,
-.navbar .nav-link:not(.dropdown-toggle):focus::after {
-  transform: scaleX(1);
-}
-
-/* ===== Dropdown Toggle Styling ===== */
-.navbar .nav-link.dropdown-toggle {
-  font-weight: 600;
-  position: relative;
-  transition: color 0.3s ease;
-}
-
-/* Separate underline animation for dropdown toggle */
+.navbar .nav-link:not(.dropdown-toggle)::after,
 .navbar .nav-link.dropdown-toggle::before {
-  content: "";
-  position: absolute;
-  left: 0;
   bottom: -0.15em;
-  width: 100%;
-  height: 2px;
-  background-color: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s ease;
 }
-
+.navbar .dropdown-menu .dropdown-item::after {
+  bottom: 0.15em;
+  height: 1.5px;
+  transition-duration: 0.25s;
+}
+.navbar .nav-link:not(.dropdown-toggle):hover::after,
+.navbar .nav-link:not(.dropdown-toggle):focus::after,
 .navbar .nav-link.dropdown-toggle:hover::before,
-.navbar .nav-link.dropdown-toggle:focus::before {
+.navbar .nav-link.dropdown-toggle:focus::before,
+.navbar .dropdown-menu .dropdown-item:hover::after,
+.navbar .dropdown-menu .dropdown-item:focus::after {
   transform: scaleX(1);
 }
 
-/* ===== Dropdown Menu Items ===== */
+/* Dropdown */
 .navbar .dropdown-menu {
   --bs-dropdown-link-active-color: #fff;
   --bs-dropdown-link-active-bg: var(--barn-red);
@@ -109,49 +90,14 @@
     black
   );
   --bs-dropdown-link-hover-bg: color-mix(in srgb, var(--barn-red) 9%, #fff);
-
   border-radius: 0.75rem;
 }
-
-/* Dropdown item text styling + animated underline */
 .navbar .dropdown-menu .dropdown-item {
   position: relative;
   font-weight: 500;
-  transition: color 0.3s ease;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
-
-.navbar .dropdown-menu .dropdown-item::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: 0.15em;
-  width: 100%;
-  height: 1.5px;
-  background-color: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.25s ease;
-}
-
-.navbar .dropdown-menu .dropdown-item:hover,
-.navbar .dropdown-menu .dropdown-item:focus {
-  color: var(--barn-red-500);
-}
-
-.navbar .dropdown-menu .dropdown-item:hover::after,
-.navbar .dropdown-menu .dropdown-item:focus::after {
-  transform: scaleX(1);
-}
-
-/* Active dropdown item */
-.navbar .dropdown-item.active,
-.navbar .dropdown-item:active {
-  color: #fff;
-  background-color: var(--barn-red);
-}
-
-/* ===== Accessibility: Focus States ===== */
 :where(
     .navbar a.nav-link:focus-visible,
     .navbar .navbar-brand:focus-visible,
@@ -162,17 +108,12 @@
   border-radius: 0.25rem;
 }
 
-/* ==================================================
-   FOOTER
-   ================================================== */
-
+/* ========== FOOTER ========== */
 footer {
   background: color-mix(in srgb, var(--weathered-wood) 85%, black 15%);
   color: var(--milo-stripe);
   border-top: 1px solid color-mix(in srgb, var(--weathered-wood) 35%, #fff);
 }
-
-/* Footer Headings */
 footer h5,
 footer .footer-title {
   font-family: var(--font-heading);
@@ -180,15 +121,11 @@ footer .footer-title {
   letter-spacing: 0.2px;
   margin-bottom: 0.5rem;
 }
-
-/* Footer Body Text */
 footer p,
 footer .small {
   color: color-mix(in srgb, var(--milo-stripe) 92%, #000);
   line-height: 1.6;
 }
-
-/* Footer Links */
 .footer-link {
   color: var(--milo-stripe);
   text-decoration: none;
@@ -197,51 +134,14 @@ footer .small {
   gap: 0.4rem;
   font-size: 1.15rem;
 }
-
 .footer-link:hover,
 .footer-link:focus {
   color: var(--hay-gold);
   text-decoration: underline;
   text-underline-offset: 0.16em;
 }
-
 .footer-link:focus-visible {
   outline: 0;
   box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 45%, transparent);
   border-radius: 0.25rem;
-}
-
-/* ==================================================
-   UTILITY CLASSES
-   ================================================== */
-
-.badge-pill {
-  border-radius: 9999px;
-}
-
-.shadow-soft {
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-}
-
-.rounded-4 {
-  border-radius: 1rem !important;
-}
-
-/* ==================================================
-   FIXES & OVERRIDES
-   ================================================== */
-
-/* Suppress shadow on Notie (alert) container */
-.notie-container {
-  box-shadow: none;
-}
-
-/* Ensure SweetAlert content can escape container */
-.swal2-html-container {
-  overflow: visible !important;
-}
-
-/* Ensure datepicker appears above modal footer */
-.swal2-container .datepicker {
-  z-index: 1070; /* > SweetAlert popup (1060) */
 }

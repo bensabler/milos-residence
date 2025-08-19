@@ -1,0 +1,16 @@
+/* styles.css */
+
+/* 1) Variables only */
+@import url("/static/css/tokens.css");
+
+/* 2) Element-level defaults (fonts, colors, headings, links…) */
+@import url("/static/css/base.css");
+
+/* 3) Components */
+@import url("/static/css/components.css");
+
+/* 4) Small, single-purpose helpers */
+@import url("/static/css/utilities.css");
+
+/* 5) Rare, targeted patches */
+@import url("/static/css/overrides.css");
