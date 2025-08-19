@@ -4,15 +4,71 @@
   --font-base: "Crimson Pro", serif;
   --font-heading: "Nunito", sans-serif;
 
-  /* Palette */
-  --milo-gray-700: #626b73;
+  /* Palette: Milo Gray */
+  --milo-gray-100: #f5f6f7;
+  --milo-gray-200: #e4e7ea;
+  --milo-gray-300: #cfd4d8;
+  --milo-gray-400: #aab2b8;
   --milo-gray-500: #8a939b;
-  --milo-stripe: #f5f6f7;
-  --barn-red: #7b2d26;
-  --weathered-wood: #8d7b68;
-  --hay-gold: #ddb771;
-  --field-sage: #7a8f66;
-  --sky-dust: #9fb3c8;
+  --milo-gray-600: #727b84;
+  --milo-gray-700: #626b73;
+  --milo-gray-800: #4f5960;
+  --milo-gray-900: #3b4349;
+
+  /* Palette: Barn Red */
+  --barn-red-100: #f8eaea;
+  --barn-red-200: #efc9c6;
+  --barn-red-300: #e4a29e;
+  --barn-red-400: #d87b74;
+  --barn-red-500: #cb534a;
+  --barn-red-600: #a5423b;
+  --barn-red-700: #7b2d26;
+  --barn-red-800: #561d18;
+  --barn-red-900: #36100d;
+
+  /* Palette: Weathered Wood */
+  --weathered-wood-100: #f3ece6;
+  --weathered-wood-200: #e0d4c5;
+  --weathered-wood-300: #c9b59f;
+  --weathered-wood-400: #b0957a;
+  --weathered-wood-500: #99785f;
+  --weathered-wood-600: #86654e;
+  --weathered-wood-700: #8d7b68;
+  --weathered-wood-800: #5e4b3e;
+  --weathered-wood-900: #3b2e24;
+
+  /* Palette: Hay Gold */
+  --hay-gold-100: #fff7e9;
+  --hay-gold-200: #ffe8bb;
+  --hay-gold-300: #ffdb94;
+  --hay-gold-400: #f4c877;
+  --hay-gold-500: #ddb771;
+  --hay-gold-600: #c0a15d;
+  --hay-gold-700: #a98d4c;
+  --hay-gold-800: #7c6735;
+  --hay-gold-900: #524521;
+
+  /* Palette: Field Sage */
+  --field-sage-100: #edf2e8;
+  --field-sage-200: #d3ddc4;
+  --field-sage-300: #b3c199;
+  --field-sage-400: #95a875;
+  --field-sage-500: #7a8f66;
+  --field-sage-600: #65794f;
+  --field-sage-700: #53633f;
+  --field-sage-800: #3d472e;
+  --field-sage-900: #2a311f;
+
+  /* Palette: Sky Dust */
+  --sky-dust-100: #f0f4f9;
+  --sky-dust-200: #d8e1ec;
+  --sky-dust-300: #bfd0e2;
+  --sky-dust-400: #a7bcd6;
+  --sky-dust-500: #9fb3c8;
+  --sky-dust-600: #8195a6;
+  --sky-dust-700: #65798a;
+  --sky-dust-800: #495a67;
+  --sky-dust-900: #2f3b45;
 
   /* Base */
   --color-bg: #f5f2ed;
