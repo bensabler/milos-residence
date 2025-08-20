@@ -13,15 +13,20 @@
     />
 
     <!-- Nunito via Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Crimson Pro via Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap" rel="stylesheet">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200..900;1,200..900&family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap"
+      rel="stylesheet"
+    />
 
     <!-- Bootstrap 5 (latest v5) -->
     <link
@@ -52,7 +57,6 @@
 
     <!-- Custom CSS -->
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
-
   </head>
   <body>
     <!-- Nav -->
@@ -71,21 +75,40 @@
         </button>
         <div id="nav" class="collapse navbar-collapse">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
-            <li class="nav-item"><a class="nav-link" href="/about">About</a></li>
-            <li class="nav-item"><a class="nav-link" href="/photos">Photos</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="/about">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/photos">Photos</a>
+            </li>
 
             <li class="nav-item dropdown">
-              <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                data-bs-toggle="dropdown" aria-expanded="false">Rooms</a>
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+                >Snooze Spots</a
+              >
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li><a class="dropdown-item" href="/room1">Room 1</a></li>
+                <li>
+                  <a class="dropdown-item" href="/room1">Golden Haybeam Loft</a>
+                </li>
                 <li><a class="dropdown-item" href="/room2">Room 2</a></li>
                 <li><a class="dropdown-item" href="/room3">Room 3</a></li>
               </ul>
             </li>
 
-            <li class="nav-item"><a class="nav-link" href="/search-availability">Check Availability</a></li>
-            <li class="nav-item"><a class="nav-link" href="/contact">Contact</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="/search-availability"
+                >Check Availability</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/contact">Contact</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -95,16 +118,13 @@
 
     {{ end }}
 
-
     <!-- Footer -->
     <footer class="mt-5 py-5">
       <div class="container">
         <div class="row g-4">
           <div class="col-md-6">
             <h5 class="fw-semibold">Milo's Residence</h5>
-            <p class="mb-2">
-              A cozy riverside stay in Mohawk, NY.
-            </p>
+            <p class="mb-2">A cozy riverside stay in Mohawk, NY.</p>
             <div class="d-flex gap-3">
               <a class="footer-link" href="#"
                 ><i class="bi bi-instagram"></i
@@ -138,99 +158,99 @@
     {{block "js" .}}
 
     {{ end }}
-    
-  <script>
-    function updateQuote() {
-      const inEl = document.getElementById("in");
-      const outEl = document.getElementById("out");
-      const quoteEl = document.getElementById("quote");
 
-      // Bail if this page doesn't have the booking inputs
-      if (!inEl || !outEl || !quoteEl) return;
+    <script>
+      function updateQuote() {
+        const inEl = document.getElementById("in");
+        const outEl = document.getElementById("out");
+        const quoteEl = document.getElementById("quote");
 
-      const guests = +(document.getElementById("guests")?.value || 1);
+        // Bail if this page doesn't have the booking inputs
+        if (!inEl || !outEl || !quoteEl) return;
 
-      const inDate = new Date(inEl.value);
-      const outDate = new Date(outEl.value);
-      if (isNaN(inDate) || isNaN(outDate) || outDate <= inDate) {
-        quoteEl.textContent = "—";
-        return;
+        const guests = +(document.getElementById("guests")?.value || 1);
+
+        const inDate = new Date(inEl.value);
+        const outDate = new Date(outEl.value);
+        if (isNaN(inDate) || isNaN(outDate) || outDate <= inDate) {
+          quoteEl.textContent = "—";
+          return;
+        }
+
+        const nights = Math.round((outDate - inDate) / 86400000);
+        const nightly = 149;
+        const cleaning = 40;
+        const extraGuestFee = Math.max(guests - 2, 0) * 15 * nights;
+        const subtotal = nightly * nights + cleaning + extraGuestFee;
+        quoteEl.textContent = `$${subtotal.toLocaleString()}`;
+      }
+      updateQuote(); // harmless on pages without those fields
+
+      function updateRoomQuote(slug, nightly, cleaning, weeklyPct) {
+        const start = document.getElementById("start")?.value;
+        const end = document.getElementById("end")?.value;
+        const guests = +document.getElementById("guests")?.value || 1;
+        const out = document.getElementById("quote-" + slug);
+        if (!start || !end) {
+          out && (out.textContent = "—");
+          return;
+        }
+        const s = new Date(start),
+          e = new Date(end);
+        if (isNaN(s) || isNaN(e) || e <= s) {
+          out && (out.textContent = "—");
+          return;
+        }
+
+        const nights = Math.round((e - s) / 86400000);
+        let subtotal = nightly * nights + cleaning;
+        if (weeklyPct && nights >= 7) {
+          subtotal *= 1 - weeklyPct / 100;
+        }
+        // example: $15 extra per guest beyond 2
+        const extraGuest = Math.max(guests - 2, 0) * 15 * nights;
+        out &&
+          (out.textContent =
+            "$" + Math.round(subtotal + extraGuest).toLocaleString());
       }
 
-      const nights = Math.round((outDate - inDate) / 86400000);
-      const nightly = 149;
-      const cleaning = 40;
-      const extraGuestFee = Math.max(guests - 2, 0) * 15 * nights;
-      const subtotal = nightly * nights + cleaning + extraGuestFee;
-      quoteEl.textContent = `$${subtotal.toLocaleString()}`;
-    }
-    updateQuote(); // harmless on pages without those fields
+      let attention = Prompt();
+      (() => {
+        "use strict";
 
-    function updateRoomQuote(slug, nightly, cleaning, weeklyPct) {
-      const start = document.getElementById("start")?.value;
-      const end = document.getElementById("end")?.value;
-      const guests = +document.getElementById("guests")?.value || 1;
-      const out = document.getElementById("quote-" + slug);
-      if (!start || !end) {
-        out && (out.textContent = "—");
-        return;
+        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        const forms = document.querySelectorAll(".needs-validation");
+
+        // Loop over them and prevent submission
+        Array.from(forms).forEach((form) => {
+          form.addEventListener(
+            "submit",
+            (event) => {
+              if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+              }
+
+              form.classList.add("was-validated");
+            },
+            false
+          );
+        });
+      })();
+
+      // DateRangePicker Logic
+      const elem = document.getElementById("reservation-dates");
+      if (elem && window.DateRangePicker) {
+        new DateRangePicker(elem, {
+          // ...options
+        });
       }
-      const s = new Date(start),
-        e = new Date(end);
-      if (isNaN(s) || isNaN(e) || e <= s) {
-        out && (out.textContent = "—");
-        return;
-      }
 
-      const nights = Math.round((e - s) / 86400000);
-      let subtotal = nightly * nights + cleaning;
-      if (weeklyPct && nights >= 7) {
-        subtotal *= 1 - weeklyPct / 100;
-      }
-      // example: $15 extra per guest beyond 2
-      const extraGuest = Math.max(guests - 2, 0) * 15 * nights;
-      out &&
-        (out.textContent =
-          "$" + Math.round(subtotal + extraGuest).toLocaleString());
-    }
-
-    let attention = Prompt();
-    (() => {
-      "use strict";
-
-      // Fetch all the forms we want to apply custom Bootstrap validation styles to
-      const forms = document.querySelectorAll(".needs-validation");
-
-      // Loop over them and prevent submission
-      Array.from(forms).forEach((form) => {
-        form.addEventListener(
-          "submit",
-          (event) => {
-            if (!form.checkValidity()) {
-              event.preventDefault();
-              event.stopPropagation();
-            }
-
-            form.classList.add("was-validated");
-          },
-          false
-        );
-      });
-    })();
-
-    // DateRangePicker Logic
-    const elem = document.getElementById("reservation-dates");
-    if (elem && window.DateRangePicker) {
-      new DateRangePicker(elem, {
-        // ...options
-      });
-    }
-
-    // SweetAlert2 Logic
-    const alertBtn = document.getElementById("alert-demo");
-    if (alertBtn) {
-      alertBtn.addEventListener("click", function () {
-        let html = `
+      // SweetAlert2 Logic
+      const alertBtn = document.getElementById("alert-demo");
+      if (alertBtn) {
+        alertBtn.addEventListener("click", function () {
+          let html = `
       <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
         <div id="modal-reservation-dates" class="row">
           <div class="col">
@@ -241,109 +261,108 @@
           </div>
         </div>
       </form>`;
-        attention.custom({ msg: html, title: "Choose Your Dates" });
-      });
-    }
-
-    function notify(msg, msgType) {
-      notie.alert({
-        type: msgType,
-        text: msg,
-      });
-    }
-
-    function notifyModal(title, html, icon, confirmButtonText) {
-      Swal.fire({
-        title: title,
-        html: html,
-        icon: icon,
-        confirmButtonText: confirmButtonText,
-      });
-    }
-
-    // Prompt is our JavaScript module for all alerts, notifications, and custom popup dialogs
-    function Prompt() {
-      let toast = function (c) {
-        const { msg = "", icon = "success", position = "top-end" } = c;
-        const Toast = Swal.mixin({
-          toast: true,
-          title: msg,
-          position: position,
-          icon: icon,
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
+          attention.custom({ msg: html, title: "Choose Your Dates" });
         });
-        Toast.fire({});
-      };
-
-      let success = function (c) {
-        const { msg = "", title = "", footer = "" } = c;
-        Swal.fire({
-          icon: "success",
-          title: title,
-          text: msg,
-          footer: footer,
-        });
-      };
-
-      let error = function (c) {
-        const { msg = "", title = "", footer = "" } = c;
-        Swal.fire({
-          icon: "error",
-          title: title,
-          text: msg,
-          footer: footer,
-        });
-      };
-
-      async function custom(c) {
-        const { msg = "", title = "" } = c;
-
-        const { value: formValues } = await Swal.fire({
-          title: title,
-          html: msg,
-          backdrop: false,
-          inputAutoFocus: false,
-          showCancelButton: true,
-          willOpen: () => {
-            const modalElem = document.getElementById(
-              "modal-reservation-dates"
-            );
-            new DateRangePicker(modalElem, {
-              format: "mm-dd-yyyy",
-              showOnFocus: true,
-              orientation: "top auto",
-              container: Swal.getHtmlContainer(),
-            });
-          },
-
-          preConfirm: () => {
-            return [
-              document.getElementById("start").value,
-              document.getElementById("end").value,
-            ];
-          },
-        });
-
-        if (formValues) {
-          Swal.fire(JSON.stringify(formValues));
-        }
       }
 
-      return {
-        toast: toast,
-        success: success,
-        error: error,
-        custom: custom,
-      };
-    }
-  </script>
+      function notify(msg, msgType) {
+        notie.alert({
+          type: msgType,
+          text: msg,
+        });
+      }
 
+      function notifyModal(title, html, icon, confirmButtonText) {
+        Swal.fire({
+          title: title,
+          html: html,
+          icon: icon,
+          confirmButtonText: confirmButtonText,
+        });
+      }
+
+      // Prompt is our JavaScript module for all alerts, notifications, and custom popup dialogs
+      function Prompt() {
+        let toast = function (c) {
+          const { msg = "", icon = "success", position = "top-end" } = c;
+          const Toast = Swal.mixin({
+            toast: true,
+            title: msg,
+            position: position,
+            icon: icon,
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            },
+          });
+          Toast.fire({});
+        };
+
+        let success = function (c) {
+          const { msg = "", title = "", footer = "" } = c;
+          Swal.fire({
+            icon: "success",
+            title: title,
+            text: msg,
+            footer: footer,
+          });
+        };
+
+        let error = function (c) {
+          const { msg = "", title = "", footer = "" } = c;
+          Swal.fire({
+            icon: "error",
+            title: title,
+            text: msg,
+            footer: footer,
+          });
+        };
+
+        async function custom(c) {
+          const { msg = "", title = "" } = c;
+
+          const { value: formValues } = await Swal.fire({
+            title: title,
+            html: msg,
+            backdrop: false,
+            inputAutoFocus: false,
+            showCancelButton: true,
+            willOpen: () => {
+              const modalElem = document.getElementById(
+                "modal-reservation-dates"
+              );
+              new DateRangePicker(modalElem, {
+                format: "mm-dd-yyyy",
+                showOnFocus: true,
+                orientation: "top auto",
+                container: Swal.getHtmlContainer(),
+              });
+            },
+
+            preConfirm: () => {
+              return [
+                document.getElementById("start").value,
+                document.getElementById("end").value,
+              ];
+            },
+          });
+
+          if (formValues) {
+            Swal.fire(JSON.stringify(formValues));
+          }
+        }
+
+        return {
+          toast: toast,
+          success: success,
+          error: error,
+          custom: custom,
+        };
+      }
+    </script>
   </body>
 </html>
 

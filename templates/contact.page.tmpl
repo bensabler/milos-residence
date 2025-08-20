@@ -1,11 +1,180 @@
-{{ template "base" .}}
+{{template "base" .}}
 
-{{ define "content"}}
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <h1 class="mt-5">This is the Contact page.</h1>
-    </div>
+{{define "content"}}
+<!-- Hero -->
+<header class="hero">
+  <div class="container text-center text-lg-start">
+    <span class="badge rounded-pill px-3 py-2 mb-3 shadow-soft">Say Meow</span>
+    <h1 class="fw-bold">Contact Milo’s Residence</h1>
+    <p class="lead mb-0">
+      Questions, compliments, or treat recommendations? We usually respond
+      within one sunbeam cycle.
+    </p>
   </div>
-</div>
+</header>
+
+<!-- Contact form + details -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <!-- Form -->
+      <div class="col-lg-7">
+        <div
+          class="p-4 bg-white border border-subtle rounded-4 shadow-soft h-100"
+        >
+          <h2 class="fw-bold mb-3">Send a message</h2>
+          <form
+            class="row g-3 needs-validation"
+            action="/contact"
+            method="POST"
+            novalidate
+          >
+            <!-- Honeypot (anti-spam) -->
+            <div class="visually-hidden" aria-hidden="true">
+              <label for="website">Leave this field empty</label>
+              <input
+                type="text"
+                id="website"
+                name="website"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+
+            <div class="col-md-6">
+              <label for="name" class="form-label"
+                >Name <span class="text-danger">*</span></label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="name"
+                name="name"
+                required
+                autocomplete="name"
+              />
+              <div class="invalid-feedback">Please tell us your name.</div>
+            </div>
+
+            <div class="col-md-6">
+              <label for="email" class="form-label"
+                >Email <span class="text-danger">*</span></label
+              >
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                name="email"
+                required
+                autocomplete="email"
+              />
+              <div class="invalid-feedback">Please enter a valid email.</div>
+            </div>
+
+            <div class="col-12">
+              <label for="topic" class="form-label">Topic</label>
+              <select
+                class="form-select"
+                id="topic"
+                name="topic"
+                aria-label="Select a topic"
+              >
+                <option value="" selected>Choose a topic…</option>
+                <option value="availability">Availability question</option>
+                <option value="photography">Photography & licensing</option>
+                <option value="general">General hello</option>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label for="message" class="form-label"
+                >Message <span class="text-danger">*</span></label
+              >
+              <textarea
+                class="form-control"
+                id="message"
+                name="message"
+                rows="5"
+                required
+                placeholder="How can we help?"
+              ></textarea>
+              <div class="invalid-feedback">A short message is required.</div>
+            </div>
+
+            <div
+              class="col-12 d-flex align-items-center justify-content-between"
+            >
+              <small class="text-secondary"
+                >We reply within 24 hours (Milo permitting).</small
+              >
+              <button type="submit" class="btn btn-accent">
+                <i class="bi bi-send me-2"></i>Send Message
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="col-lg-5">
+        <div
+          class="p-4 bg-white border border-subtle rounded-4 h-100 d-flex flex-column gap-4"
+        >
+          <div>
+            <h3 class="fw-bold mb-2">Ways to reach us</h3>
+            <ul class="list-unstyled small mb-0">
+              <li class="mb-2">
+                <i class="bi bi-envelope me-2 text-primary"></i>
+                <a
+                  href="mailto:hello@milosresidence.example"
+                  class="text-decoration-underline"
+                  >hello@milosresidence.example</a
+                >
+              </li>
+              <li class="mb-2">
+                <i class="bi bi-geo-alt me-2 text-primary"></i>
+                Mohawk, NY • By appointment only
+              </li>
+              <li class="mb-0">
+                <i class="bi bi-clock me-2 text-primary"></i>
+                Quiet hours: 10pm–8am • Prime loafing: 1–4pm
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h4 class="fw-semibold mb-2">Social</h4>
+            <div class="d-flex gap-3">
+              <a class="footer-link" href="#" aria-label="Instagram"
+                ><i class="bi bi-instagram"></i
+              ></a>
+              <a class="footer-link" href="#" aria-label="Facebook"
+                ><i class="bi bi-facebook"></i
+              ></a>
+              <a class="footer-link" href="#" aria-label="Email"
+                ><i class="bi bi-envelope"></i
+              ></a>
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            <h4 class="fw-semibold mb-2">Find us</h4>
+            <div
+              class="ratio ratio-16x9 rounded-4 overflow-hidden shadow-soft map-embed"
+            >
+              <iframe
+                title="Map to Milo's Residence"
+                src="https://www.google.com/maps?q=Mohawk,NY&output=embed"
+                allowfullscreen
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"
+              ></iframe>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /row -->
+  </div>
+</section>
 {{ end }}
