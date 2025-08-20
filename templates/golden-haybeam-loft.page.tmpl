@@ -89,12 +89,12 @@
 {{end}}
 
 {{ define "js" }}
-  <script>
-      // SweetAlert2 Logic
-      const alertBtn = document.getElementById("check-availability-button");
-      if (alertBtn) {
-        alertBtn.addEventListener("click", function () {
-          let html = `
+<script>
+  // SweetAlert2 Logic
+  const alertBtn = document.getElementById("check-availability-button");
+  if (alertBtn) {
+    alertBtn.addEventListener("click", function () {
+      let html = `
       <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
         <div id="modal-reservation-dates" class="row">
           <div class="col">
@@ -105,8 +105,23 @@
           </div>
         </div>
       </form>`;
-          attention.custom({ msg: html, title: "Choose Your Dates" });
-        });
-      }
-  </script>
+      attention.custom({
+        msg: html,
+        title: "Choose Your Dates",
+        callback: function (result) {
+          console.log("called");
+
+          fetch('/search-availability-json')
+            .then(response => response.json())
+            .then(data => {
+              console.log(data);
+              console.log(data.ok);
+              console.log(data.message);
+            })
+        }
+      });
+    });
+  }
+</script>
+
 {{ end }}
