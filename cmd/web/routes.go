@@ -24,9 +24,9 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/", handlers.Repo.Home)
 	mux.Get("/about", handlers.Repo.About)
 	mux.Get("/photos", handlers.Repo.Photos)
-	mux.Get("/room1", handlers.Repo.Room1)
-	mux.Get("/room2", handlers.Repo.Room2)
-	mux.Get("/room3", handlers.Repo.Room3)
+	mux.Get("/golden-haybeam-loft", handlers.Repo.GoldenHaybeamLoft)
+	mux.Get("/window-perch-theater", handlers.Repo.WindowPerchTheater)
+	mux.Get("/laundry-basket-nook", handlers.Repo.LaundryBasketNook)
 	mux.Get("/search-availability", handlers.Repo.Availability)
 	mux.Get("/contact", handlers.Repo.Contact)
 

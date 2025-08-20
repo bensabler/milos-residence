@@ -161,7 +161,7 @@
         </div>
 
         <div class="mt-4">
-          <a href="/search-availability" class="btn btn-accent">
+          <a id="check-availability-button" href="#!" class="btn btn-accent">
             <i class="bi bi-calendar2-week me-2"></i>Check Availability
           </a>
         </div>
@@ -213,6 +213,25 @@
 
 {{define "js"}}
 <script>
+      // SweetAlert2 Logic
+      const alertBtn = document.getElementById("check-availability-button");
+      if (alertBtn) {
+        alertBtn.addEventListener("click", function () {
+          let html = `
+      <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
+        <div id="modal-reservation-dates" class="row">
+          <div class="col">
+            <input required class="form-control" type="text" name="start" id="start" placeholder="Arrival" autocomplete="off" />
+          </div>
+          <div class="col">
+            <input required class="form-control" type="text" name="end" id="end" placeholder="Departure" autocomplete="off" />
+          </div>
+        </div>
+      </form>`;
+          attention.custom({ msg: html, title: "Choose Your Dates" });
+        });
+      }
+
   // Sync thumbnail active state with carousel
   (function () {
     const carouselEl = document.getElementById("gallery-window");

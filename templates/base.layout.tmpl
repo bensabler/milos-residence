@@ -94,15 +94,15 @@
               >
               <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li>
-                  <a class="dropdown-item" href="/room1">Golden Haybeam Loft</a>
+                  <a class="dropdown-item" href="/golden-haybeam-loft">Golden Haybeam Loft</a>
                 </li>
                 <li>
-                  <a class="dropdown-item" href="/room2"
+                  <a class="dropdown-item" href="/window-perch-theater"
                     >Window Perch Theater</a
                   >
                 </li>
                 <li>
-                  <a class="dropdown-item" href="/room3">Laundry-Basket Nook</a>
+                  <a class="dropdown-item" href="/laundry-basket-nook">Laundry-Basket Nook</a>
                 </li>
               </ul>
             </li>
@@ -243,33 +243,6 @@
           );
         });
       })();
-
-      // DateRangePicker Logic
-      const elem = document.getElementById("reservation-dates");
-      if (elem && window.DateRangePicker) {
-        new DateRangePicker(elem, {
-          // ...options
-        });
-      }
-
-      // SweetAlert2 Logic
-      const alertBtn = document.getElementById("alert-demo");
-      if (alertBtn) {
-        alertBtn.addEventListener("click", function () {
-          let html = `
-      <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
-        <div id="modal-reservation-dates" class="row">
-          <div class="col">
-            <input required class="form-control" type="text" name="start" id="start" placeholder="Arrival" autocomplete="off" />
-          </div>
-          <div class="col">
-            <input required class="form-control" type="text" name="end" id="end" placeholder="Departure" autocomplete="off" />
-          </div>
-        </div>
-      </form>`;
-          attention.custom({ msg: html, title: "Choose Your Dates" });
-        });
-      }
 
       function notify(msg, msgType) {
         notie.alert({

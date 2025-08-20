@@ -60,17 +60,17 @@ func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
 }
 
 // Room1 renders the room 1 page
-func (m *Repository) Room1(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) GoldenHaybeamLoft(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "golden-haybeam-loft.page.tmpl", &models.TemplateData{})
 }
 
 // Room2 renders the room 2 page
-func (m *Repository) Room2(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) WindowPerchTheater(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "window-perch-theater.page.tmpl", &models.TemplateData{})
 }
 
 // Room3 renders the room 3 page
-func (m *Repository) Room3(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) LaundryBasketNook(w http.ResponseWriter, r *http.Request) {
 	render.RenderTemplate(w, "laundry-basket-nook.page.tmpl", &models.TemplateData{})
 }
 
