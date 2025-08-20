@@ -1,11 +1,243 @@
-{{ template "base" .}}
+{{template "base" .}}
 
-{{ define "content"}}
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <h1>This is the Room 3 Page.</h1>
+{{define "content"}}
+<!-- Hero with integrated gallery -->
+<header class="hero hero--room">
+  <div class="container position-relative">
+    <!-- Overlay copy -->
+    <div class="hero-copy text-center text-lg-start">
+      <span class="badge rounded-pill px-3 py-2 mb-2 shadow-soft"
+        >Snooze Spot • Laundry-Basket Nook</span
+      >
+      <h1 class="fw-bold mb-1">Laundry-Basket Nook</h1>
+      <p class="lead mb-0">
+        Crinkly comfort, blanket burrows, and the coziest post-zoomie cooldown.
+      </p>
+    </div>
+
+    <!-- Gallery -->
+    <div
+      id="gallery-laundry"
+      class="carousel slide carousel-fade rounded-4 overflow-hidden shadow-soft hero-gallery"
+      data-bs-ride="carousel"
+    >
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img
+            src="/static/images/laundry-1.jpg"
+            class="d-block w-100"
+            alt="Laundry basket with soft blankets in warm light"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="carousel-item">
+          <img
+            src="/static/images/laundry-2.jpg"
+            class="d-block w-100"
+            alt="Close-up of cozy blanket textures inside the basket"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="carousel-item">
+          <img
+            src="/static/images/laundry-3.jpg"
+            class="d-block w-100"
+            alt="Nook view with nearby toy and water station"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#gallery-laundry"
+        data-bs-slide="prev"
+        aria-label="Previous image"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#gallery-laundry"
+        data-bs-slide="next"
+        aria-label="Next image"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <!-- Thumbnail band -->
+    <div class="thumbstrip mt-3" aria-label="Gallery thumbnails">
+      <button
+        class="thumb active"
+        type="button"
+        data-bs-target="#gallery-laundry"
+        data-bs-slide-to="0"
+        aria-label="Show image 1"
+      >
+        <img
+          src="/static/images/laundry-1-thumb.jpg"
+          alt="Thumbnail: laundry basket with blankets"
+        />
+      </button>
+      <button
+        class="thumb"
+        type="button"
+        data-bs-target="#gallery-laundry"
+        data-bs-slide-to="1"
+        aria-label="Show image 2"
+      >
+        <img
+          src="/static/images/laundry-2-thumb.jpg"
+          alt="Thumbnail: blanket textures"
+        />
+      </button>
+      <button
+        class="thumb"
+        type="button"
+        data-bs-target="#gallery-laundry"
+        data-bs-slide-to="2"
+        aria-label="Show image 3"
+      >
+        <img
+          src="/static/images/laundry-3-thumb.jpg"
+          alt="Thumbnail: nook view with toy and water"
+        />
+      </button>
     </div>
   </div>
-</div>
-{{end}}
+</header>
+
+<!-- Details -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-7">
+        <h2 class="fw-bold mb-3">Crinkle. Curl. Conk out.</h2>
+        <p class="text-secondary">
+          The Laundry-Basket Nook is engineered for burrowing bliss—soft fleece
+          layers, gentle basket walls, and just the right crinkle soundtrack.
+          Ideal for biscuit-making, loaf mode, and dignified snores.
+        </p>
+
+        <ul class="list-unstyled small mb-4">
+          <li class="mb-2">
+            <i class="bi bi-basket2 me-2 text-primary"></i>Deep basket with cozy
+            liner—fits a full regal curl
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-thermometer-sun me-2 text-primary"></i>Warmth
+            retention for post-dryer daydreams
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-volume-down me-2 text-primary"></i>Soft, low noise
+            environment (occasional dryer hum cameo)
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-stars me-2 text-primary"></i>Biscuit-making
+            approved; purr-amplifying acoustics
+          </li>
+        </ul>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="p-3 border border-subtle rounded-4 h-100">
+              <div class="small text-secondary">Best for</div>
+              <div class="fw-semibold">Burrowers & Blanket Artists</div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 border border-subtle rounded-4 h-100">
+              <div class="small text-secondary">Vibe</div>
+              <div class="fw-semibold">Cozy, crinkly, utterly snoozable</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="/search-availability" class="btn btn-accent">
+            <i class="bi bi-calendar2-week me-2"></i>Check Availability
+          </a>
+        </div>
+      </div>
+
+      <!-- Facts card -->
+      <div class="col-lg-5">
+        <div
+          class="p-4 bg-white border border-subtle rounded-4 h-100 d-flex flex-column justify-content-between"
+        >
+          <div>
+            <h4 class="fw-bold">Quick facts</h4>
+            <ul class="small text-secondary mb-4">
+              <li>Location: Quiet alcove near linen closet</li>
+              <li>Basket: Woven shell with removable, washable liner</li>
+              <li>Textures: Soft fleece, layered for optimal burrow depth</li>
+              <li>Noise: Low; occasional soothing dryer hum</li>
+            </ul>
+
+            <h4 class="fw-bold">Amenities</h4>
+            <ul class="small text-secondary">
+              <li>Fresh liner rotation</li>
+              <li>Blanket burrowing permitted & encouraged</li>
+              <li>Tiny toy stash within paw’s reach</li>
+              <li>Water station a few paw-steps away</li>
+            </ul>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <img
+              src="/static/images/milo-avatar.png"
+              class="rounded-circle"
+              alt="Host Milo avatar"
+              width="48"
+              height="48"
+            />
+            <div class="small">
+              <strong>Curated by Milo</strong><br /><span class="text-secondary"
+                >Head of Hospitality</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{define "js"}}
+<script>
+  // Sync thumbnail active state with carousel (Laundry)
+  (function () {
+    const carouselEl = document.getElementById("gallery-laundry");
+    if (!carouselEl) return;
+
+    const thumbs = Array.from(
+      document.querySelectorAll(
+        '[data-bs-target="#gallery-laundry"][data-bs-slide-to]'
+      )
+    );
+    thumbs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        thumbs.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+    });
+
+    // Keep thumbnails in sync when sliding via controls/swipe
+    carouselEl.addEventListener("slid.bs.carousel", (e) => {
+      const index = e.to;
+      thumbs.forEach((b) =>
+        b.classList.toggle(
+          "active",
+          +b.getAttribute("data-bs-slide-to") === index
+        )
+      );
+    });
+  })();
+</script>
+{{ end }}

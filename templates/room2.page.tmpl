@@ -1,11 +1,245 @@
-{{ template "base" .}}
+{{template "base" .}}
 
-{{ define "content"}}
-<div class="container">
-  <div class="row">
-    <div class="col">
-      <h1>This is the Room 2 Page.</h1>
+{{define "content"}}
+<!-- Hero with integrated gallery -->
+<header class="hero hero--room">
+  <div class="container position-relative">
+    <!-- Overlay copy -->
+    <div class="hero-copy text-center text-lg-start">
+      <span class="badge rounded-pill px-3 py-2 mb-2 shadow-soft"
+        >Snooze Spot • Window Perch Theater</span
+      >
+      <h1 class="fw-bold mb-1">Window Perch Theater</h1>
+      <p class="lead mb-0">
+        Front-row Bird TV, warm sill, premium chin-rest. Intermission snacks
+        encouraged.
+      </p>
+    </div>
+
+    <!-- Gallery -->
+    <div
+      id="gallery-window"
+      class="carousel slide carousel-fade rounded-4 overflow-hidden shadow-soft hero-gallery"
+      data-bs-ride="carousel"
+    >
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <img
+            src="/static/images/window-1.jpg"
+            class="d-block w-100"
+            alt="Sunny window perch with a wide sill and soft cushion"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="carousel-item">
+          <img
+            src="/static/images/window-2.jpg"
+            class="d-block w-100"
+            alt="Close-up of the perch cushion with soft textures in warm light"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+        <div class="carousel-item">
+          <img
+            src="/static/images/window-3.jpg"
+            class="d-block w-100"
+            alt="View from the perch looking out to leafy trees and Bird TV"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
+      </div>
+      <button
+        class="carousel-control-prev"
+        type="button"
+        data-bs-target="#gallery-window"
+        data-bs-slide="prev"
+        aria-label="Previous image"
+      >
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      </button>
+      <button
+        class="carousel-control-next"
+        type="button"
+        data-bs-target="#gallery-window"
+        data-bs-slide="next"
+        aria-label="Next image"
+      >
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      </button>
+    </div>
+
+    <!-- Thumbnail band -->
+    <div class="thumbstrip mt-3" aria-label="Gallery thumbnails">
+      <button
+        class="thumb active"
+        type="button"
+        data-bs-target="#gallery-window"
+        data-bs-slide-to="0"
+        aria-label="Show image 1"
+      >
+        <img
+          src="/static/images/window-1-thumb.jpg"
+          alt="Thumbnail: sunny window perch"
+        />
+      </button>
+      <button
+        class="thumb"
+        type="button"
+        data-bs-target="#gallery-window"
+        data-bs-slide-to="1"
+        aria-label="Show image 2"
+      >
+        <img
+          src="/static/images/window-2-thumb.jpg"
+          alt="Thumbnail: perch cushion"
+        />
+      </button>
+      <button
+        class="thumb"
+        type="button"
+        data-bs-target="#gallery-window"
+        data-bs-slide-to="2"
+        aria-label="Show image 3"
+      >
+        <img
+          src="/static/images/window-3-thumb.jpg"
+          alt="Thumbnail: leafy Bird TV view"
+        />
+      </button>
     </div>
   </div>
-</div>
-{{end}}
+</header>
+
+<!-- Details -->
+<section class="py-5">
+  <div class="container">
+    <div class="row g-4 align-items-start">
+      <div class="col-lg-7">
+        <h2 class="fw-bold mb-3">A front-row seat to Bird TV</h2>
+        <p class="text-secondary">
+          For connoisseurs of sun and sparrows, the Window Perch Theater offers
+          a generous sill with a soft cushion, gentle afternoon light, and
+          uninterrupted views of the day’s programming. Perfect for loafs,
+          bleps, and philosophic whisker twitches.
+        </p>
+
+        <ul class="list-unstyled small mb-4">
+          <li class="mb-2">
+            <i class="bi bi-sun me-2 text-primary"></i>Afternoon sunbeams 1–4pm
+            (peak snooze hour)
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-tv me-2 text-primary"></i>Premium Bird TV: sparrows,
+            leaves, occasional squirrel guest stars
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-wind me-2 text-primary"></i>Breeze-approved screen
+            for safe sniffs
+          </li>
+          <li class="mb-2">
+            <i class="bi bi-cloud-moon me-2 text-primary"></i>Night mode:
+            moonlit silhouettes & moth specials
+          </li>
+        </ul>
+
+        <div class="row g-3">
+          <div class="col-sm-6">
+            <div class="p-3 border border-subtle rounded-4 h-100">
+              <div class="small text-secondary">Best for</div>
+              <div class="fw-semibold">Sunseekers & Bird TV fans</div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div class="p-3 border border-subtle rounded-4 h-100">
+              <div class="small text-secondary">Vibe</div>
+              <div class="fw-semibold">Bright, calm, contemplative</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <a href="/search-availability" class="btn btn-accent">
+            <i class="bi bi-calendar2-week me-2"></i>Check Availability
+          </a>
+        </div>
+      </div>
+
+      <!-- Facts card -->
+      <div class="col-lg-5">
+        <div
+          class="p-4 bg-white border border-subtle rounded-4 h-100 d-flex flex-column justify-content-between"
+        >
+          <div>
+            <h4 class="fw-bold">Quick facts</h4>
+            <ul class="small text-secondary mb-4">
+              <li>Location: East-facing window, quiet lane</li>
+              <li>Cushion: dense foam core + soft cover</li>
+              <li>Light: warm, filtered, nap-optimized</li>
+              <li>Noise: low; occasional chirp soundtrack</li>
+            </ul>
+
+            <h4 class="fw-bold">Amenities</h4>
+            <ul class="small text-secondary">
+              <li>Soft blanket & chin-rest edge</li>
+              <li>Window screen for safe breeze sniffing</li>
+              <li>Nearby water & snack station</li>
+              <li>Optional toy mouse intermission</li>
+            </ul>
+          </div>
+
+          <div class="d-flex align-items-center gap-2">
+            <img
+              src="/static/images/milo-avatar.png"
+              class="rounded-circle"
+              alt="Host Milo avatar"
+              width="48"
+              height="48"
+            />
+            <div class="small">
+              <strong>Curated by Milo</strong><br /><span class="text-secondary"
+                >Head of Hospitality</span
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{{ end }}
+
+{{define "js"}}
+<script>
+  // Sync thumbnail active state with carousel
+  (function () {
+    const carouselEl = document.getElementById("gallery-window");
+    if (!carouselEl) return;
+
+    const thumbs = Array.from(
+      document.querySelectorAll(
+        '[data-bs-target="#gallery-window"][data-bs-slide-to]'
+      )
+    );
+    thumbs.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        thumbs.forEach((b) => b.classList.remove("active"));
+        btn.classList.add("active");
+      });
+    });
+
+    // Also update on slide events (e.g., via prev/next controls or swipe)
+    carouselEl.addEventListener("slid.bs.carousel", (e) => {
+      const index = e.to;
+      thumbs.forEach((b) =>
+        b.classList.toggle(
+          "active",
+          +b.getAttribute("data-bs-slide-to") === index
+        )
+      );
+    });
+  })();
+</script>
+{{ end }}
