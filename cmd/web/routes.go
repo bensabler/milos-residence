@@ -28,6 +28,7 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/window-perch-theater", handlers.Repo.WindowPerchTheater)
 	mux.Get("/laundry-basket-nook", handlers.Repo.LaundryBasketNook)
 	mux.Get("/search-availability", handlers.Repo.Availability)
+	mux.Post("/search-availability", handlers.Repo.PostAvailability)
 	mux.Get("/contact", handlers.Repo.Contact)
 
 	mux.Get("/reservation", handlers.Repo.Reservation)

@@ -11,6 +11,7 @@ import (
 
 	"github.com/bensabler/milos-residence/pkg/config"
 	"github.com/bensabler/milos-residence/pkg/models"
+	"github.com/justinas/nosurf"
 )
 
 // app is the package-level reference to AppConfig set by NewTemplates.
@@ -22,22 +23,24 @@ func NewTemplates(a *config.AppConfig) { app = a }
 // AddDefaultData injects default values into every template render (e.g., CSRF tokens,
 // flash messages). To supply a CSRF token from nosurf, consider changing the signature to
 // accept *http.Request and pulling nosurf.Token(r) here.
-func AddDefaultData(td *models.TemplateData) *models.TemplateData {
-	// TODO: Inject CSRF token and flash messages here once available.
+func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateData {
+	td.CSRFToken =  nosurf.Token(r)
 	return td
 }
 
 // RenderTemplate looks up and executes a named template, writing the result to w.
 // When UseCache is false, it rebuilds the template cache on each request (handy in dev).
-func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
 	var (
 		tc  map[string]*template.Template
 		err error
 	)
 
+	// Get the template cache from the app config
 	if app.UseCache {
 		tc = app.TemplateCache
 	} else {
+		// This is used for testing, so that we rebuild the cache on every request
 		if tc, err = CreateTemplateCache(); err != nil {
 			log.Printf("error creating template cache: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -54,7 +57,7 @@ func RenderTemplate(w http.ResponseWriter, tmpl string, td *models.TemplateData)
 	}
 
 	buf := new(bytes.Buffer)
-	td = AddDefaultData(td)
+	td = AddDefaultData(td, r)
 
 	if err = t.Execute(buf, td); err != nil {
 		log.Printf("error executing template %q: %v", tmpl, err)

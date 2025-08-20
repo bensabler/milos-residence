@@ -3,6 +3,7 @@
 package handlers
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/bensabler/milos-residence/pkg/config"
@@ -34,7 +35,7 @@ func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	remoteIP := r.RemoteAddr
 	m.App.Session.Put(r.Context(), "remote_ip", remoteIP)
 
-	render.RenderTemplate(w, "home.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
 }
 
 // About handles GET /about by rendering the about page template.
@@ -46,40 +47,48 @@ func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	remoteIP := m.App.Session.GetString(r.Context(), "remote_ip")
 	stringMap["remote_ip"] = remoteIP
 
-	render.RenderTemplate(w, "about.page.tmpl", &models.TemplateData{StringMap: stringMap})
+	render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{StringMap: stringMap})
 }
 
 // Photos renders the photos page
 func (m *Repository) Photos(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "photos.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "photos.page.tmpl", &models.TemplateData{})
 }
 
 // Reservation renders the make a reservation page and displays form
 func (m *Repository) Reservation(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "reservation.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "reservation.page.tmpl", &models.TemplateData{})
 }
 
-// Room1 renders the room 1 page
+// GoldenHaybeamLoft renders the golden haybeam loft page
 func (m *Repository) GoldenHaybeamLoft(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "golden-haybeam-loft.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "golden-haybeam-loft.page.tmpl", &models.TemplateData{})
 }
 
-// Room2 renders the room 2 page
+// WindowPerchTheater renders the window perch theater page
 func (m *Repository) WindowPerchTheater(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "window-perch-theater.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "window-perch-theater.page.tmpl", &models.TemplateData{})
 }
 
-// Room3 renders the room 3 page
+// LaundryBasketNook renders the laundry basket nook page
 func (m *Repository) LaundryBasketNook(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "laundry-basket-nook.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "laundry-basket-nook.page.tmpl", &models.TemplateData{})
 }
 
 // Availability renders the search-availability page
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "search-availability.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "search-availability.page.tmpl", &models.TemplateData{})
+}
+
+// PostAvailability renders the search-availability page
+func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	start := r.Form.Get("start")
+	end := r.Form.Get("end")
+
+	w.Write([]byte(fmt.Sprintf("start date is %s and end date is %s", start, end)))
 }
 
 // Contact renders the photos page
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	render.RenderTemplate(w, "contact.page.tmpl", &models.TemplateData{})
+	render.RenderTemplate(w, r, "contact.page.tmpl", &models.TemplateData{})
 }
