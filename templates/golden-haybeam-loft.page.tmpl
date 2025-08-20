@@ -108,10 +108,32 @@
       attention.custom({
         msg: html,
         title: "Choose Your Dates",
+
+        willOpen: () => {
+          const modalElem = document.getElementById("modal-reservation-dates");
+          new DateRangePicker(modalElem, {
+            format: "mm-dd-yyyy",
+            showOnFocus: true,
+            orientation: "top auto",
+            container: Swal.getHtmlContainer(),
+          });
+        },
+        
         callback: function (result) {
           console.log("called");
 
-          fetch('/search-availability-json')
+          // get the form and store a reference to it
+          let form = document.getElementById("check-availability-form");
+          // create a FormData object that contains all of the inputs
+          let formData = new FormData(form);
+          // append the CSRF Token
+          formData.append("csrf_token", "{{.CSRFToken}}");
+
+          // create a post action with the form data
+          fetch('/search-availability-json', {
+            method: "POST",
+            body: formData,
+          })
             .then(response => response.json())
             .then(data => {
               console.log(data);

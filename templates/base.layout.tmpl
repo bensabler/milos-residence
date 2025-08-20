@@ -309,14 +309,11 @@
             backdrop: false,
             inputAutoFocus: false,
             showCancelButton: true,
+            
             willOpen: () => {
-              const modalElem = document.getElementById("modal-reservation-dates");
-              new DateRangePicker(modalElem, {
-                format: "mm-dd-yyyy",
-                showOnFocus: true,
-                orientation: "top auto",
-                container: Swal.getHtmlContainer(),
-              });
+              if (c.willOpen !== undefined) {
+                c.willOpen();
+              }
             },
 
             preConfirm: () => {

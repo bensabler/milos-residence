@@ -24,14 +24,14 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/", handlers.Repo.Home)
 	mux.Get("/about", handlers.Repo.About)
 	mux.Get("/photos", handlers.Repo.Photos)
-	
+
 	mux.Get("/golden-haybeam-loft", handlers.Repo.GoldenHaybeamLoft)
 	mux.Get("/window-perch-theater", handlers.Repo.WindowPerchTheater)
 	mux.Get("/laundry-basket-nook", handlers.Repo.LaundryBasketNook)
 
 	mux.Get("/search-availability", handlers.Repo.Availability)
 	mux.Post("/search-availability", handlers.Repo.PostAvailability)
-	mux.Get("/search-availability-json", handlers.Repo.AvailabilityJSON)
+	mux.Post("/search-availability-json", handlers.Repo.AvailabilityJSON)
 
 	mux.Get("/contact", handlers.Repo.Contact)
 
