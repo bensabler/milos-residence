@@ -5,6 +5,7 @@
 
 /* Notie: remove drop shadow */
 .notie-container {
+  z-index: 9999;
   box-shadow: none;
 }
 
