@@ -22,6 +22,6 @@ type TemplateData struct {
 	Warning string
 	// Error is for fatal or error messages.
 	Error string
-	// Form is for checking a form after it's submitted
+	// Form is for checking a form after it's submitted.
 	Form *forms.Form
 }
