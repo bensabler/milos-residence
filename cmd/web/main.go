@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"log"
 	"net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/bensabler/milos-residence/internal/config"
 	"github.com/bensabler/milos-residence/internal/handlers"
+	"github.com/bensabler/milos-residence/internal/models"
 	"github.com/bensabler/milos-residence/internal/render"
 )
 
@@ -27,6 +29,9 @@ var session *scs.SessionManager
 // main is the entry point for the application. It initializes configuration
 // (sessions, template cache, flags), registers handlers, and starts the HTTP server.
 func main() {
+	// what I am going to put in the session
+	gob.Register(models.Reservation{})
+
 	// NOTE: Set to true for production to enable secure cookies and caching.
 	app.InProduction = false
 
