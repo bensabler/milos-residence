@@ -14,8 +14,11 @@ import (
 	"github.com/justinas/nosurf"
 )
 
+var functions = template.FuncMap{}
+
 // app is the package-level reference to AppConfig set by NewTemplates.
 var app *config.AppConfig
+var pathToTemplates = "./templates"
 
 // NewTemplates stores the application config for use by the render package.
 func NewTemplates(a *config.AppConfig) { app = a }
@@ -78,7 +81,7 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	myCache := map[string]*template.Template{}
 
 	// Collect all page templates.
-	pages, err := filepath.Glob("./templates/*.page.tmpl")
+	pages, err := filepath.Glob(fmt.Sprintf("%s/*.page.tmpl", pathToTemplates))
 	if err != nil {
 		return myCache, err
 	}
@@ -87,17 +90,17 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 	for _, page := range pages {
 		name := filepath.Base(page)
 
-		ts, err := template.New(name).ParseFiles(page)
+		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 		if err != nil {
 			return myCache, err
 		}
 
-		matches, err := filepath.Glob("./templates/*.layout.tmpl")
+		matches, err := filepath.Glob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
 		if err != nil {
 			return myCache, err
 		}
 		if len(matches) > 0 {
-			if ts, err = ts.ParseGlob("./templates/*.layout.tmpl"); err != nil {
+			if ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates)); err != nil {
 				return myCache, err
 			}
 		}
