@@ -1,6 +1,8 @@
 // Package models defines data structures shared between layers (e.g., templates).
 package models
 
+import "github.com/bensabler/milos-residence/internal/forms"
+
 // TemplateData carries dynamic values from handlers to templates.
 // Add or remove fields as your templates require.
 type TemplateData struct {
@@ -20,4 +22,6 @@ type TemplateData struct {
 	Warning string
 	// Error is for fatal or error messages.
 	Error string
+	// Form is for checking a form after it's submitted
+	Form *forms.Form
 }

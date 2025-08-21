@@ -9,9 +9,9 @@ import (
 	"time"
 
 	"github.com/alexedwards/scs/v2"
-	"github.com/bensabler/milos-residence/pkg/config"
-	"github.com/bensabler/milos-residence/pkg/handlers"
-	"github.com/bensabler/milos-residence/pkg/render"
+	"github.com/bensabler/milos-residence/internal/config"
+	"github.com/bensabler/milos-residence/internal/handlers"
+	"github.com/bensabler/milos-residence/internal/render"
 )
 
 // portNumber is the TCP address the HTTP server binds to.

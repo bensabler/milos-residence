@@ -9,8 +9,8 @@ import (
 	"net/http"
 	"path/filepath"
 
-	"github.com/bensabler/milos-residence/pkg/config"
-	"github.com/bensabler/milos-residence/pkg/models"
+	"github.com/bensabler/milos-residence/internal/config"
+	"github.com/bensabler/milos-residence/internal/models"
 	"github.com/justinas/nosurf"
 )
 

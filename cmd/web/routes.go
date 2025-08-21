@@ -4,8 +4,8 @@ package main
 import (
 	"net/http"
 
-	"github.com/bensabler/milos-residence/pkg/config"
-	"github.com/bensabler/milos-residence/pkg/handlers"
+	"github.com/bensabler/milos-residence/internal/config"
+	"github.com/bensabler/milos-residence/internal/handlers"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -36,6 +36,7 @@ func routes(app *config.AppConfig) http.Handler {
 	mux.Get("/contact", handlers.Repo.Contact)
 
 	mux.Get("/reservation", handlers.Repo.Reservation)
+	mux.Post("/reservation", handlers.Repo.PostReservation)
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
