@@ -3,6 +3,7 @@ package render
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
 	"log"
@@ -30,13 +31,13 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 	td.Flash = app.Session.PopString(r.Context(), "flash")
 	td.Error = app.Session.PopString(r.Context(), "error")
 	td.Warning = app.Session.PopString(r.Context(), "warning")
-	td.CSRFToken =  nosurf.Token(r)
+	td.CSRFToken = nosurf.Token(r)
 	return td
 }
 
 // RenderTemplate looks up and executes a named template, writing the result to w.
 // When UseCache is false, it rebuilds the template cache on each request (handy in dev).
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) {
+func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	var (
 		tc  map[string]*template.Template
 		err error
@@ -50,7 +51,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 		if tc, err = CreateTemplateCache(); err != nil {
 			log.Printf("error creating template cache: %v", err)
 			http.Error(w, "Internal Server Error", http.StatusInternalServerError)
-			return
+			return err
 		}
 	}
 
@@ -59,7 +60,7 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	if !ok {
 		log.Printf("template %q not found in cache", tmpl)
 		http.Error(w, "Template Not Found", http.StatusInternalServerError)
-		return
+		return errors.New("can't get template from cache")
 	}
 
 	buf := new(bytes.Buffer)
@@ -68,12 +69,14 @@ func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *mod
 	if err = t.Execute(buf, td); err != nil {
 		log.Printf("error executing template %q: %v", tmpl, err)
 		http.Error(w, "Template Execution Error", http.StatusInternalServerError)
-		return
+		return err
 	}
 
 	if _, err = buf.WriteTo(w); err != nil {
 		fmt.Println("error writing template to response:", err)
 	}
+
+	return nil
 }
 
 // CreateTemplateCache parses *.page.tmpl and *.layout.tmpl files into a cache keyed by page name.
