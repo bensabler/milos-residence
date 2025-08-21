@@ -61,7 +61,7 @@ func getRoutes() http.Handler {
 	// Recover from panics with a 500 and stack trace in logs.
 	mux.Use(middleware.Recoverer)
 	// Add CSRF protection and session persistence.
-	mux.Use(NoSurf)
+	// mux.Use(NoSurf)
 	mux.Use(SessionLoad)
 
 	// Routes
@@ -82,7 +82,6 @@ func getRoutes() http.Handler {
 	mux.Get("/make-reservation", Repo.MakeReservation)
 	mux.Post("/make-reservation", Repo.PostReservation)
 	mux.Get("/reservation-summary", Repo.ReservationSummary)
-
 
 	fileServer := http.FileServer(http.Dir("./static/"))
 	mux.Handle("/static/*", http.StripPrefix("/static", fileServer))
