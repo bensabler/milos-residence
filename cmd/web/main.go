@@ -7,11 +7,13 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/bensabler/milos-residence/internal/config"
 	"github.com/bensabler/milos-residence/internal/handlers"
+	"github.com/bensabler/milos-residence/internal/helpers"
 	"github.com/bensabler/milos-residence/internal/models"
 	"github.com/bensabler/milos-residence/internal/render"
 )
@@ -25,6 +27,9 @@ var app config.AppConfig
 
 // session manages user sessions across requests via cookies.
 var session *scs.SessionManager
+
+var infoLog *log.Logger
+var errorLog *log.Logger
 
 // main is the entry point for the application. It initializes configuration
 // (sessions, template cache, flags), registers handlers, and starts the HTTP server.
@@ -54,6 +59,12 @@ func run() error {
 	// NOTE: Set to true for production to enable secure cookies and caching.
 	app.InProduction = false
 
+	infoLog = log.New(os.Stdout, "INFO:\t", log.Ldate|log.Ltime)
+	app.InfoLog = infoLog
+
+	errorLog = log.New(os.Stdout, "ERROR:\t", log.Ldate|log.Ltime|log.Lshortfile)
+	app.ErrorLog = errorLog
+
 	// --- Session configuration
 	session = scs.New()
 	session.Lifetime = 24 * time.Hour
@@ -77,7 +88,7 @@ func run() error {
 	repo := handlers.NewRepo(&app)
 	handlers.NewHandlers(repo)
 	render.NewTemplates(&app)
-
+	helpers.NewHelpers(&app)
 
 	return nil
 }
