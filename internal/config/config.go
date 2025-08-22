@@ -16,7 +16,8 @@ type AppConfig struct {
 	// TemplateCache maps template names to parsed template sets.
 	TemplateCache map[string]*template.Template
 	// InfoLog is an optional logger for informational messages.
-	InfoLog *log.Logger
+	InfoLog  *log.Logger
+	ErrorLog *log.Logger
 	// InProduction enables production-only behaviors (e.g., secure cookies).
 	InProduction bool
 	// Session is the session manager used across requests.
