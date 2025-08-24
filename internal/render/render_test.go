@@ -57,13 +57,13 @@ func TestRenderTemplate(t *testing.T) {
 	ww := httptest.NewRecorder()
 
 	// render a known-good template; expect no error
-	err = RenderTemplate(ww, r, "home.page.tmpl", &models.TemplateData{})
+	err = Template(ww, r, "home.page.tmpl", &models.TemplateData{})
 	if err != nil {
 		t.Error("error writing template to browser")
 	}
 
 	// attempt to render a template that doesn't exist; expect an error
-	err = RenderTemplate(ww, r, "non-existent.page.tmpl", &models.TemplateData{})
+	err = Template(ww, r, "non-existent.page.tmpl", &models.TemplateData{})
 	if err == nil {
 		t.Error("rendered template that does not exist")
 	}
@@ -90,7 +90,7 @@ func getSession() (*http.Request, error) {
 // TestNewTemplates confirms NewTemplates accepts the shared app config without error.
 func TestNewTemplates(t *testing.T) {
 	// call the initializer; it should not panic or fail
-	NewTemplates(app)
+	NewRenderer(app)
 }
 
 // TestCreateTemplateCache verifies that templates on disk parse into a cache successfully.

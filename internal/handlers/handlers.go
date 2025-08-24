@@ -4,12 +4,17 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
+	"time"
 
 	"github.com/bensabler/milos-residence/internal/config"
+	"github.com/bensabler/milos-residence/internal/driver"
 	"github.com/bensabler/milos-residence/internal/forms"
 	"github.com/bensabler/milos-residence/internal/helpers"
 	"github.com/bensabler/milos-residence/internal/models"
 	"github.com/bensabler/milos-residence/internal/render"
+	"github.com/bensabler/milos-residence/internal/repository"
+	"github.com/bensabler/milos-residence/internal/repository/dbrepo"
 )
 
 // Repo is the globally accessible handlers entrypoint used by the router.
@@ -18,14 +23,16 @@ var Repo *Repository
 // Repository holds shared application dependencies for HTTP handlers.
 type Repository struct {
 	App *config.AppConfig
+	DB  repository.DatabaseRepo
 }
 
 // NewRepo builds a Repository that shares the provided application config.
-func NewRepo(a *config.AppConfig) *Repository {
+func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	// return a repository wired to the app config so handlers can access logs,
 	// sessions, template cache, and other cross-cutting services
 	return &Repository{
 		App: a,
+		DB:  dbrepo.NewPostgresRepo(db.SQL, a),
 	}
 }
 
@@ -37,20 +44,21 @@ func NewHandlers(r *Repository) {
 
 // Home handles GET / by rendering the landing page.
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
+	m.DB.AllUsers()
 	// render the home page with default template data (CSRF, flash, etc. added later)
-	render.RenderTemplate(w, r, "home.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "home.page.tmpl", &models.TemplateData{})
 }
 
 // About handles GET /about by rendering the about page.
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	// no dynamic data needed here yet—just render the static template
-	render.RenderTemplate(w, r, "about.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "about.page.tmpl", &models.TemplateData{})
 }
 
 // Photos handles GET /photos by rendering the gallery page.
 func (m *Repository) Photos(w http.ResponseWriter, r *http.Request) {
 	// serve the simple photo gallery page
-	render.RenderTemplate(w, r, "photos.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "photos.page.tmpl", &models.TemplateData{})
 }
 
 // MakeReservation renders the reservation form page for GET /make-reservation.
@@ -68,7 +76,7 @@ func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// render the reservation form for the visitor to complete
-	render.RenderTemplate(w, r, "make-reservation.page.tmpl", td)
+	render.Template(w, r, "make-reservation.page.tmpl", td)
 }
 
 // PostReservation processes a reservation form submission and redirects on success.
@@ -81,12 +89,33 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+
+	layout := "08-24-2025"
+	startDate, err := time.Parse(layout, sd)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+
+	roomID, err := strconv.Atoi(r.Form.Get("room_id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+	}
+
 	// collect the posted fields into a typed Reservation for easier handling
 	reservation := models.Reservation{
 		FirstName: r.Form.Get("first_name"),
 		LastName:  r.Form.Get("last_name"),
 		Email:     r.Form.Get("email"),
 		Phone:     r.Form.Get("phone"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		RoomID:    roomID,
 	}
 
 	// wrap the raw form values in our Form helper to run validations
@@ -106,11 +135,16 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		data["reservation"] = reservation
 
 		// show the form again with helpful messages beside each field
-		render.RenderTemplate(w, r, "reservation.page.tmpl", &models.TemplateData{
+		render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
 			Form: form,
 			Data: data,
 		})
 		return
+	}
+
+	err = m.DB.InsertReservation(reservation)
+	if err != nil {
+		helpers.ServerError(w, err)
 	}
 
 	// on success, save the reservation in session for the summary page to read
@@ -123,25 +157,25 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 // GoldenHaybeamLoft shows the themed “golden haybeam” snooze spot page.
 func (m *Repository) GoldenHaybeamLoft(w http.ResponseWriter, r *http.Request) {
 	// render the dedicated feature page for this snooze spot
-	render.RenderTemplate(w, r, "golden-haybeam-loft.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "golden-haybeam-loft.page.tmpl", &models.TemplateData{})
 }
 
 // WindowPerchTheater shows the themed “window perch theater” snooze spot page.
 func (m *Repository) WindowPerchTheater(w http.ResponseWriter, r *http.Request) {
 	// render the dedicated feature page for this snooze spot
-	render.RenderTemplate(w, r, "window-perch-theater.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "window-perch-theater.page.tmpl", &models.TemplateData{})
 }
 
 // LaundryBasketNook shows the themed “laundry basket nook” snooze spot page.
 func (m *Repository) LaundryBasketNook(w http.ResponseWriter, r *http.Request) {
 	// render the dedicated feature page for this snooze spot
-	render.RenderTemplate(w, r, "laundry-basket-nook.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "laundry-basket-nook.page.tmpl", &models.TemplateData{})
 }
 
 // Availability shows the availability search page (GET /search-availability).
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 	// render a simple form where users can input date ranges for availability
-	render.RenderTemplate(w, r, "search-availability.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "search-availability.page.tmpl", &models.TemplateData{})
 }
 
 // PostAvailability handles the availability form submission and echoes the dates.
@@ -184,7 +218,7 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 // Contact renders the contact page with ways to get in touch.
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 	// show a simple page with contact details or a contact form
-	render.RenderTemplate(w, r, "contact.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "contact.page.tmpl", &models.TemplateData{})
 }
 
 // ReservationSummary displays a confirmation page using the reservation from session.
@@ -207,7 +241,7 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	data["reservation"] = reservation
 
 	// render the summary page with the collected data
-	render.RenderTemplate(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
+	render.Template(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
 }

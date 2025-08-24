@@ -26,8 +26,8 @@ var pathToTemplates = "./templates"
 
 // TODO(config): consider making this path configurable via env/flag for prod.
 
-// NewTemplates stores the application config for use by the render package.
-func NewTemplates(a *config.AppConfig) {
+// NewRenderer stores the application config for use by the render package.
+func NewRenderer(a *config.AppConfig) {
 	// keep a package-level pointer to the shared app configuration
 	app = a
 }
@@ -48,7 +48,7 @@ func AddDefaultData(td *models.TemplateData, r *http.Request) *models.TemplateDa
 
 // RenderTemplate looks up and executes a named template, writing the result to w.
 // When UseCache is false, it rebuilds the template cache per call (handy in dev/tests).
-func RenderTemplate(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
+func Template(w http.ResponseWriter, r *http.Request, tmpl string, td *models.TemplateData) error {
 	// set up local variables used during rendering
 	var (
 		// tc will hold the template cache we decide to use (prebuilt or freshly created)
