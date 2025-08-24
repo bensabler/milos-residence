@@ -74,7 +74,7 @@ func getRoutes() http.Handler {
 	// wire up the repository/handlers and renderer to the shared app config
 	repo := NewRepo(&app)
 	NewHandlers(repo)
-	render.NewTemplates(&app)
+	render.NewRenderer(&app)
 
 	// create the chi router that tests will mount in an httptest server
 	mux := chi.NewRouter()

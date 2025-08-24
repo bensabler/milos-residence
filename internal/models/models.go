@@ -1,10 +1,60 @@
 package models
 
-// Reservation represents the visitor details collected by the reservation form.
+import "time"
+
+// User represents the user model
+type User struct {
+	ID          int
+	FirstName   string
+	LastName    string
+	Email       string
+	Password    string
+	AccessLevel int
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}
+
+// Room represents the room model
+type Room struct {
+	ID        int
+	RoomName  string
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}
+
+// Restrictions represents the restrictions model
+type Restriction struct {
+	ID              int
+	RestrictionName string
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
+// Re3servations represents the reservations model
 type Reservation struct {
-	FirstName string // visitor's given name for messages/confirmations
-	LastName  string // visitor's family name
-	Email     string // contact address for follow-ups
-	Phone     string // optional direct contact number
-	// TODO(data): when you add dates/room selections, extend this struct accordingly.
+	ID        int
+	FirstName string
+	LastName  string
+	Email     string
+	Phone     string
+	StartDate time.Time
+	EndDate   time.Time
+	RoomID    int
+	CreatedAt time.Time
+	UpdatedAt time.Time
+	Room      Room
+}
+
+// RoomRestrictions represents the room restrictions model
+type RoomRestriction struct {
+	ID            int
+	StartDate     time.Time
+	EndDate       time.Time
+	RoomID        int
+	ReservationID int
+	RestrictionID int
+	UpdatedAt     time.Time
+	Room          Room
+	Reservation   Reservation
+	Restriction   Restriction
 }
