@@ -13,13 +13,12 @@ DB        ?= postgres
 DB_HOST   ?= localhost
 DB_PORT   ?= 5432
 DB_USER   ?= app
-DB_PASS   ?=
 DB_NAME   ?= appdb
 DB_SSLMODE?= disable
 MIG       ?= ./migrations
 
 # Compose DSN from parts; quotes handle spaces
-DSN ?= host=$(DB_HOST) port=$(DB_PORT) user=$(DB_USER) password=$(DB_PASS) dbname=$(DB_NAME) sslmode=$(DB_SSLMODE)
+DSN ?= host=$(DB_HOST) port=$(DB_PORT) user=$(DB_USER) dbname=$(DB_NAME) sslmode=$(DB_SSLMODE)
 
 # ---- Helpers ----
 GOOSE = GOOSE_DRIVER=$(DB) GOOSE_DBSTRING="$(DSN)" GOOSE_MIGRATION_DIR=$(MIG) goose
@@ -31,7 +30,7 @@ build:
 	go build $(GOFLAGS) -ldflags "$(LDFLAGS)" -o $(APP) $(MAIN)
 
 run: build
-	./$(APP)
+	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_USER=$(DB_USER) DB_PASSWORD=$(DB_PASSWORD) DB_NAME=$(DB_NAME) DB_SSLMODE=$(DB_SSLMODE) ./$(APP)
 
 br: run
 

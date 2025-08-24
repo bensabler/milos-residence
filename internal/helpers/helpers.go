@@ -30,7 +30,7 @@ func ClientError(w http.ResponseWriter, status int) {
 // ServerError logs the error and stack trace, then returns a 500 response.
 func ServerError(w http.ResponseWriter, err error) {
 	// combine the original error with a snapshot of the current call stack
-	trace := fmt.Sprintf("%s\n%s", err.Error(), debug.Stack())
+	trace := fmt.Errorf("%s\n%s", err.Error(), debug.Stack())
 
 	// record the detailed trace to the centralized error logger for diagnosis
 	app.ErrorLog.Println(trace)

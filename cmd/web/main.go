@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -41,17 +42,23 @@ func buildDSN() string {
 	host := env("DB_HOST", "localhost")
 	port := env("DB_PORT", "5432")
 	user := env("DB_USER", "app")
-	pass := env("DB_PASS", "")
 	name := env("DB_NAME", "appdb")
 	ssl := env("DB_SSLMODE", "disable")
-	extra := os.Getenv("DB_EXTRA") // optional, e.g. "search_path=public"
 
-	base := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
-		host, port, user, pass, name, ssl)
-	if extra != "" {
-		return base + " " + extra
+	parts := []string{
+		"host=" + host,
+		"port=" + port,
+		"user=" + user,
+		"dbname=" + name,
+		"sslmode=" + ssl,
 	}
-	return base
+	if pass := os.Getenv("DB_PASSWORD"); pass != "" {
+		parts = append(parts, "password="+pass)
+	}
+	if extra := os.Getenv("DB_EXTRA"); extra != "" {
+		parts = append(parts, extra)
+	}
+	return strings.Join(parts, " ")
 }
 
 // main is the entry point for the application. It initializes configuration
@@ -117,9 +124,14 @@ func run() (*driver.DB, error) {
 	infoLog.Println("Connecting to database...")
 	dsn := buildDSN()
 	db, err := driver.ConnectSQL(dsn)
+	// after driver.ConnectSQL(dsn)
 	if err != nil {
 		return nil, fmt.Errorf("cannot connect to database: %w", err)
 	}
+	var dbName, dbUser, schema, host string
+	_ = db.SQL.QueryRow(`select current_database(), current_user, current_schema(), inet_server_addr()::text`).Scan(&dbName, &dbUser, &schema, &host)
+	infoLog.Printf("DB target confirmed: db=%s user=%s schema=%s host=%s", dbName, dbUser, schema, host)
+
 	infoLog.Println("Connected to database")
 
 	// --- Template caching
