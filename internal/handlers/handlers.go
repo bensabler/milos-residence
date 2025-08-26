@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 	"time"
@@ -89,9 +88,9 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const layout = "2006-01-02"
-	sd := r.FormValue("start_date")
-	ed := r.FormValue("end_date")
+	const layout = "01/02/2006"
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
 
 	startDate, err := time.Parse(layout, sd)
 	if err != nil {
@@ -202,8 +201,47 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	start := r.Form.Get("start")
 	end := r.Form.Get("end")
 
-	// respond with a simple, human-readable confirmation
-	w.Write([]byte(fmt.Sprintf("start date is %s and end date is %s", start, end)))
+	const layout = "01/02/2006"
+	startDate, err := time.Parse(layout, start)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+	endDate, err := time.Parse(layout, end)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	rooms, err := m.DB.SearchAvailabilityForAllRooms(startDate, endDate)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	if len(rooms) == 0 {
+		// no availability
+		m.App.Session.Put(r.Context(), "error", "No availability")
+		http.Redirect(w, r, "/search-availability", http.StatusSeeOther)
+		return
+	}
+
+	// store the rooms in a data variable that is a map of string interfaces
+	data := make(map[string]interface{})
+	data["rooms"] = rooms
+
+	res := models.Reservation{
+		StartDate: startDate,
+		EndDate:   endDate,
+	}
+
+	// store start date and end date in session
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	// render the choose-room template and pass the room data
+	render.Template(w, r, "choose-room.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
 }
 
 // jsonResponse is the minimal payload we send back to AJAX callers.

@@ -126,11 +126,10 @@ func run() (*driver.DB, error) {
 	db, err := driver.ConnectSQL(dsn)
 	// after driver.ConnectSQL(dsn)
 	if err != nil {
-		return nil, fmt.Errorf("cannot connect to database: %w", err)
+		return nil, fmt.Errorf("cannot connect to database: %s", err)
 	}
 	var dbName, dbUser, schema, host string
 	_ = db.SQL.QueryRow(`select current_database(), current_user, current_schema(), inet_server_addr()::text`).Scan(&dbName, &dbUser, &schema, &host)
-	infoLog.Printf("DB target confirmed: db=%s user=%s schema=%s host=%s", dbName, dbUser, schema, host)
 
 	infoLog.Println("Connected to database")
 
@@ -139,7 +138,7 @@ func run() (*driver.DB, error) {
 	tc, err := render.CreateTemplateCache()
 	// if template parsing fails, log and abort startup
 	if err != nil {
-		return nil, fmt.Errorf("cannot create template cache: %w", err)
+		return nil, fmt.Errorf("cannot create template cache: %s", err)
 	}
 	// store the parsed templates on the app config
 	app.TemplateCache = tc
