@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"testing"
 	"time"
 
 	"github.com/alexedwards/scs/v2"
@@ -31,8 +32,7 @@ var session *scs.SessionManager
 // pathToTemplates points to the templates directory relative to this test package.
 var pathToTemplates = "./../../templates"
 
-// getRoutes constructs a fully wired chi router for use by tests.
-func getRoutes() http.Handler {
+func TestMain(m *testing.M) {
 	// registers Reservation model data into the session
 	gob.Register(models.Reservation{})
 
@@ -75,6 +75,13 @@ func getRoutes() http.Handler {
 	repo := NewTestRepo(&app)
 	NewHandlers(repo)
 	render.NewRenderer(&app)
+
+	os.Exit(m.Run())
+
+}
+
+// getRoutes constructs a fully wired chi router for use by tests.
+func getRoutes() http.Handler {
 
 	// create the chi router that tests will mount in an httptest server
 	mux := chi.NewRouter()

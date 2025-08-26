@@ -5,7 +5,7 @@ export
 # ---- App config ----
 APP       ?= milos-residence
 MAIN      ?= ./cmd/web
-LDFLAGS   ?= -s -w
+LDFLAGS   ?= -s -w 
 GOFLAGS   ?=
 
 # ---- Database config ----
@@ -29,8 +29,8 @@ GOOSE = GOOSE_DRIVER=$(DB) GOOSE_DBSTRING="$(DSN)" GOOSE_MIGRATION_DIR=$(MIG) go
 build:
 	go build $(GOFLAGS) -ldflags "$(LDFLAGS)" -o $(APP) $(MAIN)
 
-run: build
-	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_USER=$(DB_USER) DB_PASSWORD=$(DB_PASSWORD) DB_NAME=$(DB_NAME) DB_SSLMODE=$(DB_SSLMODE) ./$(APP)
+run: build 
+	DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_USER=$(DB_USER) DB_NAME=$(DB_NAME) DB_SSLMODE=$(DB_SSLMODE) ./$(APP)
 
 br: run
 
