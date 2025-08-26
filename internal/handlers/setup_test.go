@@ -72,7 +72,7 @@ func getRoutes() http.Handler {
 
 	// --- Dependency injection for handlers and render package
 	// wire up the repository/handlers and renderer to the shared app config
-	repo := NewRepo(&app)
+	repo := NewTestRepo(&app)
 	NewHandlers(repo)
 	render.NewRenderer(&app)
 

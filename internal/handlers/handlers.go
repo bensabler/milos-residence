@@ -37,6 +37,16 @@ func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	}
 }
 
+// NewTestRepo builds a Repository for testing.
+func NewTestRepo(a *config.AppConfig) *Repository {
+	// return a repository wired to the app config so handlers can access logs,
+	// sessions, template cache, and other cross-cutting services
+	return &Repository{
+		App: a,
+		DB:  dbrepo.NewTestingRepo(a),
+	}
+}
+
 // NewHandlers assigns the global Repo so package callers can reach handlers.
 func NewHandlers(r *Repository) {
 	// stash the repository so route wiring (e.g., handlers.Repo.Home) works
@@ -109,7 +119,7 @@ func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		helpers.ServerError(w, errors.New("cn't get from session"))
+		helpers.ServerError(w, errors.New("can't get from session"))
 		return
 	}
 
