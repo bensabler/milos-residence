@@ -160,70 +160,17 @@
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <!-- Custom JS -->
     {{block "js" .}}
 
     {{ end }}
 
-    <script>
-      function updateQuote() {
-        const inEl = document.getElementById("in");
-        const outEl = document.getElementById("out");
-        const quoteEl = document.getElementById("quote");
+  <script type="module">
+      // Import ES module
+      import { prompty } from "/static/js/app.js";
 
-        // Bail if this page doesn't have the booking inputs
-        if (!inEl || !outEl || !quoteEl) return;
+      const attention = prompty;
 
-        const guests = +(document.getElementById("guests")?.value || 1);
-
-        const inDate = new Date(inEl.value);
-        const outDate = new Date(outEl.value);
-        if (isNaN(inDate) || isNaN(outDate) || outDate <= inDate) {
-          quoteEl.textContent = "—";
-          return;
-        }
-
-        const nights = Math.round((outDate - inDate) / 86400000);
-        const nightly = 149;
-        const cleaning = 40;
-        const extraGuestFee = Math.max(guests - 2, 0) * 15 * nights;
-        const subtotal = nightly * nights + cleaning + extraGuestFee;
-        quoteEl.textContent = `$${subtotal.toLocaleString()}`;
-      }
-      updateQuote(); // harmless on pages without those fields
-
-      function updateRoomQuote(slug, nightly, cleaning, weeklyPct) {
-        const start = document.getElementById("start")?.value;
-        const end = document.getElementById("end")?.value;
-        const guests = +document.getElementById("guests")?.value || 1;
-        const out = document.getElementById("quote-" + slug);
-        if (!start || !end) {
-          out && (out.textContent = "—");
-          return;
-        }
-        const s = new Date(start),
-          e = new Date(end);
-        if (isNaN(s) || isNaN(e) || e <= s) {
-          out && (out.textContent = "—");
-          return;
-        }
-
-        const nights = Math.round((e - s) / 86400000);
-        let subtotal = nightly * nights + cleaning;
-        if (weeklyPct && nights >= 7) {
-          subtotal *= 1 - weeklyPct / 100;
-        }
-        // example: $15 extra per guest beyond 2
-        const extraGuest = Math.max(guests - 2, 0) * 15 * nights;
-        out &&
-          (out.textContent =
-            "$" + Math.round(subtotal + extraGuest).toLocaleString());
-      }
-
-      let attention = Prompt();
       (() => {
-        "use strict";
-
         // Fetch all the forms we want to apply custom Bootstrap validation styles to
         const forms = document.querySelectorAll(".needs-validation");
 
@@ -236,7 +183,6 @@
                 event.preventDefault();
                 event.stopPropagation();
               }
-
               form.classList.add("was-validated");
             },
             false
@@ -244,6 +190,7 @@
         });
       })();
 
+      // `notify` uses Notie; `notifyModal` uses SweetAlert2
       function notify(msg, msgType) {
         notie.alert({
           type: msgType,
@@ -260,6 +207,7 @@
         });
       }
 
+      // Flash messages from Go template
       {{with .Flash}}
       notify("{{.}}", "success")
       {{end}}
@@ -271,95 +219,6 @@
       {{with .Warning}}
       notify("{{.}}", "warning")
       {{end}}
-
-      // Prompt is our JavaScript module for all alerts, notifications, and custom popup dialogs
-      function Prompt() {
-        let toast = function (c) {
-          const { msg = "", icon = "success", position = "top-end" } = c;
-          const Toast = Swal.mixin({
-            toast: true,
-            title: msg,
-            position: position,
-            icon: icon,
-            showConfirmButton: false,
-            timer: 3000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-              toast.onmouseenter = Swal.stopTimer;
-              toast.onmouseleave = Swal.resumeTimer;
-            },
-          });
-          Toast.fire({});
-        };
-
-        let success = function (c) {
-          const { msg = "", title = "", footer = "" } = c;
-          Swal.fire({
-            icon: "success",
-            title: title,
-            text: msg,
-            footer: footer,
-          });
-        };
-
-        let error = function (c) {
-          const { msg = "", title = "", footer = "" } = c;
-          Swal.fire({
-            icon: "error",
-            title: title,
-            text: msg,
-            showConfirmButton: true,
-          });
-        };
-
-        async function custom(c) {
-          const { icon = "", msg = "", title = "", showConfirmButton = true } = c;
-
-          const { value: result } = await Swal.fire({
-            icon: icon,
-            title: title,
-            html: msg,
-            backdrop: false,
-            inputAutoFocus: false,
-            showCancelButton: true,
-            showConfirmButton: showConfirmButton,
-            
-            willOpen: () => {
-              if (c.willOpen !== undefined) {
-                c.willOpen();
-              }
-            },
-
-            preConfirm: () => {
-              return [
-                document.getElementById("start").value,
-                document.getElementById("end").value,
-              ];
-            },
-          });
-
-          if (result) {
-            if (result.dismiss !== Swal.DismissReason.cancel) {
-              if (result.value !== "") {
-                if (c.callback !== undefined) {
-                  c.callback(result);
-                }
-              } else {
-                c.callback(false);
-              }
-            } else {
-              c.callback(false);
-            }
-          }
-        }
-
-        return {
-          toast: toast,
-          success: success,
-          error: error,
-          custom: custom,
-        };
-      }
     </script>
   </body>
 </html>

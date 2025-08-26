@@ -89,11 +89,15 @@
 {{end}}
 
 {{ define "js" }}
-<script>
+<script type="module">
+  import { prompty as attention } from "/static/js/app.js";
+
   // SweetAlert2 Logic
   const alertBtn = document.getElementById("check-availability-button");
   if (alertBtn) {
-    alertBtn.addEventListener("click", function () {
+    alertBtn.addEventListener("click", function (e) {
+      e.preventDefault();
+
       let html = `
       <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
         <div id="modal-reservation-dates" class="row">
@@ -105,6 +109,7 @@
           </div>
         </div>
       </form>`;
+
       attention.custom({
         msg: html,
         title: "Choose Your Dates",
@@ -120,17 +125,14 @@
             container: Swal.getHtmlContainer(),
           });
         },
-        
-        callback: function (result) {
-          console.log("called");
 
+        callback: function (result) {
           // get the form and store a reference to it
           let form = document.getElementById("check-availability-form");
           // create a FormData object that contains all of the inputs
           let formData = new FormData(form);
           // append the CSRF Token
           formData.append("csrf_token", "{{.CSRFToken}}");
-          
           formData.append("room_id", "1");
 
           // create a post action with the form data
@@ -138,29 +140,30 @@
             method: "POST",
             body: formData,
           })
-            .then(response => response.json())
-            .then(data => {
-              if (data.ok) {
-                const href = `/book-room?id=${data.room_id}&s=${data.start_date}&e=${data.end_date}`;
-                const html = `
-                    <p>Room is available!</p>
-                    <p><a href="${href}" class="btn btn-primary">Book now!</a></p>`;
-                attention.custom({
-                  icon: "success",
-                  msg: html,
-                  showConfirmButton: false,
-                })
-              } else {
-                attention.error({
-                  msg: "No availability",
-                })
-              }
-
-            })
+          .then(response => response.json())
+          .then(data => {
+            if (data.ok) {
+              const href = `/book-room?id=${data.room_id}&s=${data.start_date}&e=${data.end_date}`;
+              const html = `
+                <p>Room is available!</p>
+                <p><a href="${href}" class="btn btn-primary">Book now!</a></p>`;
+              attention.custom({
+                icon: "success",
+                msg: html,
+                showConfirmButton: false,
+              });
+            } else {
+              attention.error({
+                msg: "No availability",
+              });
+            }
+          })
+          .catch(() => {
+            attention.error({ title: "Network error", msg: "Please try again." });
+          });
         }
       });
     });
   }
 </script>
-
 {{ end }}
