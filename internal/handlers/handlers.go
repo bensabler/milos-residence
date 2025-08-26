@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -63,16 +64,39 @@ func (m *Repository) Photos(w http.ResponseWriter, r *http.Request) {
 
 // MakeReservation renders the reservation form page for GET /make-reservation.
 func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
-	// start with an empty reservation so the template has fields to bind to
-	var emptyReservation models.Reservation
+	// Get the reservation from the session
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		// Key not found or wrong type
+		helpers.ServerError(w, errors.New("cannot get reservation from session"))
+		return
+	}
+
+	room, err := m.DB.GetRoomByID(res.RoomID)
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	res.Room.RoomName = room.RoomName
+
+	// format start and end date
+	sd := res.StartDate.Format("01/02/2006")
+	ed := res.EndDate.Format("01/02/2006")
+
+	// insert start and end date data into map of strings
+	stringMap := make(map[string]string)
+	stringMap["start_date"] = sd
+	stringMap["end_date"] = ed
+
 	data := make(map[string]interface{})
-	data["reservation"] = emptyReservation
+	data["reservation"] = res
 
 	// attach a fresh form wrapper so the template can show inline errors if present
 	td := &models.TemplateData{
-		Data:  data,
-		Form:  forms.New(nil), // nil is fine here; template mainly reads Form.Errors
-		Flash: "",
+		Data:      data,
+		Form:      forms.New(nil), // nil is fine here; template mainly reads Form.Errors
+		StringMap: stringMap,
 	}
 
 	// render the reservation form for the visitor to complete
