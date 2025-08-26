@@ -213,29 +213,34 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// query db for all available rooms and store output in a slice of type model-Room
 	rooms, err := m.DB.SearchAvailabilityForAllRooms(startDate, endDate)
 	if err != nil {
 		helpers.ServerError(w, err)
 		return
 	}
 
+	// if slice of rooms is empty
 	if len(rooms) == 0 {
 		// no availability
+		// add error to context and redirect to /search-availability
 		m.App.Session.Put(r.Context(), "error", "No availability")
 		http.Redirect(w, r, "/search-availability", http.StatusSeeOther)
 		return
 	}
 
 	// store the rooms in a data variable that is a map of string interfaces
+	// assign key rooms to variable that holds the slice of available rooms
 	data := make(map[string]interface{})
 	data["rooms"] = rooms
 
+	// read the start and end date values from the form data into a Reservation model and stored in res
 	res := models.Reservation{
 		StartDate: startDate,
 		EndDate:   endDate,
 	}
 
-	// store start date and end date in session
+	// putting the start and end date data from the posted form in the session
 	m.App.Session.Put(r.Context(), "reservation", res)
 
 	// render the choose-room template and pass the room data
