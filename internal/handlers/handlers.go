@@ -14,6 +14,7 @@ import (
 	"github.com/bensabler/milos-residence/internal/render"
 	"github.com/bensabler/milos-residence/internal/repository"
 	"github.com/bensabler/milos-residence/internal/repository/dbrepo"
+	"github.com/go-chi/chi/v5"
 )
 
 // Repo is the globally accessible handlers entrypoint used by the router.
@@ -305,4 +306,32 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	render.Template(w, r, "reservation-summary.page.tmpl", &models.TemplateData{
 		Data: data,
 	})
+}
+
+func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
+	// convert and store roomID
+	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	// Get the reservation from the session
+	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
+	if !ok {
+		// Key not found or wrong type
+		m.App.Session.Put(r.Context(), "error", "Reservation data not found in session")
+		http.Redirect(w, r, "/", http.StatusSeeOther)
+		return
+	}
+
+	// set the RoomID from the selected link
+	res.RoomID = roomID
+
+	// put the updated reservation back into the session
+	m.App.Session.Put(r.Context(), "reservation", res)
+
+	// redirect to the reservation page
+	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
+
 }
