@@ -257,16 +257,35 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 
 // jsonResponse is the minimal payload we send back to AJAX callers.
 type jsonResponse struct {
-	OK      bool   `json:"ok"`      // true when the check passes (e.g., dates are available)
-	Message string `json:"message"` // short, human-readable status for UI display
+	OK        bool   `json:"ok"`      // true when the check passes (e.g., dates are available)
+	Message   string `json:"message"` // short, human-readable status for UI display
+	RoomID    string `json:"room_id"`
+	StartDate string `json:"start_date"`
+	EndDate   string `json:"end_date"`
 }
 
 // AvailabilityJSON returns a small JSON payload indicating availability status.
 func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
-	// define the payload we want to send back to the client
+	sd := r.Form.Get("start")
+	ed := r.Form.Get("end")
+
+	layout := "01/02/2006"
+	startDate, _ := time.Parse(layout, sd)
+	endDate, _ := time.Parse(layout, ed)
+
+	roomID, _ := strconv.Atoi(r.Form.Get("room_id"))
+
+	available, err := m.DB.SearchAvailabilityByDatesByRoomID(startDate, endDate, roomID)
 	resp := jsonResponse{
-		OK:      true,
-		Message: "Available!",
+		OK:        available,
+		Message:   "",
+		StartDate: sd,
+		EndDate:   ed,
+		RoomID:    strconv.Itoa(roomID),
+	}
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
 	}
 
 	// marshal the response with indentation for readability

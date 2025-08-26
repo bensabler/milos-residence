@@ -108,12 +108,14 @@
       attention.custom({
         msg: html,
         title: "Choose Your Dates",
+        showConfirmButton: true,
 
         willOpen: () => {
           const modalElem = document.getElementById("modal-reservation-dates");
           new DateRangePicker(modalElem, {
-            format: "mm-dd-yyyy",
+            format: "mm/dd/yyyy",
             showOnFocus: true,
+            minDate: new Date(),
             orientation: "top auto",
             container: Swal.getHtmlContainer(),
           });
@@ -128,6 +130,8 @@
           let formData = new FormData(form);
           // append the CSRF Token
           formData.append("csrf_token", "{{.CSRFToken}}");
+          
+          formData.append("room_id", "1");
 
           // create a post action with the form data
           fetch('/search-availability-json', {
@@ -136,9 +140,22 @@
           })
             .then(response => response.json())
             .then(data => {
-              console.log(data);
-              console.log(data.ok);
-              console.log(data.message);
+              if (data.ok) {
+                const href = `/book-room?id=${data.room_id}&s=${data.start_date}&e=${data.end_date}`;
+                const html = `
+                    <p>Room is available!</p>
+                    <p><a href="${href}" class="btn btn-primary">Book now!</a></p>`;
+                attention.custom({
+                  icon: "success",
+                  msg: html,
+                  showConfirmButton: false,
+                })
+              } else {
+                attention.error({
+                  msg: "No availability",
+                })
+              }
+
             })
         }
       });
