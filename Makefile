@@ -18,7 +18,7 @@ DB_SSLMODE?= disable
 MIG       ?= ./migrations
 
 # Compose DSN from parts; quotes handle spaces
-DSN ?= host=$(DB_HOST) port=$(DB_PORT) user=$(DB_USER) dbname=$(DB_NAME) sslmode=$(DB_SSLMODE)
+DSN ?= host=$(DB_HOST) port=$(DB_PORT) user=$(DB_USER) password=$(DB_PASSWORD) dbname=$(DB_NAME) sslmode=$(DB_SSLMODE)
 
 # ---- Helpers ----
 GOOSE = GOOSE_DRIVER=$(DB) GOOSE_DBSTRING="$(DSN)" GOOSE_MIGRATION_DIR=$(MIG) goose

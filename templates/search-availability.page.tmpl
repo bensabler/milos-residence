@@ -56,7 +56,8 @@
       const elem = document.getElementById("reservation-dates");
       if (elem && window.DateRangePicker) {
         new DateRangePicker(elem, {
-          // ...options
+          format: "mm/dd/yyyy",
+          minDate: new Date(),
         });
       }
   </script>
