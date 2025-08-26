@@ -211,13 +211,13 @@
 </section>
 {{ end }}
 
-{{define "js"}}
+{{ define "js" }}
 <script>
-      // SweetAlert2 Logic
-      const alertBtn = document.getElementById("check-availability-button");
-      if (alertBtn) {
-        alertBtn.addEventListener("click", function () {
-          let html = `
+  // SweetAlert2 Logic
+  const alertBtn = document.getElementById("check-availability-button");
+  if (alertBtn) {
+    alertBtn.addEventListener("click", function () {
+      let html = `
       <form id="check-availability-form" action="" method="POST" novalidate class="needs-validation">
         <div id="modal-reservation-dates" class="row">
           <div class="col">
@@ -228,37 +228,62 @@
           </div>
         </div>
       </form>`;
-          attention.custom({ msg: html, title: "Choose Your Dates" });
-        });
-      }
+      attention.custom({
+        msg: html,
+        title: "Choose Your Dates",
+        showConfirmButton: true,
 
-  // Sync thumbnail active state with carousel
-  (function () {
-    const carouselEl = document.getElementById("gallery-window");
-    if (!carouselEl) return;
+        willOpen: () => {
+          const modalElem = document.getElementById("modal-reservation-dates");
+          new DateRangePicker(modalElem, {
+            format: "mm/dd/yyyy",
+            showOnFocus: true,
+            minDate: new Date(),
+            orientation: "top auto",
+            container: Swal.getHtmlContainer(),
+          });
+        },
+        
+        callback: function (result) {
+          console.log("called");
 
-    const thumbs = Array.from(
-      document.querySelectorAll(
-        '[data-bs-target="#gallery-window"][data-bs-slide-to]'
-      )
-    );
-    thumbs.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        thumbs.forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
+          // get the form and store a reference to it
+          let form = document.getElementById("check-availability-form");
+          // create a FormData object that contains all of the inputs
+          let formData = new FormData(form);
+          // append the CSRF Token
+          formData.append("csrf_token", "{{.CSRFToken}}");
+          
+          formData.append("room_id", "2");
+
+          // create a post action with the form data
+          fetch('/search-availability-json', {
+            method: "POST",
+            body: formData,
+          })
+            .then(response => response.json())
+            .then(data => {
+              if (data.ok) {
+                const href = `/book-room?id=${data.room_id}&s=${data.start_date}&e=${data.end_date}`;
+                const html = `
+                    <p>Room is available!</p>
+                    <p><a href="${href}" class="btn btn-primary">Book now!</a></p>`;
+                attention.custom({
+                  icon: "success",
+                  msg: html,
+                  showConfirmButton: false,
+                })
+              } else {
+                attention.error({
+                  msg: "No availability",
+                })
+              }
+
+            })
+        }
       });
     });
-
-    // Also update on slide events (e.g., via prev/next controls or swipe)
-    carouselEl.addEventListener("slid.bs.carousel", (e) => {
-      const index = e.to;
-      thumbs.forEach((b) =>
-        b.classList.toggle(
-          "active",
-          +b.getAttribute("data-bs-slide-to") === index
-        )
-      );
-    });
-  })();
+  }
 </script>
+
 {{ end }}
