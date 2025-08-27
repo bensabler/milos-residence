@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"errors"
 	"net/http"
 	"strconv"
 	"time"
@@ -227,8 +226,11 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	// This demonstrates how multi-step forms maintain state across requests
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		// Session state is corrupted - use centralized error handling
-		helpers.ServerError(w, errors.New("can't get from session"))
+		// Session data is missing or corrupted - implement graceful error handling
+		// Store error message in session for display on redirect target page
+		m.App.Session.Put(r.Context(), "error", "can't parse form!")
+		// Redirect to home page rather than showing a broken form
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -280,8 +282,11 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	// The repository abstracts away database implementation details
 	newReservationID, err := m.DB.InsertReservation(reservation)
 	if err != nil {
-		// Database error during reservation creation
-		helpers.ServerError(w, err)
+		// Session data is missing or corrupted - implement graceful error handling
+		// Store error message in session for display on redirect target page
+		m.App.Session.Put(r.Context(), "error", "can't insert reservation into database!")
+		// Redirect to home page rather than showing a broken form
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -298,10 +303,10 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	// Persist the room restriction to prevent double-bookings
 	err = m.DB.InsertRoomRestriction(restriction)
 	if err != nil {
-		// Database error during restriction creation
-		// Note: This could leave the system in an inconsistent state
-		// Production systems might use database transactions here
-		helpers.ServerError(w, err)
+		// Session data is missing or corrupted - implement graceful error handling
+		// Store error message in session for display on redirect target page
+		// Redirect to home page rather than showing a broken form
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
