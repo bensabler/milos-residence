@@ -52,6 +52,7 @@ func (m *testDBRepo) AllUsers() bool {
 //
 // Returns: Always returns ID 1 to simulate successful reservation creation for testing
 func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
+
 	// Return fixed ID to simulate successful reservation creation
 	// The specific ID value (1) is chosen for predictability and can be used
 	// consistently in test assertions to verify that calling code properly handles
@@ -62,6 +63,11 @@ func (m *testDBRepo) InsertReservation(res models.Reservation) (int, error) {
 	// - Return different IDs based on reservation characteristics
 	// - Simulate various error conditions based on test configuration
 	// - Validate reservation data consistency during test execution
+
+	// if the room id is 2, then fail;otherwise, pass
+	if res.RoomID == 2 {
+		return 0, errors.New("some error")
+	}
 	return 1, nil
 }
 
@@ -90,6 +96,10 @@ func (m *testDBRepo) InsertRoomRestriction(r models.RoomRestriction) error {
 	// This no-op implementation enables testing of business workflows that depend
 	// on room restriction creation without requiring actual database operations
 	// or complex test data management procedures.
+
+	if r.RoomID == 1000 {
+		return errors.New("some error")
+	}
 	return nil
 }
 

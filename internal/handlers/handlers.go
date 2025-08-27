@@ -269,6 +269,8 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		data := make(map[string]interface{})
 		data["reservation"] = reservation
 
+		http.Error(w, "my own error message", http.StatusSeeOther)
+
 		// Re-render the form template with validation errors displayed
 		// The form object contains both the submitted values and error messages
 		render.Template(w, r, "make-reservation.page.tmpl", &models.TemplateData{
@@ -549,7 +551,7 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	if !ok {
 		// Reservation data is missing - user may have accessed page directly
 		// Log the error for debugging while providing user-friendly feedback
-		m.App.ErrorLog.Println("Can't get error from session")
+		m.App.ErrorLog.Println("Can't get reservation from session")
 
 		// Use Flash Message pattern to inform user of the problem
 		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
