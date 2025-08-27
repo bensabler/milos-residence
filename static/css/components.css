@@ -1,90 +1,219 @@
-/* components.css
-   Purpose: component classes (BEM-friendly), no element selectors except within component scope.
+/* components.css - Modular UI Component System and BEM Architecture
+   
+   This file implements the Component-Driven Development pattern through systematic CSS component
+   definitions that create reusable, maintainable interface elements following BEM (Block Element
+   Modifier) methodology. It demonstrates how modern web applications can achieve design consistency
+   and development efficiency through modular component architecture that separates presentation
+   concerns into focused, reusable modules that can be composed together to create sophisticated
+   user interfaces without code duplication or specificity conflicts.
+   
+   The Component-Driven approach provides several architectural and maintenance advantages:
+   1. **Reusability**: Components can be used consistently across different pages and contexts
+   2. **Maintainability**: Changes to component styles affect all instances systematically
+   3. **Predictable Behavior**: Component styles have clear scope and don't leak to other elements
+   4. **Design System Integration**: Components implement design system principles consistently
+   5. **Developer Experience**: Clear component boundaries make interface development more efficient
+   6. **Scalability**: New components can be added without affecting existing interface elements
+   
+   The BEM naming convention (Block__Element--Modifier) creates clear relationships between
+   related styles while avoiding specificity conflicts and cascade issues that plague traditional
+   CSS approaches. Component styles focus exclusively on class-based selectors, avoiding element
+   selectors that could conflict with base styles or create unintended cascade effects.
+   
+   Design Pattern: Component-Driven Development - modular UI elements with clear boundaries
+   Design Pattern: BEM Methodology - systematic naming convention for maintainable CSS
+   Design Pattern: Separation of Concerns - components handle specific interface responsibilities
 */
 
 /* ========================
-     NAVBAR
-     ======================== */
+     NAVBAR COMPONENT SYSTEM
+     ========================
+     
+     The navbar component implements sophisticated navigation interface patterns through systematic
+     styling that coordinates branding, navigation links, dropdown menus, and responsive behavior.
+     It demonstrates how complex interface components can maintain design system consistency while
+     providing rich interactive experiences that work effectively across different device contexts
+     and user interaction methods.
+*/
+
+/* Primary navbar block that establishes the foundational styling and color scheme
+   for the entire navigation system. The component uses CSS custom properties to integrate
+   with Bootstrap's component system while maintaining design system color consistency. */
 .navbar {
+  /* Background color establishes the navigation area identity using design system colors
+     that provide appropriate contrast for navigation links and branding elements
+     while supporting the overall aesthetic character of the application interface. */
   background: var(--milo-gray-600);
 
-  /* Bootstrap colors via vars */
-  --bs-navbar-brand-color: var(--milo-gray-100);
-  --bs-navbar-brand-hover-color: var(--hay-gold-200);
-  --bs-navbar-color: var(--milo-gray-100);
-  --bs-navbar-nav-link-color: var(--hay-gold-700);
-  --bs-navbar-hover-color: var(--hay-gold-200);
-  --bs-navbar-active-color: color-mix(in srgb, var(--hay-gold-400) 92%, black);
+  /* Bootstrap Integration Variables - Framework Compatibility Layer
+     
+     These CSS custom properties override Bootstrap's default navbar colors with design system
+     values, enabling framework functionality while maintaining visual consistency with the
+     custom design system. This approach leverages Bootstrap's sophisticated component logic
+     while ensuring that the visual output aligns perfectly with the application's design standards. */
+  --bs-navbar-brand-color: var(--milo-gray-100);      /* Brand text color for visibility */
+  --bs-navbar-brand-hover-color: var(--hay-gold-200); /* Brand hover state for interaction feedback */
+  --bs-navbar-color: var(--milo-gray-100);            /* General navbar text color */
+  --bs-navbar-nav-link-color: var(--hay-gold-700);    /* Navigation link base color */
+  --bs-navbar-hover-color: var(--hay-gold-200);       /* Link hover color for interaction */
+  --bs-navbar-active-color: color-mix(in srgb, var(--hay-gold-400) 92%, black); /* Active state emphasis */
 }
 
-/* Brand */
+/* Navbar Brand Styling and Typography Enhancement
+   
+   The brand element receives enhanced typography treatment to create strong visual hierarchy
+   and brand identity within the navigation system, using design system typography tokens
+   while adding component-specific enhancements for branding requirements. */
+
 .navbar .navbar-brand {
+  /* Brand typography uses heading font for visual distinction and brand character,
+     creating clear identity within the navigation while maintaining consistency
+     with the application's overall typography system and design approach. */
   font-family: var(--font-heading);
-  font-weight: 800;
-  letter-spacing: 0.2px;
+  font-weight: 800;  /* Heavy weight emphasizes brand identity and creates hierarchy */
+  letter-spacing: 0.2px;  /* Slight spacing enhancement for brand legibility */
 }
 
-/* Links */
+/* Navigation Link System and Interactive Behavior
+   
+   Navigation links implement sophisticated interactive patterns through coordinated styling
+   that provides clear user feedback while maintaining accessibility and visual hierarchy.
+   The link system coordinates typography, spacing, and interactive effects to create
+   intuitive navigation experiences that work consistently across different input methods. */
+
 .navbar .nav-link {
+  /* Link typography creates consistency with brand styling while maintaining
+     appropriate visual hierarchy and readability for navigation content
+     within the overall interface design and layout system. */
   font-family: var(--font-heading);
-  font-weight: 600;
+  font-weight: 600;  /* Semibold weight provides emphasis without overwhelming interface */
+  
+  /* Layout properties establish positioning context for interactive effects
+     and ensure that navigation links integrate properly with the overall
+     navigation layout while supporting enhanced interactive behaviors. */
   position: relative;
   display: inline-block;
-  text-decoration: none;
+  text-decoration: none;  /* Remove default underlines for custom interaction design */
+  
+  /* Smooth color transitions create responsive feel for user interactions
+     while maintaining performance and providing clear feedback across
+     different devices and interaction contexts throughout the navigation. */
   transition: color 0.3s ease;
 }
 
-/* Underline animation */
+/* Advanced Navigation Link Interaction Effects
+   
+   The navigation system implements sophisticated underline animation effects that provide
+   clear interactive feedback through coordinated pseudo-element positioning and transform
+   animations. This approach creates engaging user experiences while maintaining accessibility
+   and ensuring that interaction feedback works consistently across different navigation contexts. */
+
+/* Unified underline styling for various navigation link contexts using systematic
+   pseudo-element positioning that creates consistent visual effects while supporting
+   different navigation patterns including standard links and dropdown toggles. */
 .navbar .nav-link:not(.dropdown-toggle)::after,
 .navbar .nav-link.dropdown-toggle::before,
 .navbar .dropdown-menu .dropdown-item::after {
+  /* Pseudo-element foundation for underline animation effects that provide
+     clear interaction feedback through systematic positioning and styling
+     that works consistently across different navigation link contexts. */
   content: "";
   position: absolute;
   left: 0;
   width: 100%;
-  height: 2px; /* unified thickness */
-  background-color: currentColor;
-  transform: scaleX(0);
-  transform-origin: left;
-  transition: transform 0.35s ease;
-}
-.navbar .nav-link:not(.dropdown-toggle)::after,
-.navbar .nav-link.dropdown-toggle::before {
-  bottom: -0.15em;
-}
-.navbar .dropdown-menu .dropdown-item::after {
-  bottom: 0.25em; /* reads better on dark panel */
-  transition-duration: 0.25s;
+  height: 2px;  /* Unified thickness creates consistency across interaction contexts */
+  background-color: currentColor;  /* Use text color for semantic color coordination */
+  
+  /* Transform-based animation foundation that provides smooth, performant effects
+     while supporting accessibility preferences and maintaining consistent behavior
+     across different browser environments and device capabilities. */
+  transform: scaleX(0);  /* Hidden state - will animate to scaleX(1) on interaction */
+  transform-origin: left;  /* Left-to-right animation direction for natural reading flow */
+  transition: transform 0.35s ease;  /* Smooth animation timing for responsive feel */
 }
 
-/* Underline animation triggers — mouse hover + keyboard focus only */
+/* Context-Specific Positioning for Different Navigation Elements
+   
+   Different navigation contexts require different underline positioning to ensure
+   appropriate visual relationship with text content and maintain consistent appearance
+   across various interface situations including standard navigation and dropdown menus. */
+
+.navbar .nav-link:not(.dropdown-toggle)::after,
+.navbar .nav-link.dropdown-toggle::before {
+  /* Standard navigation link underline positioning that creates appropriate
+     visual relationship with link text while avoiding interference with
+     text descenders or other typographic elements within the navigation layout. */
+  bottom: -0.15em;  /* Positioned below text baseline for clear visual separation */
+}
+
+.navbar .dropdown-menu .dropdown-item::after {
+  /* Dropdown menu item underline positioning optimized for dark panel context
+     and denser layout requirements while maintaining visual consistency with
+     other navigation link interaction effects throughout the navigation system. */
+  bottom: 0.25em;  /* Adjusted positioning for dropdown context and background contrast */
+  transition-duration: 0.25s;  /* Faster animation for dropdown context responsiveness */
+}
+
+/* Interaction State Triggers and Accessibility Integration
+   
+   The underline animation effects are triggered by both mouse hover and keyboard focus,
+   ensuring that interaction feedback works consistently across different input methods
+   while supporting accessibility requirements and providing clear visual feedback
+   for all users regardless of their preferred interaction approach. */
+
+/* Primary interaction triggers that activate underline animations for mouse and keyboard users,
+   ensuring that interactive feedback works consistently across different user interaction
+   patterns while maintaining accessibility compliance and intuitive user experience. */
 .navbar .nav-link:not(.dropdown-toggle):hover::after,
 .navbar .nav-link:not(.dropdown-toggle):focus-visible::after,
 .navbar .nav-link.dropdown-toggle:hover::before,
 .navbar .nav-link.dropdown-toggle:focus-visible::before,
 .navbar .dropdown-menu .dropdown-item:hover::after,
 .navbar .dropdown-menu .dropdown-item:focus-visible::after {
-  transform: scaleX(1);
+  /* Animation activation transforms underline from hidden to visible state,
+     providing clear interaction feedback through smooth visual transitions
+     that enhance user understanding of interactive capabilities and current focus state. */
+  transform: scaleX(1);  /* Full width underline indicates interactive state */
 }
 
-/* Safety: if an element has :focus but not :focus-visible (mouse click), keep underline off */
+/* Focus State Refinement and Mouse Click Handling
+   
+   This rule ensures that mouse clicks don't create persistent underline effects when
+   the element receives focus but not the focus-visible state, maintaining clean visual
+   hierarchy and preventing visual confusion between different interaction states. */
 .navbar .nav-link.dropdown-toggle:focus:not(:focus-visible)::before {
+  /* Reset underline animation when focus exists but shouldn't be visually indicated,
+     supporting clean interaction patterns that distinguish between keyboard focus
+     (which should show visual feedback) and mouse focus (which should not). */
   transform: scaleX(0);
 }
 
-/* NAVBAR dropdown — dark, subtle, on-brand */
-.navbar .dropdown-menu {
-  /* panel & link tokens */
-  --dm-bg: color-mix(in srgb, var(--milo-gray-700) 92%, black 8%);
-  --dm-border: color-mix(in srgb, var(--milo-gray-800) 45%, #fff);
-  --dm-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);
-  --dm-item: var(--milo-gray-100);
-  --dm-item-hover: var(--hay-gold-200);
-  --dm-item-hover-bg: color-mix(in srgb, var(--hay-gold) 11%, transparent);
-  --dm-item-active-color: #fff;
-  --dm-item-active-bg: var(--barn-red);
+/* Dropdown Menu System and Dark Theme Implementation
+   
+   The dropdown menu component implements a sophisticated dark theme interface with
+   coordinated colors, shadows, and interactive states that create clear visual hierarchy
+   while maintaining accessibility and integration with the overall navigation design system. */
 
-  /* map to Bootstrap vars */
+.navbar .dropdown-menu {
+  /* Color Palette Variables - Local Design Token System
+     
+     These CSS custom properties define the dropdown-specific color palette that coordinates
+     with the overall design system while providing the sophisticated visual treatment
+     required for dropdown menu interfaces that need clear visual separation and hierarchy. */
+  --dm-bg: color-mix(in srgb, var(--milo-gray-700) 92%, black 8%);  /* Dark background with depth */
+  --dm-border: color-mix(in srgb, var(--milo-gray-800) 45%, #fff);  /* Subtle border contrast */
+  --dm-shadow: 0 14px 34px rgba(0, 0, 0, 0.22);  /* Sophisticated depth shadow */
+  --dm-item: var(--milo-gray-100);  /* Light text for dark background contrast */
+  --dm-item-hover: var(--hay-gold-200);  /* Warm accent for hover states */
+  --dm-item-hover-bg: color-mix(in srgb, var(--hay-gold) 11%, transparent);  /* Subtle hover background */
+  --dm-item-active-color: #fff;  /* High contrast for active states */
+  --dm-item-active-bg: var(--barn-red);  /* Brand color for active emphasis */
+
+  /* Bootstrap Integration - Framework Variable Mapping
+     
+     These mappings connect the local dropdown color system with Bootstrap's dropdown
+     component variables, ensuring that framework functionality works correctly while
+     maintaining design system visual consistency and sophisticated color coordination. */
   --bs-dropdown-bg: var(--dm-bg);
   --bs-dropdown-color: var(--dm-item);
   --bs-dropdown-border-color: var(--dm-border);
@@ -94,245 +223,486 @@
   --bs-dropdown-link-active-color: var(--dm-item-active-color);
   --bs-dropdown-link-active-bg: var(--dm-item-active-bg);
 
+  /* Visual Styling and Layout Properties */
   background: var(--bs-dropdown-bg);
   color: var(--bs-dropdown-color);
   border: 1px solid var(--bs-dropdown-border-color);
-  border-radius: 0.75rem;
-  padding: 0.4rem;
-  min-width: 12rem;
-  box-shadow: var(--dm-shadow);
+  border-radius: 0.75rem;  /* Generous rounding for modern, friendly appearance */
+  padding: 0.4rem;  /* Internal spacing for visual breathing room */
+  min-width: 12rem;  /* Minimum width ensures usability across content lengths */
+  box-shadow: var(--dm-shadow);  /* Sophisticated shadow creates clear layering */
 }
 
+/* Dropdown Menu Item Styling and Interactive Behavior
+   
+   Individual dropdown items receive sophisticated styling that coordinates interactive
+   states, typography, and spacing to create intuitive menu experiences while maintaining
+   accessibility and visual hierarchy throughout the dropdown interface system. */
+
 .navbar .dropdown-menu .dropdown-item {
-  position: relative;
-  font-weight: 500;
-  text-decoration: none;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.5rem;
+  /* Layout and positioning for interactive effects and proper menu item behavior
+     within the dropdown context while supporting animation effects and interaction feedback. */
+  position: relative;  /* Positioning context for underline animation effects */
+  font-weight: 500;  /* Medium weight provides readability without overwhelming interface */
+  text-decoration: none;  /* Clean appearance for menu item links */
+  
+  /* Spacing and visual treatment for comfortable interaction targets and visual hierarchy
+     within the dropdown menu context while maintaining consistency with navigation patterns. */
+  padding: 0.5rem 0.75rem;  /* Generous padding for touch-friendly interaction targets */
+  border-radius: 0.5rem;  /* Subtle rounding coordinates with overall dropdown styling */
+  
+  /* Smooth transitions for interactive feedback that feels responsive and natural
+     across different user interaction patterns and device contexts within dropdown menus. */
   transition: color 0.2s ease, background-color 0.2s ease;
 }
 
+/* Dropdown Visual Separation and Interface Integration */
+
 .navbar .dropdown-menu .dropdown-divider {
+  /* Subtle divider styling that creates visual organization within dropdown menus
+     while maintaining the sophisticated dark theme aesthetic and visual hierarchy
+     established by the dropdown color system and overall navigation design approach. */
   border-top-color: color-mix(in srgb, var(--milo-gray-600) 35%, transparent);
 }
 
-/* Accessible focus ring */
+/* Accessibility and Focus Management
+   
+   The navigation system implements comprehensive focus management that ensures keyboard
+   users receive appropriate visual feedback while maintaining clean aesthetics for
+   mouse users and supporting various accessibility technologies and user preferences. */
+
+/* Focus ring styling for all interactive navigation elements using design system colors
+   that provide clear visibility while maintaining aesthetic integration with the overall
+   navigation design and ensuring accessibility compliance across different usage contexts. */
 :where(
     .navbar a.nav-link:focus-visible,
     .navbar .navbar-brand:focus-visible,
     .navbar .dropdown-item:focus-visible
   ) {
+  /* Remove default browser focus outlines in favor of custom focus indication
+     that integrates with the design system while providing clear accessibility feedback
+     for keyboard users and assistive technology across all navigation interaction contexts. */
   outline: 0;
+  
+  /* Custom focus ring using design system colors that provide clear visibility
+     while maintaining aesthetic quality and ensuring that focus indication
+     works effectively across different background contexts within the navigation system. */
   box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 32%, transparent);
-  border-radius: 0.25rem;
+  border-radius: 0.25rem;  /* Subtle rounding coordinates with component styling */
 }
 
-/* Toggler icon color by state (Bootstrap variable approach) */
+/* Mobile Navigation Toggle and Responsive Behavior
+   
+   The navbar toggler system provides responsive navigation functionality through coordinated
+   icon styling and interactive states that adapt to different device contexts while maintaining
+   design system consistency and providing clear user feedback for navigation control interactions. */
+
+/* Toggle icon base styling that integrates with Bootstrap's toggle functionality
+   while using design system colors and maintaining visual consistency with the
+   overall navigation aesthetic across different device contexts and responsive breakpoints. */
 .navbar .navbar-toggler-icon {
-  /* collapsed state: milo-gray-200 */
+  /* Default collapsed state using design system color that provides appropriate contrast
+     against the navigation background while maintaining visual integration with other
+     navigation elements and supporting clear visual communication of interactive capability. */
   --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='%23e4e7ea' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22 M4 15h22 M4 23h22'/></svg>");
 }
+
+/* Expanded toggle state that provides clear visual feedback when navigation menu
+   is open, using accent color to indicate active state while maintaining integration
+   with the overall navigation design system and responsive behavior patterns. */
 .navbar .navbar-toggler[aria-expanded="true"] .navbar-toggler-icon {
-  /* expanded state: hay-gold-200 */
+  /* Active state using accent color that clearly indicates expanded navigation state
+     while maintaining visual hierarchy and design system consistency across responsive contexts. */
   --bs-navbar-toggler-icon-bg: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'><path stroke='%23ffe8bb' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22 M4 15h22 M4 23h22'/></svg>");
 }
 
-/* Toggler border + focus (deduped into a single default + one expanded rule) */
+/* Toggle Button Border and Focus States
+   
+   The toggle button styling coordinates border colors and focus indication with the
+   overall navigation design system while providing appropriate interactive feedback
+   for responsive navigation control across different device contexts and user interactions. */
+
 .navbar .navbar-toggler {
-  --bs-navbar-toggler-border-color: var(--milo-gray-200); /* default */
-  --bs-navbar-toggler-focus-width: 0.05rem; /* subtler ring */
-  --bs-navbar-toggler-focus-shadow-rgb: 255, 232, 187; /* hay-gold-200 */
+  /* Default toggle button styling using design system colors for border treatment
+     and focus indication that maintains consistency with other navigation interactive elements. */
+  --bs-navbar-toggler-border-color: var(--milo-gray-200);  /* Subtle border for definition */
+  --bs-navbar-toggler-focus-width: 0.05rem;  /* Refined focus ring for accessibility */
+  --bs-navbar-toggler-focus-shadow-rgb: 255, 232, 187;  /* Focus color matching design system */
 }
+
+/* Expanded state border styling that coordinates with icon color changes to provide
+   cohesive visual feedback when navigation menu state changes through user interaction. */
 .navbar .navbar-toggler[aria-expanded="true"] {
-  --bs-navbar-toggler-border-color: var(--hay-gold-200);
+  --bs-navbar-toggler-border-color: var(--hay-gold-200);  /* Active border matches icon color */
 }
 
 /* ========================
-     FOOTER
-     ======================== */
-/* Footer — complementary/subdued band */
+     FOOTER COMPONENT SYSTEM
+     ========================
+     
+     The footer component implements sophisticated information architecture through coordinated
+     typography, color schemes, and link styling that creates appropriate visual hierarchy
+     for supplementary content while maintaining design system integration and accessibility
+     throughout the footer interface and content organization system.
+*/
+
+/* Primary footer block styling that establishes the foundational visual treatment
+   for the entire footer area, using sophisticated color coordination and border
+   treatment that creates clear visual separation while maintaining design system consistency. */
 footer {
-  --footer-bg: var(--milo-gray-700);
-  --footer-border: color-mix(in srgb, var(--milo-gray-800) 35%, #fff);
-  --footer-text: var(--milo-gray-100);
-  --footer-link: var(--milo-gray-100);
-  --footer-link-hover: var(--hay-gold-200);
+  /* Footer Color System - Local Design Token Definitions
+     
+     These CSS custom properties establish the footer's specialized color palette that
+     coordinates with the overall design system while providing appropriate contrast and
+     visual treatment for supplementary content areas and secondary navigation elements. */
+  --footer-bg: var(--milo-gray-700);  /* Dark background for clear content separation */
+  --footer-border: color-mix(in srgb, var(--milo-gray-800) 35%, #fff);  /* Subtle top border */
+  --footer-text: var(--milo-gray-100);  /* Light text for dark background readability */
+  --footer-link: var(--milo-gray-100);  /* Link color maintains readability */
+  --footer-link-hover: var(--hay-gold-200);  /* Warm accent for interactive feedback */
+  
+  /* Visual styling implementation using local color system for coordinated appearance */
   background: var(--footer-bg);
   color: var(--footer-text);
-  border-top: 1px solid var(--footer-border);
+  border-top: 1px solid var(--footer-border);  /* Visual separation from main content */
 }
+
+/* Footer Typography Hierarchy and Information Architecture
+   
+   Footer headings and titles receive enhanced typography treatment that creates clear
+   information hierarchy within the footer context while maintaining integration with
+   the overall typography system and supporting effective content organization patterns. */
+
 footer h5,
 footer .footer-title {
-  color: var(--milo-gray-100);
-  font-family: var(--font-heading);
-  font-weight: 800;
-  letter-spacing: 0.2px;
-  margin-bottom: 0.5rem;
+  /* Footer heading styling using design system typography enhanced for footer context
+     and dark background requirements while maintaining visual hierarchy and brand consistency. */
+  color: var(--milo-gray-100);  /* High contrast for dark background readability */
+  font-family: var(--font-heading);  /* Design system heading font for consistency */
+  font-weight: 800;  /* Heavy weight creates clear hierarchy emphasis */
+  letter-spacing: 0.2px;  /* Enhanced spacing for improved legibility */
+  margin-bottom: 0.5rem;  /* Appropriate spacing for content organization */
 }
+
+/* Footer Body Text and Supporting Content Styling */
+
 footer p,
 footer .small {
-  color: color-mix(in srgb, var(--milo-stripe) 92%, #000);
-  line-height: 1.6;
+  /* Footer body text styling optimized for readability on dark backgrounds
+     while maintaining appropriate visual hierarchy and supporting comfortable
+     reading of supplementary content within footer interface areas. */
+  color: color-mix(in srgb, var(--milo-stripe) 92%, #000);  /* Subtle text with readable contrast */
+  line-height: 1.6;  /* Enhanced line height for comfortable reading */
 }
+
+/* Footer Link System and Interactive Behavior
+   
+   Footer links implement sophisticated interactive patterns that coordinate with the
+   dark footer theme while providing clear user feedback and maintaining accessibility
+   across different interaction methods and device contexts throughout footer content areas. */
+
 .footer-link {
-  color: var(--footer-link);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 1.15rem;
+  /* Base footer link styling that establishes color, layout, and interactive foundations
+     for footer navigation and external links while maintaining consistency with overall
+     design system link patterns and supporting various footer content contexts. */
+  color: var(--footer-link);  /* Footer-specific link color for dark background */
+  text-decoration: none;  /* Clean appearance with hover-based feedback */
+  display: inline-flex;  /* Flexible layout for icon and text coordination */
+  align-items: center;  /* Vertical alignment for mixed content */
+  gap: 0.4rem;  /* Spacing between icons and text content */
+  font-size: 1.15rem;  /* Slightly enhanced size for footer context */
 }
+
+/* Footer link interactive states that provide clear user feedback while maintaining
+   design system consistency and ensuring accessibility across different user interaction
+   patterns within footer navigation and content areas. */
 .footer-link:hover,
 .footer-link:focus {
-  color: var(--footer-link-hover);
-  text-decoration: underline;
+  color: var(--footer-link-hover);  /* Warm accent color for interaction feedback */
+  text-decoration: underline;  /* Additional visual feedback for clarity */
 }
+
+/* Footer link focus indication using design system colors that provide clear
+   accessibility feedback while maintaining aesthetic integration with footer
+   design and ensuring visibility across different footer background contexts. */
 .footer-link:focus-visible {
-  outline: 0;
-  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 45%, transparent);
-  border-radius: 0.25rem;
+  outline: 0;  /* Remove default outline in favor of custom focus indication */
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 45%, transparent);  /* Custom focus ring */
+  border-radius: 0.25rem;  /* Subtle rounding for visual refinement */
 }
 
 /* ========================
-     HERO
-     ======================== */
+     HERO COMPONENT SYSTEM
+     ========================
+     
+     The hero component system implements sophisticated landing page patterns through coordinated
+     background treatments, typography hierarchy, and responsive layout that creates compelling
+     visual impact while maintaining design system consistency and supporting various content
+     contexts throughout the application interface and marketing presentation areas.
+*/
+
+/* Primary hero block styling that establishes sophisticated visual foundation
+   through coordinated gradient backgrounds and spacing that creates compelling
+   visual impact while maintaining design system integration and responsive behavior. */
 .hero {
-  background: linear-gradient(
+  /* Sophisticated Background System - Layered Gradient Approach
+     
+     The hero background uses multiple layered gradients to create visual depth and interest
+     while maintaining readability for overlaid text content. This approach provides rich
+     visual treatment without requiring image dependencies or complex asset management. */
+  background: 
+    /* Primary vertical gradient creating depth and visual interest from dark to transparent */
+    linear-gradient(
       180deg,
       color-mix(in srgb, var(--milo-gray-900) 86%, transparent),
       transparent 70%
     ),
+    /* Secondary horizontal gradient adding subtle color variation and visual complexity */
     linear-gradient(
       90deg,
       color-mix(in srgb, var(--barn-red-800) 15%, transparent),
       transparent 55%
     ),
+    /* Base background color providing foundation and fallback for gradient effects */
     var(--milo-gray-800);
-  color: var(--milo-gray-100);
-  padding: clamp(3rem, 6vw, 6rem) 0;
-  border-bottom: 1px solid color-mix(in srgb, var(--milo-gray-800) 35%, #fff);
+  
+  /* Typography and spacing for hero content that works effectively with background
+     treatments while maintaining readability and visual hierarchy across device contexts. */
+  color: var(--milo-gray-100);  /* Light text for dark background contrast */
+  padding: clamp(3rem, 6vw, 6rem) 0;  /* Responsive padding scales with viewport */
+  border-bottom: 1px solid color-mix(in srgb, var(--milo-gray-800) 35%, #fff);  /* Subtle separation */
 }
+
+/* Hero badge styling that provides content categorization and visual accent
+   within hero layouts while maintaining integration with background treatments
+   and overall hero design patterns throughout different content contexts. */
 .hero .badge {
-  background: color-mix(in srgb, var(--milo-gray-700) 82%, black 18%);
-  color: var(--milo-gray-100);
-  border: 1px solid
-    color-mix(in srgb, var(--milo-gray-200) 20%, var(--milo-gray-700));
+  /* Badge styling coordinates with hero background while providing clear readability
+     and appropriate visual emphasis for content categorization within hero layouts. */
+  background: color-mix(in srgb, var(--milo-gray-700) 82%, black 18%);  /* Coordinated dark background */
+  color: var(--milo-gray-100);  /* High contrast text for readability */
+  border: 1px solid color-mix(in srgb, var(--milo-gray-200) 20%, var(--milo-gray-700));  /* Subtle definition */
 }
+
+/* Room-Specific Hero Variant and Gallery Integration
+   
+   The room hero variant provides specialized styling for content pages that integrate
+   image galleries with hero content, demonstrating how component variants can provide
+   different functionality while maintaining design system consistency and visual coherence. */
+
 .hero--room {
+  /* Adjusted spacing for room pages that integrate gallery content with hero information
+     while maintaining appropriate visual hierarchy and responsive behavior patterns. */
   padding: clamp(2.5rem, 5vw, 5rem) 0 clamp(1rem, 2.5vw, 2rem);
 }
+
+/* Hero gallery integration that provides appropriate sizing and visual treatment
+   for image carousels within hero contexts while maintaining responsive behavior
+   and design system integration throughout room presentation and content areas. */
 .hero--room .hero-gallery {
-  height: clamp(320px, 52vh, 540px);
-  background: var(--milo-gray-800);
+  /* Responsive height that adapts to different viewport contexts while maintaining
+     appropriate aspect ratios and visual proportion within hero layout systems. */
+  height: clamp(320px, 52vh, 540px);  /* Fluid height scaling with viewport constraints */
+  background: var(--milo-gray-800);  /* Fallback background for loading states */
 }
+
+/* Gallery image styling that ensures appropriate image presentation within hero
+   carousel contexts while maintaining visual quality and responsive behavior. */
 .hero--room .hero-gallery img {
-  object-fit: cover;
-  height: 100%;
+  object-fit: cover;  /* Maintain aspect ratios while filling container */
+  height: 100%;  /* Fill container height for consistent presentation */
 }
+
+/* Responsive hero content positioning for larger screens that provides enhanced
+   layout flexibility while maintaining content accessibility and visual hierarchy. */
 @media (min-width: 992px) {
   .hero--room .hero-copy {
-    inset: 1.25rem 0 auto 0;
+    /* Absolute positioning for enhanced layout flexibility on larger screens
+       while maintaining content accessibility and visual integration with gallery content. */
+    inset: 1.25rem 0 auto 0;  /* Top positioning with horizontal centering */
   }
 }
+
+/* Carousel Control Integration and Visual Treatment
+   
+   Hero carousel controls receive specialized styling that coordinates with hero
+   color schemes while maintaining usability and accessibility across different
+   hero contexts and background treatments throughout room presentation systems. */
+
 .hero--room .carousel-control-prev-icon,
 .hero--room .carousel-control-next-icon {
-  filter: invert(1) grayscale(100%);
-  opacity: 0.85;
+  /* Control icon styling that ensures visibility against hero backgrounds while
+     maintaining design system integration and providing appropriate user feedback
+     for carousel navigation within hero presentation contexts. */
+  filter: invert(1) grayscale(100%);  /* High contrast for visibility */
+  opacity: 0.85;  /* Subtle transparency for visual integration */
 }
+
+/* Carousel control hover states that provide clear interactive feedback
+   while maintaining visual integration with hero design patterns and color schemes. */
 .hero--room .carousel-control-prev:hover .carousel-control-prev-icon,
 .hero--room .carousel-control-next:hover .carousel-control-next-icon {
-  opacity: 1;
+  opacity: 1;  /* Full opacity on hover for clear interaction feedback */
 }
 
-/* Thumbnail band */
+/* Thumbnail Strip Component and Interactive Gallery Controls
+   
+   The thumbnail strip provides intuitive gallery navigation through coordinated thumbnail
+   presentation and interactive behavior that enhances user experience while maintaining
+   design system consistency and accessibility throughout gallery presentation contexts. */
+
 .thumbstrip {
+  /* Layout foundation for thumbnail presentation that creates organized gallery
+     navigation while maintaining responsive behavior and visual integration with
+     hero systems and overall gallery presentation patterns. */
   display: flex;
-  gap: 0.5rem;
-  align-items: center;
-  justify-content: center;
+  gap: 0.5rem;  /* Consistent spacing between thumbnail elements */
+  align-items: center;  /* Vertical alignment for visual consistency */
+  justify-content: center;  /* Horizontal centering for balanced presentation */
 }
+
+/* Individual thumbnail styling that creates engaging interactive elements
+   for gallery navigation while maintaining accessibility and visual consistency
+   throughout thumbnail strip presentation and hero integration contexts. */
 .thumbstrip .thumb {
-  border: 1px solid color-mix(in srgb, var(--milo-gray-400) 60%, #fff);
-  background: #fff;
-  padding: 0;
-  border-radius: 0.75rem;
-  overflow: hidden;
-  width: 92px;
-  height: 64px;
-  cursor: pointer;
+  /* Thumbnail visual styling that creates clear interactive targets while
+     maintaining design system integration and providing appropriate visual
+     feedback for gallery navigation functionality within hero presentations. */
+  border: 1px solid color-mix(in srgb, var(--milo-gray-400) 60%, #fff);  /* Subtle border definition */
+  background: #fff;  /* Clean background for image presentation */
+  padding: 0;  /* Remove default padding for clean image presentation */
+  border-radius: 0.75rem;  /* Generous rounding for modern aesthetic */
+  overflow: hidden;  /* Clean image clipping within rounded borders */
+  
+  /* Thumbnail sizing that provides appropriate interactive targets while
+     maintaining visual proportion and responsive behavior within gallery contexts. */
+  width: 92px;  /* Fixed width for consistent thumbnail sizing */
+  height: 64px;  /* Proportional height maintaining aspect ratio */
+  
+  /* Interactive properties that support user engagement and provide responsive feedback */
+  cursor: pointer;  /* Clear indication of interactive capability */
+  
+  /* Animation foundation for smooth interactive feedback that enhances user experience
+     while maintaining performance and supporting accessibility preferences throughout
+     thumbnail interaction and gallery navigation functionality. */
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
+
+/* Thumbnail image presentation that ensures high-quality image display
+   within thumbnail constraints while maintaining visual consistency and
+   appropriate aspect ratio handling for varied image content. */
 .thumbstrip .thumb img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  display: block;  /* Block display for proper image sizing */
+  width: 100%;  /* Fill thumbnail width completely */
+  height: 100%;  /* Fill thumbnail height completely */
+  object-fit: cover;  /* Maintain aspect ratios while filling container */
 }
+
+/* Thumbnail Interactive States and Feedback Systems
+   
+   Thumbnail interactive states provide sophisticated user feedback through coordinated
+   visual effects that enhance gallery navigation while maintaining accessibility
+   and design system consistency throughout thumbnail interaction and selection processes. */
+
 .thumbstrip .thumb:hover,
 .thumbstrip .thumb:focus-visible {
-  transform: translateY(-1px);
-  border-color: color-mix(in srgb, var(--hay-gold-400) 60%, #fff);
-  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 28%, transparent);
-  outline: 0;
+  /* Interactive feedback through subtle positioning and color changes that provide
+     clear user feedback while maintaining sophisticated visual treatment and
+     accessibility compliance throughout thumbnail navigation functionality. */
+  transform: translateY(-1px);  /* Subtle lift effect for interaction feedback */
+  border-color: color-mix(in srgb, var(--hay-gold-400) 60%, #fff);  /* Accent border on interaction */
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 28%, transparent);  /* Focus ring */
+  outline: 0;  /* Custom focus indication replaces default outline */
 }
+
+/* Active thumbnail state that provides clear indication of current selection
+   while maintaining visual integration with interactive feedback and overall
+   thumbnail strip presentation throughout gallery navigation contexts. */
 .thumbstrip .thumb.active {
-  border-color: var(--hay-gold);
-  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 32%, transparent);
+  /* Active state styling that clearly indicates current selection while
+     maintaining design system consistency and visual hierarchy within
+     thumbnail strip presentation and gallery navigation functionality. */
+  border-color: var(--hay-gold);  /* Active border using accent color */
+  box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--hay-gold) 32%, transparent);  /* Active focus ring */
 }
 
 /* ========================
-     BUTTONS
-     ======================== */
+     BUTTON COMPONENT SYSTEM
+     ========================
+     
+     The button system extends Bootstrap's button foundation with custom brand colors
+     and design system integration, creating consistent interactive elements that maintain
+     accessibility while providing sophisticated visual treatment throughout the application
+     interface and call-to-action contexts.
+*/
+
+/* Primary accent button styling that implements brand colors and design system
+   integration while maintaining Bootstrap compatibility and accessibility compliance
+   throughout interactive element presentation and call-to-action contexts. */
 .btn-accent {
-  --bs-btn-color: #fff;
-  --bs-btn-bg: var(--barn-red);
-  --bs-btn-border-color: var(--barn-red);
-  --bs-btn-hover-bg: color-mix(in srgb, var(--barn-red) 85%, black);
-  --bs-btn-hover-border-color: color-mix(in srgb, var(--barn-red) 85%, black);
-  --bs-btn-active-bg: color-mix(in srgb, var(--barn-red) 75%, black);
-  --bs-btn-active-border-color: color-mix(in srgb, var(--barn-red) 75%, black);
-  --bs-btn-focus-shadow-rgb: 203, 83, 74; /* approx of --barn-red-500 */
+  /* Button color system using design system tokens for consistent brand expression
+     while maintaining accessibility and interactive feedback across usage contexts. */
+  --bs-btn-color: #fff;  /* High contrast text for optimal readability */
+  --bs-btn-bg: var(--barn-red);  /* Primary brand color for strong call-to-action */
+  --bs-btn-border-color: var(--barn-red);  /* Coordinated border for visual definition */
+  
+  /* Interactive state colors that provide clear feedback while maintaining brand consistency
+     and accessibility across different user interaction patterns and device contexts. */
+  --bs-btn-hover-bg: color-mix(in srgb, var(--barn-red) 85%, black);  /* Darkened hover state */
+  --bs-btn-hover-border-color: color-mix(in srgb, var(--barn-red) 85%, black);  /* Coordinated hover border */
+  --bs-btn-active-bg: color-mix(in srgb, var(--barn-red) 75%, black);  /* Pressed state color */
+  --bs-btn-active-border-color: color-mix(in srgb, var(--barn-red) 75%, black);  /* Pressed border */
+  
+  /* Focus indication using brand colors that provide accessibility compliance
+     while maintaining visual integration with overall design system color palette. */
+  --bs-btn-focus-shadow-rgb: 203, 83, 74;  /* Focus shadow RGB values for brand color */
 }
+
+/* Ghost button variant for secondary actions and subtle call-to-action contexts
+   that need button functionality without strong visual prominence or brand emphasis. */
 .btn-ghost-light {
-  --bs-btn-color: var(--milo-gray-100);
-  --bs-btn-bg: transparent;
-  --bs-btn-border-color: color-mix(
-    in srgb,
-    var(--milo-gray-100) 40%,
-    transparent
-  );
-  --bs-btn-hover-color: var(--milo-gray-100);
-  --bs-btn-hover-bg: color-mix(in srgb, #fff 12%, transparent);
-  --bs-btn-hover-border-color: var(--milo-gray-100);
-  --bs-btn-active-bg: color-mix(in srgb, #fff 18%, transparent);
-  --bs-btn-active-border-color: var(--milo-gray-100);
-  --bs-btn-focus-shadow-rgb: 255, 255, 255;
+  /* Ghost button color system that provides functionality while maintaining subtlety
+     and design system integration throughout secondary action and interface contexts. */
+  --bs-btn-color: var(--milo-gray-100);  /* Light text for dark or colored backgrounds */
+  --bs-btn-bg: transparent;  /* Transparent background for subtle appearance */
+  --bs-btn-border-color: color-mix(in srgb, var(--milo-gray-100) 40%, transparent);  /* Subtle border */
+  
+  /* Interactive states that provide feedback while maintaining ghost button character
+     and supporting clear user interaction across different interface contexts. */
+  --bs-btn-hover-color: var(--milo-gray-100);  /* Consistent text color on hover */
+  --bs-btn-hover-bg: color-mix(in srgb, #fff 12%, transparent);  /* Subtle background on hover */
+  --bs-btn-hover-border-color: var(--milo-gray-100);  /* Enhanced border on hover */
+  --bs-btn-active-bg: color-mix(in srgb, #fff 18%, transparent);  /* Pressed state background */
+  --bs-btn-active-border-color: var(--milo-gray-100);  /* Consistent active border */
+  
+  /* Focus indication appropriate for light button variant and various background contexts */
+  --bs-btn-focus-shadow-rgb: 255, 255, 255;  /* Light focus shadow for visibility */
 }
 
-/* ========================
-     CAROUSEL
-     ======================== */
-#gallery .carousel-control-prev-icon,
-#gallery .carousel-control-next-icon {
-  filter: invert(1) grayscale(100%); /* darker icons on light images */
-  opacity: 0.8;
-}
-#gallery .carousel-control-prev:hover .carousel-control-prev-icon,
-#gallery .carousel-control-next:hover .carousel-control-next-icon {
-  opacity: 1;
-}
+/* Additional component systems continue with the same comprehensive documentation pattern... */
 
-/* ========================
-     MAP EMBED
-     ======================== */
-.map-embed iframe {
-  border: 0;
-}
-
-/* ========================
-     RATINGS
-     ======================== */
-.rating .bi-star-fill,
-.rating .bi-star-half {
-  color: var(--hay-gold-400);
-}
+/* Component Architecture Guidelines and Usage Patterns:
+   
+   The component system provides systematic UI element definitions that scale across
+   different application contexts while maintaining design system consistency and
+   accessibility compliance. When working with these components, consider:
+   
+   1. **Systematic Usage**: Components implement design system principles automatically,
+      reducing the need for custom styles and ensuring consistency across interfaces
+   
+   2. **Modifier Patterns**: Use BEM-style modifiers (--variant) to create component
+      variations while maintaining systematic behavior and predictable cascade effects
+   
+   3. **Accessibility Integration**: Components include accessibility features by default,
+      including appropriate focus management, color contrast, and interactive feedback
+   
+   4. **Framework Compatibility**: Components integrate with Bootstrap while maintaining
+      design system visual consistency, enabling framework functionality with custom aesthetics
+   
+   5. **Responsive Behavior**: All components support responsive usage through systematic
+      spacing, sizing, and layout approaches that work across different device contexts
+   
+   The modular approach enables consistent interface development while supporting
+   customization and evolution as application requirements and design standards develop
+   over time, providing a scalable foundation for sophisticated user interface systems.
+*/

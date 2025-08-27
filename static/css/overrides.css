@@ -1,33 +1,172 @@
-/* overrides.css
-   Purpose: narrowly scoped fixes for third-party or one-off issues.
-   Periodically pay this file down.
+/* overrides.css - Third-Party Library Integration and Compatibility Patches
+   
+   This file implements the Technical Debt Management pattern through systematic handling
+   of third-party library styling conflicts, browser compatibility issues, and edge cases
+   that don't integrate cleanly with the systematic CSS architecture. It demonstrates how
+   modern web applications can maintain clean architectural boundaries while addressing
+   real-world integration challenges that arise when combining custom design systems
+   with external libraries, frameworks, and browser-specific behaviors.
+   
+   The Technical Debt Management approach provides several strategic advantages:
+   1. **Architectural Isolation**: Problematic styles contained in dedicated module for visibility
+   2. **Maintenance Transparency**: Override reasons documented for future resolution planning
+   3. **Systematic Reduction**: Isolated overrides can be systematically addressed over time
+   4. **Integration Support**: Enables use of powerful third-party libraries despite styling conflicts
+   5. **Performance Optimization**: Targeted fixes avoid broad cascade modifications throughout system
+   6. **Team Communication**: Override documentation helps team understand integration challenges
+   
+   The override approach recognizes that real-world web development involves integration
+   with external systems that may not align with internal design system standards. Rather
+   than avoiding beneficial libraries or creating extensive workarounds throughout the
+   application, this module centralizes compatibility fixes while maintaining clear separation
+   from the systematic architecture, enabling both clean code organization and practical functionality.
+   
+   Design Pattern: Technical Debt Management - systematic handling of architectural exceptions
+   Design Pattern: Patch Pattern - targeted fixes for specific integration challenges
+   Design Pattern: Separation of Concerns - isolate problematic styles from systematic architecture
 */
 
-/* Notie: remove drop shadow */
+/* Third-Party Library Styling Corrections
+   
+   These overrides address specific styling conflicts and integration issues with external
+   JavaScript libraries that provide valuable functionality but include CSS that conflicts
+   with the application's design system or creates visual inconsistencies. Each override
+   targets specific library behavior while minimizing impact on overall system architecture. */
+
+/* Notie Notification Library - Visual Refinement and Design System Integration
+   
+   Notie provides excellent notification functionality but includes default styling that
+   conflicts with the application's sophisticated visual design approach. These overrides
+   refine the notification appearance while preserving library functionality and ensuring
+   that notifications integrate seamlessly with the overall interface aesthetic. */
+
 .notie-container {
+  /* High z-index ensures notifications appear above all other interface elements including
+     modals, dropdowns, and other overlays, providing reliable notification visibility
+     that works consistently across different page contexts and interface states. */
   z-index: 9999;
+  
+  /* Remove default drop shadow that conflicts with design system shadow approach and
+     creates visual inconsistency with other interface elements throughout the application
+     that use systematic shadow definitions for depth and layering effects. */
   box-shadow: none;
 }
 
-/* SweetAlert: allow content overflow */
+/* SweetAlert2 Modal System - Content Overflow and Layout Corrections
+   
+   SweetAlert2 provides sophisticated modal functionality but includes CSS that restricts
+   content overflow in ways that interfere with date picker widgets and other dynamic
+   content that needs to extend beyond modal boundaries for proper user interaction. */
+
 .swal2-html-container {
+  /* Allow content overflow to support date picker calendars and other widgets that need
+     to extend beyond modal content boundaries while maintaining modal functionality and
+     visual integration with the overall interface layout and interaction patterns. */
   overflow: visible !important;
 }
 
-/* Datepicker above modal footer */
+/* Date Picker Integration - Z-Index Layering for Modal Compatibility
+   
+   Date picker widgets need appropriate z-index values to appear above modal overlays
+   while maintaining usability and visual hierarchy within modal dialog contexts. This
+   override ensures date picker functionality works correctly within SweetAlert2 modals. */
+
 .swal2-container .datepicker {
-  z-index: 1070; /* > SweetAlert popup (1060) */
+  /* Z-index positioning that ensures date picker appears above SweetAlert2 modal overlay
+     (which uses z-index 1060) while maintaining appropriate layering hierarchy and
+     supporting reliable date selection functionality within modal dialog contexts. */
+  z-index: 1070;  /* Higher than SweetAlert2 modal overlay for reliable visibility */
 }
+
+/* Application-Specific Styling Adjustments
+   
+   These overrides address specific styling requirements for application features that
+   need visual adjustments beyond what the systematic CSS architecture provides. While
+   these could potentially be integrated into component styles, they represent edge cases
+   or temporary solutions that benefit from isolation and explicit documentation. */
+
+/* Gallery Carousel - Image Sizing and Presentation Standardization
+   
+   Gallery carousel images require consistent sizing that may not align with responsive
+   image approaches used elsewhere in the application. This override ensures consistent
+   visual presentation within gallery contexts while maintaining image quality and aspect ratios. */
 
 #gallery .carousel-item img {
-  height: 400px;
-  object-fit: cover;
+  /* Fixed height ensures consistent carousel presentation regardless of source image
+     dimensions while object-fit maintains aspect ratios and prevents image distortion
+     throughout gallery presentation and carousel navigation functionality. */
+  height: 400px;  /* Consistent height for visual uniformity */
+  object-fit: cover;  /* Maintain aspect ratios while filling container */
 }
+
+/* Map Embed Container - Minimum Height for Responsive Map Display
+   
+   Embedded maps require minimum height constraints to ensure usable presentation across
+   different viewport sizes while supporting responsive behavior that adapts to content
+   context and layout requirements throughout location and contact presentation areas. */
 
 .map-embed {
-  min-height: 360px;
+  /* Minimum height ensures map usability across responsive breakpoints while supporting
+     flexible layout integration within content areas that include location information
+     and contact details throughout the application interface presentation patterns. */
+  min-height: 360px;  /* Sufficient height for map interaction and geographic context */
 }
 
+/* Rating Display - Color Standardization for Visual Consistency
+   
+   Rating star displays use specific color values that need to remain consistent across
+   different contexts while integrating with the overall design system color approach
+   and supporting clear visual communication of rating information throughout content areas. */
+
 .rating i {
-  color: #f5c518;
+  /* Rating color uses specific golden yellow that provides clear visual association
+     with star ratings while maintaining sufficient contrast and visual appeal across
+     different background contexts throughout rating display and review presentation areas. */
+  color: #f5c518;  /* Golden rating color for clear visual association */
 }
+
+/* Override Usage Guidelines and Maintenance Strategy:
+   
+   The override system serves as a controlled approach to handling integration challenges
+   and edge cases that don't fit cleanly within the systematic CSS architecture. These
+   styles should be periodically reviewed for potential integration into the main
+   architectural components or elimination through alternative approaches.
+   
+   When working with override styles, consider the following maintenance principles:
+   
+   1. **Documentation Requirements**: Every override should include clear comments explaining
+      the reason for the exception and potential approaches for systematic integration
+   
+   2. **Minimize Scope**: Override styles should target specific problems without broad
+      impact on system architecture or cascade behavior throughout the application
+   
+   3. **Regular Review**: Override styles should be periodically evaluated for elimination
+      through architectural improvements, library updates, or alternative implementation approaches
+   
+   4. **Integration Opportunities**: Some overrides may represent features that should be
+      systematically integrated into component architecture rather than handled as exceptions
+   
+   5. **Performance Monitoring**: Override styles with !important declarations should be
+      minimized and monitored for impact on cascade performance and maintainability
+   
+   The goal is to minimize the number of override styles over time by addressing root
+   causes through architectural improvements rather than accumulating patches that create
+   maintenance burden and architectural complexity throughout the development process.
+   
+   Future Maintenance Approach and Override Reduction Strategy:
+   
+   The override system should be treated as temporary solutions that enable immediate
+   functionality while working toward systematic architectural solutions. Regular
+   maintenance reviews should focus on:
+   
+   - **Library Updates**: New versions of third-party libraries may resolve styling conflicts
+   - **Architectural Integration**: Override patterns may indicate opportunities for component enhancement  
+   - **Alternative Libraries**: Some overrides may justify evaluation of alternative solutions
+   - **Design System Evolution**: Design system improvements may eliminate the need for specific overrides
+   - **Performance Optimization**: Override elimination can improve CSS performance and maintainability
+   
+   The systematic approach ensures that override styles remain manageable and transparent
+   while supporting practical development needs and enabling the use of valuable third-party
+   functionality that enhances application capabilities and user experience throughout
+   the development process and ongoing application maintenance activities.
+*/

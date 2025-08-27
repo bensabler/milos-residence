@@ -1,16 +1,119 @@
-/* styles.css */
+/* styles.css - CSS Architecture Entry Point and Module Orchestration
+   
+   This file implements the Modular CSS Architecture pattern for systematic stylesheet organization,
+   demonstrating how modern web applications can maintain scalable, maintainable CSS through careful
+   separation of concerns and hierarchical import organization. It serves as the single entry point
+   that orchestrates all CSS modules in their proper loading order, ensuring predictable cascade
+   behavior and preventing specificity conflicts that plague monolithic stylesheet approaches.
+   
+   The Modular CSS Architecture provides several critical benefits for maintainable web development:
+   1. **Separation of Concerns**: Each module handles distinct styling responsibilities without overlap
+   2. **Predictable Cascade**: Import order controls specificity and cascade behavior systematically
+   3. **Maintainable Specificity**: Controlled specificity prevents the cascade wars that create brittle styles
+   4. **Scalable Organization**: New features can be added without affecting existing styles
+   5. **Team Collaboration**: Multiple developers can work on different modules without conflicts
+   6. **Performance Optimization**: Unused styles can be identified and removed at the module level
+   
+   The import order follows CSS architecture best practices, loading foundation styles first
+   (tokens, base elements) and progressively building up to more specific styles (components)
+   and finally utility overrides. This approach ensures that the cascade works predictably
+   and that more specific styles can override more general ones without specificity hacks.
+   
+   This systematic approach scales from simple applications to complex design systems by
+   providing clear boundaries between different types of styles and establishing conventions
+   that prevent common CSS maintainability problems like specificity conflicts, cascade
+   unpredictability, and style duplication across the codebase.
+   
+   Design Pattern: Modular CSS Architecture - systematic organization of styles into focused modules
+   Design Pattern: Single Entry Point - centralized import orchestration for predictable loading
+   Design Pattern: Cascading Specificity Management - controlled specificity through import order
+*/
 
-/* 1) Variables only */
+/* 1) Design Token Foundation - Variables and Design System Primitives
+   
+   Tokens establish the design system foundation by defining all design primitives (colors, typography,
+   spacing, etc.) in a centralized location. This follows the Design Token pattern where visual
+   properties are abstracted into named variables that can be consistently applied throughout the
+   application. Loading tokens first ensures that all subsequent modules have access to the complete
+   design system vocabulary without encountering undefined variable references.
+   
+   The token system enables systematic design consistency and provides a single source of truth
+   for visual properties that can evolve over time without requiring changes throughout the codebase.
+*/
 @import url("/static/css/tokens.css");
 
-/* 2) Element-level defaults (fonts, colors, headings, links…) */
+/* 2) Base Element Styles - Semantic HTML Element Defaults
+   
+   Base styles establish consistent defaults for semantic HTML elements, providing the foundational
+   layer that ensures good typography, readable text, and accessible styling regardless of component
+   complexity. This follows the Progressive Enhancement pattern where basic HTML elements look good
+   and function correctly before any component-specific styling is applied.
+   
+   Base styles focus on element selectors only (h1, p, a, etc.) and avoid classes, ensuring that
+   semantic HTML markup receives appropriate styling automatically. This approach supports both
+   accessibility and maintainability by making good design the default rather than requiring
+   explicit class application for basic visual hierarchy and readability.
+*/
 @import url("/static/css/base.css");
 
-/* 3) Components */
+/* 3) Component Styles - Modular UI Component Definitions
+   
+   Components implement reusable UI patterns through class-based selectors that can be applied
+   to any appropriate HTML element. This follows the BEM (Block Element Modifier) methodology
+   and Component-Driven Development patterns where UI functionality is encapsulated in discrete,
+   reusable modules that maintain visual and behavioral consistency across the application.
+   
+   Component styles build upon the base element styles, providing enhanced functionality and
+   visual design for specific use cases like navigation, cards, buttons, and forms. The modular
+   approach enables design system consistency while supporting customization and variation
+   through modifier classes and CSS custom properties.
+*/
 @import url("/static/css/components.css");
 
-/* 4) Small, single-purpose helpers */
+/* 4) Utility Classes - Single-Purpose Helper Styles
+   
+   Utilities provide atomic, single-purpose classes that enable precise styling adjustments
+   without requiring custom CSS or component modifications. This follows the Utility-First CSS
+   pattern where common styling needs are addressed through small, focused classes that can
+   be composed together to achieve desired visual outcomes.
+   
+   Utility classes load after components to ensure they can override component defaults when
+   needed, supporting design flexibility while maintaining systematic consistency. The utility
+   approach reduces custom CSS requirements and provides a standardized vocabulary for common
+   styling operations like spacing, colors, and layout adjustments.
+*/
 @import url("/static/css/utilities.css");
 
-/* 5) Rare, targeted patches */
+/* 5) Override Patches - Targeted Third-Party and Edge Case Fixes
+   
+   Overrides handle specific compatibility issues, third-party library styling adjustments,
+   and edge cases that don't fit cleanly into the systematic architecture. This follows the
+   Technical Debt Management pattern where necessary but non-systematic styles are isolated
+   in a dedicated module for easy identification and eventual resolution.
+   
+   Override styles load last to ensure maximum specificity when needed for compatibility fixes,
+   but the separation into a dedicated file makes these exceptions visible and maintainable.
+   The goal is to minimize overrides over time by addressing root causes in the base
+   architecture rather than accumulating patches that create maintenance burden.
+*/
 @import url("/static/css/overrides.css");
+
+/* CSS Architecture Documentation and Maintenance Guidelines:
+   
+   This modular architecture supports systematic CSS development through clear separation
+   of concerns and predictable cascade behavior. When adding new styles, consider:
+   
+   1. **Design Tokens**: Add new colors, fonts, or measurements to tokens.css first
+   2. **Base Elements**: Enhance semantic HTML styling in base.css for global improvements
+   3. **Components**: Create new component classes in components.css for reusable patterns
+   4. **Utilities**: Add atomic helper classes in utilities.css for common styling needs
+   5. **Overrides**: Use overrides.css sparingly for compatibility fixes that need resolution
+   
+   The import order is critical - changes to the sequence can affect cascade behavior and
+   specificity relationships throughout the application. Test thoroughly when modifying
+   the module loading order or when adding new CSS files to the architecture.
+   
+   For optimal maintainability, prefer enhancing existing modules over creating new ones,
+   and regularly review override styles for opportunities to integrate fixes into the
+   systematic architecture rather than maintaining them as exceptions.
+*/

@@ -1,132 +1,341 @@
-/* tokens.css
-   Purpose: global design tokens and Bootstrap variable mapping.
-   No selectors beyond :root.
+/* tokens.css - Design System Foundation and Token-Based Architecture
+   
+   This file implements the Design Token pattern for systematic visual design management,
+   establishing a centralized design system that defines all visual primitives used throughout
+   the application. It demonstrates how modern web applications can achieve design consistency,
+   maintainability, and scalability through token-based architecture that separates design
+   decisions from their implementation, enabling systematic design evolution without codebase
+   changes throughout the application.
+   
+   The Design Token approach provides several architectural and maintenance advantages:
+   1. **Single Source of Truth**: All design decisions centralized in one location for consistency
+   2. **Design System Scalability**: Tokens can evolve independently of component implementations
+   3. **Theme Support**: Token architecture enables systematic theming and design variations  
+   4. **Brand Management**: Brand colors and typography can be updated systematically
+   5. **Design-Development Collaboration**: Designers and developers share common design vocabulary
+   6. **Maintenance Efficiency**: Design changes propagate automatically throughout the application
+   
+   The token structure follows industry best practices for design system organization,
+   progressing from foundational primitives (color palettes, typography scales) through
+   semantic aliases (brand colors, functional roles) to framework integration variables
+   that connect the design system with CSS frameworks like Bootstrap. This layered approach
+   provides both flexibility for design evolution and compatibility with existing frameworks.
+   
+   Design Pattern: Design Token System - centralized design primitive management
+   Design Pattern: CSS Custom Properties - runtime-modifiable design variables
+   Design Pattern: Design System Architecture - systematic approach to visual consistency
 */
 :root {
   /* ========================
-     Typography families
-     ======================== */
+     Typography System Foundation
+     ======================== 
+     
+     Typography tokens establish the systematic foundation for all text rendering throughout
+     the application, defining font families that create visual hierarchy, readability, and
+     brand personality. The two-font approach balances readability for body text with
+     distinctive character for headings, creating clear information architecture.
+     
+     Font selection criteria include web performance (system fonts load faster), accessibility
+     (high contrast and readability), and design character (serif for warmth, sans-serif
+     for clarity). This combination provides both technical optimization and aesthetic quality.
+  */
+  
+  /* Primary typeface for body content, optimized for extended reading comfort and legibility.
+     Crimson Pro provides excellent readability characteristics with its moderate contrast,
+     generous letter spacing, and carefully crafted character forms designed specifically
+     for screen reading. The serif nature adds warmth and personality while maintaining
+     high legibility across different screen sizes and resolutions. */
   --font-base: "Crimson Pro", serif;
+  
+  /* Display typeface for headings and interface elements requiring strong visual hierarchy.
+     Nunito offers clean, modern aesthetics with excellent scalability from small interface
+     text to large display headings. Its geometric character provides contrast with the serif
+     body text while maintaining readability and accessibility across all usage contexts. */
   --font-heading: "Nunito", sans-serif;
 
   /* ========================
-     Color palettes
-     ======================== */
-  /* Milo Gray */
-  --milo-gray-100: #f5f6f7;
-  --milo-gray-200: #e4e7ea;
-  --milo-gray-300: #cfd4d8;
-  --milo-gray-400: #aab2b8;
-  --milo-gray-500: #8a939b;
-  --milo-gray-600: #727b84;
-  --milo-gray-700: #626b73;
-  --milo-gray-800: #4f5960;
-  --milo-gray-900: #3b4349;
+     Color System Architecture
+     ========================
+     
+     The color system implements a systematic approach to color management through carefully
+     curated palettes that support both functional needs (accessibility, user interface
+     requirements) and aesthetic goals (brand expression, emotional design). Each palette
+     provides a complete range of tonal variations that can be used consistently throughout
+     the application for different design requirements and contexts.
+     
+     Color naming follows the 100-900 scale convention where 100 represents the lightest
+     tints and 900 represents the darkest shades. This systematic approach enables predictable
+     color relationships and makes it easy to create consistent visual hierarchies and
+     accessible color combinations throughout the application interface.
+  */
+  
+  /* Milo Gray Palette - Primary Neutral Foundation
+     
+     The gray palette serves as the backbone of the interface color system, providing
+     versatile neutral colors for backgrounds, borders, text, and subtle interface elements.
+     Milo Gray offers warmth compared to pure grays while maintaining excellent readability
+     and accessibility when paired with other colors in the system. The range supports
+     everything from light background surfaces to dark text colors while maintaining
+     sufficient contrast ratios for accessibility compliance. */
+  --milo-gray-100: #f5f6f7;  /* Lightest tint - backgrounds, subtle surfaces */
+  --milo-gray-200: #e4e7ea;  /* Light borders, dividers, inactive elements */
+  --milo-gray-300: #cfd4d8;  /* Medium borders, input borders, subtle text */
+  --milo-gray-400: #aab2b8;  /* Placeholder text, disabled states */
+  --milo-gray-500: #8a939b;  /* Secondary text, less important content */
+  --milo-gray-600: #727b84;  /* Primary interface elements, navigation */
+  --milo-gray-700: #626b73;  /* Dark interface elements, strong emphasis */
+  --milo-gray-800: #4f5960;  /* Dark backgrounds, high contrast elements */
+  --milo-gray-900: #3b4349;  /* Darkest shade - high contrast text, emphasis */
 
-  /* Barn Red */
-  --barn-red-100: #f8eaea;
-  --barn-red-200: #efc9c6;
-  --barn-red-300: #e4a29e;
-  --barn-red-400: #d87b74;
-  --barn-red-500: #cb534a;
-  --barn-red-600: #a5423b;
-  --barn-red-700: #7b2d26;
-  --barn-red-800: #561d18;
-  --barn-red-900: #36100d;
+  /* Barn Red Palette - Primary Brand and Accent Color
+     
+     Barn Red serves as the primary brand color and accent system, providing warm,
+     approachable color options that convey reliability and comfort. The palette supports
+     various interface needs from subtle accent touches to prominent call-to-action elements
+     while maintaining accessibility and visual hierarchy throughout the application. */
+  --barn-red-100: #f8eaea;  /* Lightest tint - error backgrounds, subtle highlights */
+  --barn-red-200: #efc9c6;  /* Light accent backgrounds, soft emphasis */
+  --barn-red-300: #e4a29e;  /* Medium accent elements, hover states */
+  --barn-red-400: #d87b74;  /* Interactive elements, secondary buttons */
+  --barn-red-500: #cb534a;  /* Primary interactive color, links */
+  --barn-red-600: #a5423b;  /* Primary buttons, strong call-to-actions */
+  --barn-red-700: #7b2d26;  /* Pressed states, active elements */
+  --barn-red-800: #561d18;  /* Dark accent elements, high contrast */
+  --barn-red-900: #36100d;  /* Darkest shade - text on light backgrounds */
 
-  /* Weathered Wood */
-  --weathered-wood-100: #f3ece6;
-  --weathered-wood-200: #e0d4c5;
-  --weathered-wood-300: #c9b59f;
-  --weathered-wood-400: #b0957a;
-  --weathered-wood-500: #99785f;
-  --weathered-wood-600: #86654e;
-  --weathered-wood-700: #8d7b68;
-  --weathered-wood-800: #5e4b3e;
-  --weathered-wood-900: #3b2e24;
+  /* Weathered Wood Palette - Secondary Neutral and Natural Accent
+     
+     Weathered Wood provides earthy, natural accent colors that complement the primary
+     gray system while adding warmth and organic character to the interface. This palette
+     works particularly well for secondary elements, subtle backgrounds, and design
+     elements that need to feel approachable and natural rather than purely digital. */
+  --weathered-wood-100: #f3ece6;  /* Subtle warm backgrounds */
+  --weathered-wood-200: #e0d4c5;  /* Light natural accents */
+  --weathered-wood-300: #c9b59f;  /* Medium natural elements */
+  --weathered-wood-400: #b0957a;  /* Interactive natural elements */
+  --weathered-wood-500: #99785f;  /* Strong natural accents */
+  --weathered-wood-600: #86654e;  /* Primary natural color */
+  --weathered-wood-700: #8d7b68;  /* Dark natural elements */
+  --weathered-wood-800: #5e4b3e;  /* High contrast natural color */
+  --weathered-wood-900: #3b2e24;  /* Darkest natural shade */
 
-  /* Hay Gold */
-  --hay-gold-100: #fff7e9;
-  --hay-gold-200: #ffe8bb;
-  --hay-gold-300: #ffdb94;
-  --hay-gold-400: #f4c877;
-  --hay-gold-500: #ddb771;
-  --hay-gold-600: #c0a15d;
-  --hay-gold-700: #a98d4c;
-  --hay-gold-800: #7c6735;
-  --hay-gold-900: #524521;
+  /* Hay Gold Palette - Warm Accent and Highlighting System
+     
+     Hay Gold provides warm, optimistic accent colors perfect for highlighting important
+     information, creating positive user feedback, and adding warmth to the interface.
+     The palette range supports both subtle accent applications and prominent highlighting
+     while maintaining accessibility and readability across different background colors. */
+  --hay-gold-100: #fff7e9;  /* Lightest warm backgrounds */
+  --hay-gold-200: #ffe8bb;  /* Soft highlighting, warm accents */
+  --hay-gold-300: #ffdb94;  /* Medium warm highlights */
+  --hay-gold-400: #f4c877;  /* Interactive warm elements */
+  --hay-gold-500: #ddb771;  /* Primary warm accent color */
+  --hay-gold-600: #c0a15d;  /* Strong warm accents */
+  --hay-gold-700: #a98d4c;  /* Dark warm elements */
+  --hay-gold-800: #7c6735;  /* High contrast warm color */
+  --hay-gold-900: #524521;  /* Darkest warm shade */
 
-  /* Field Sage */
-  --field-sage-100: #edf2e8;
-  --field-sage-200: #d3ddc4;
-  --field-sage-300: #b3c199;
-  --field-sage-400: #95a875;
-  --field-sage-500: #7a8f66;
-  --field-sage-600: #65794f;
-  --field-sage-700: #53633f;
-  --field-sage-800: #3d472e;
-  --field-sage-900: #2a311f;
+  /* Field Sage Palette - Success States and Natural Growth Indicators
+     
+     Field Sage provides sophisticated green tones that work excellently for success
+     states, positive feedback, and elements that represent growth, nature, or completion.
+     Unlike harsh digital greens, Field Sage offers muted, sophisticated color options
+     that feel natural and calming while still providing clear positive associations. */
+  --field-sage-100: #edf2e8;  /* Subtle success backgrounds */
+  --field-sage-200: #d3ddc4;  /* Light success elements */
+  --field-sage-300: #b3c199;  /* Medium success indicators */
+  --field-sage-400: #95a875;  /* Interactive success elements */
+  --field-sage-500: #7a8f66;  /* Primary success color */
+  --field-sage-600: #65794f;  /* Strong success indicators */
+  --field-sage-700: #53633f;  /* Dark success elements */
+  --field-sage-800: #3d472e;  /* High contrast success color */
+  --field-sage-900: #2a311f;  /* Darkest success shade */
 
-  /* Sky Dust */
-  --sky-dust-100: #f0f4f9;
-  --sky-dust-200: #d8e1ec;
-  --sky-dust-300: #bfd0e2;
-  --sky-dust-400: #a7bcd6;
-  --sky-dust-500: #9fb3c8;
-  --sky-dust-600: #8195a6;
-  --sky-dust-700: #65798a;
-  --sky-dust-800: #495a67;
-  --sky-dust-900: #2f3b45;
+  /* Sky Dust Palette - Information States and Calm Interface Elements
+     
+     Sky Dust provides subtle, calming blue-gray tones perfect for informational content,
+     secondary interface elements, and creating calm, trustworthy interface areas.
+     The muted character prevents the harshness often associated with bright digital
+     blues while still providing clear informational and navigational color associations. */
+  --sky-dust-100: #f0f4f9;  /* Subtle info backgrounds */
+  --sky-dust-200: #d8e1ec;  /* Light informational elements */
+  --sky-dust-300: #bfd0e2;  /* Medium info indicators */
+  --sky-dust-400: #a7bcd6;  /* Interactive info elements */
+  --sky-dust-500: #9fb3c8;  /* Primary info color */
+  --sky-dust-600: #8195a6;  /* Strong info indicators */
+  --sky-dust-700: #65798a;  /* Dark info elements */
+  --sky-dust-800: #495a67;  /* High contrast info color */
+  --sky-dust-900: #2f3b45;  /* Darkest info shade */
 
   /* ========================
-     Semantic aliases
-     ======================== */
-  --barn-red: var(--barn-red-600);
-  --weathered-wood: var(--weathered-wood-600);
-  --hay-gold: var(--hay-gold-600);
-  --field-sage: var(--field-sage-600);
-  --sky-dust: var(--sky-dust-600);
+     Semantic Color Aliases
+     ========================
+     
+     Semantic aliases create meaningful connections between the abstract color palettes
+     and their functional usage throughout the application. This intermediate layer
+     enables design flexibility by allowing palette changes without requiring updates
+     throughout the component system. The semantic layer also makes the design intent
+     more obvious to developers implementing interface components.
+  */
+  
+  /* Primary brand colors mapped to specific palette values for consistent brand expression
+     throughout the application. These aliases enable brand evolution without requiring
+     widespread code changes, supporting design system maintenance and brand management. */
+  --barn-red: var(--barn-red-600);            /* Primary brand and CTA color */
+  --weathered-wood: var(--weathered-wood-600); /* Secondary natural accent */
+  --hay-gold: var(--hay-gold-600);            /* Warm highlighting and positive accent */
+  --field-sage: var(--field-sage-600);        /* Success states and positive feedback */
+  --sky-dust: var(--sky-dust-600);            /* Information and neutral accent */
 
-  /* Light text on dark surfaces (e.g., footer) */
-  --milo-stripe: var(--milo-gray-100);
+  /* Specialized semantic aliases for specific interface contexts and design requirements
+     that need particular color characteristics or usage patterns within the application. */
+  --milo-stripe: var(--milo-gray-100);        /* Light text on dark surfaces (footer, etc.) */
 
   /* ========================
-     Base colors
-     ======================== */
+     Foundation Color System
+     ========================
+     
+     Foundation colors establish the basic color relationships for backgrounds, text,
+     and essential interface elements. These high-level semantic colors provide the
+     foundation that all other interface elements build upon, ensuring consistent
+     color relationships and accessibility throughout the application.
+  */
+  
+  /* Primary background color with warm, approachable character that provides excellent
+     contrast for text readability while feeling more inviting than pure white backgrounds.
+     The slight warm tint complements the overall color palette and brand character. */
   --color-bg: #f5f2ed;
+  
+  /* Primary text color optimized for maximum readability and accessibility compliance
+     across all background colors used in the application. The near-black color provides
+     excellent contrast while avoiding the harshness of pure black text. */
   --color-ink: #1f2328;
+  
+  /* Secondary text color for less prominent content that still maintains accessibility
+     while creating visual hierarchy through reduced contrast. Used for captions,
+     secondary information, and supporting text elements. */
   --color-ink-soft: #4b5563;
 
   /* ========================
-     Type scale & rhythm
-     ======================== */
-  --bs-body-font-size: 1.0625rem; /* ~17px */
+     Typography Scale and Rhythm
+     ========================
+     
+     Typography tokens establish systematic text sizing, spacing, and character
+     relationships that create consistent vertical rhythm and readable text hierarchy
+     throughout the application. The scale follows typographic best practices for
+     screen reading while supporting both functional text requirements and aesthetic quality.
+  */
+  
+  /* Base font size slightly larger than browser default to improve readability on all
+     devices and screen densities. The 17px equivalent provides comfortable reading
+     without feeling overly large or affecting layout density negatively. */
+  --bs-body-font-size: 1.0625rem; /* ~17px - optimized for comfortable screen reading */
+  
+  /* Line height optimized for extended reading comfort and visual rhythm throughout
+     body text content. The 1.65 ratio provides excellent readability for the chosen
+     typeface while creating appropriate vertical spacing for comfortable scanning. */
   --body-line-height: 1.65;
+  
+  /* Letter spacing subtly optimized to improve character definition and reading
+     comfort in digital environments. The slight increase improves readability
+     without affecting text density or line length inappropriately. */
   --body-letter-spacing: 0.03em;
+  
+  /* Word spacing adjusted for optimal reading rhythm and visual text flow.
+     The slight increase improves word definition while maintaining natural
+     reading patterns and text density appropriate for screen reading. */
   --body-word-spacing: 0.02em;
 
-  --heading-line-height-tight: 1.15;
-  --heading-line-height: 1.2;
+  /* Heading-specific line heights optimized for visual hierarchy and title readability.
+     Tighter line heights work better for larger heading text while maintaining
+     readability and creating strong visual hierarchy distinctions. */
+  --heading-line-height-tight: 1.15;  /* For large headings (h1, h2) */
+  --heading-line-height: 1.2;         /* For medium headings (h3, h4, h5, h6) */
+  
+  /* Heading letter spacing slightly tightened to improve visual cohesion in larger
+     text sizes while maintaining readability and character definition for titles
+     and headings throughout the application interface. */
   --heading-letter-spacing: -0.01em;
+  
+  /* Semantic heading color alias that can be adjusted independently of body text
+     color, enabling design flexibility for heading emphasis and visual hierarchy
+     without requiring changes throughout the heading system implementation. */
   --bs-heading-color: var(--color-ink);
 
   /* ========================
-     Radii & shadows (for utilities)
-     ======================== */
-  --radius-lg: 1rem;
-  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);
+     Layout and Visual Effects Tokens
+     ========================
+     
+     Layout tokens provide consistent spacing, sizing, and visual effect primitives
+     that can be used throughout component and utility systems to maintain consistent
+     visual relationships and spacing patterns across the application interface.
+  */
+  
+  /* Border radius values for different visual emphasis levels, supporting both subtle
+     rounding for modern aesthetics and more prominent rounding for card-like elements
+     that need stronger visual separation and contemporary interface styling. */
+  --radius-lg: 1rem;  /* Large radius for cards, panels, prominent interface elements */
+  
+  /* Box shadow definitions that provide consistent depth and layering effects
+     throughout the interface without harsh visual contrast. The soft shadow approach
+     creates subtle depth that feels natural and supports visual hierarchy. */
+  --shadow-soft: 0 10px 30px rgba(0, 0, 0, 0.08);  /* Subtle depth for cards and elevated elements */
 
   /* ========================
-     Bootstrap mapping
-     ======================== */
-  --bs-body-font-family: var(--font-base);
-  --bs-body-color: var(--color-ink);
-  --bs-body-bg: var(--color-bg);
-  --bs-link-color: var(--barn-red);
+     CSS Framework Integration
+     ========================
+     
+     Framework integration tokens provide systematic mapping between the custom design
+     token system and popular CSS frameworks like Bootstrap. This approach enables
+     leveraging framework capabilities while maintaining design system consistency
+     and avoiding the need to replace framework styles throughout the application.
+     
+     The mapping strategy preserves the framework's functionality while ensuring that
+     its visual output aligns with the custom design system, providing the best of
+     both systematic design and framework efficiency for rapid interface development.
+  */
+  
+  /* Typography integration with Bootstrap's text rendering system, ensuring that
+     framework typography components use the same fonts, colors, and characteristics
+     as custom components throughout the application interface. */
+  --bs-body-font-family: var(--font-base);    /* Connect Bootstrap to design system typography */
+  --bs-body-color: var(--color-ink);          /* Framework body text uses design system color */
+  --bs-body-bg: var(--color-bg);              /* Framework background matches design system */
+  --bs-link-color: var(--barn-red);           /* Framework links use primary brand color */
 
-  --bs-primary: var(--barn-red);
-  --bs-secondary: var(--weathered-wood);
-  --bs-success: var(--field-sage);
-  --bs-info: var(--sky-dust);
-  --bs-warning: var(--hay-gold);
+  /* Semantic color mapping that connects Bootstrap's color system with design system
+     palette colors, ensuring that framework components like buttons, alerts, and badges
+     use appropriate colors from the design system rather than default framework colors. */
+  --bs-primary: var(--barn-red);      /* Primary actions and brand elements */
+  --bs-secondary: var(--weathered-wood);  /* Secondary actions and neutral elements */
+  --bs-success: var(--field-sage);    /* Success states and positive feedback */
+  --bs-info: var(--sky-dust);         /* Informational content and neutral feedback */
+  --bs-warning: var(--hay-gold);      /* Warning states and attention-requiring elements */
 }
+
+/* Design Token Usage Guidelines and Best Practices:
+   
+   These design tokens form the foundation of a systematic approach to visual design
+   that scales effectively across teams and maintains consistency over time. When
+   working with these tokens, consider the following architectural principles:
+   
+   1. **Use Semantic Aliases**: Prefer semantic color names (--barn-red) over palette
+      references (--barn-red-600) in component styles to maintain design flexibility
+   
+   2. **Respect the Hierarchy**: Foundation colors should be used for basic elements,
+      semantic aliases for component styling, and raw palette values only when creating
+      new semantic relationships
+   
+   3. **Maintain Accessibility**: All color combinations should meet WCAG contrast
+      requirements, with particular attention to text color and background relationships
+   
+   4. **Consider Context**: Different interface areas may require different approaches
+      to color application, but all should use colors from the established system
+   
+   5. **Test Systematically**: Changes to foundational tokens affect the entire
+      application, so comprehensive testing is essential when evolving the design system
+   
+   The token architecture supports design evolution while maintaining consistency,
+   enabling both systematic design improvements and brand evolution without requiring
+   widespread code changes throughout the application codebase.
+*/

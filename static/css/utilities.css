@@ -1,16 +1,146 @@
-/* utilities.css
-   Purpose: small helper classes; keep names obvious and specificity low.
+/* utilities.css - Atomic Utility System and Single-Purpose Helper Classes
+   
+   This file implements the Utility-First CSS pattern through focused, single-purpose classes
+   that enable precise styling adjustments without requiring custom CSS or component modifications.
+   It demonstrates how modern web applications can achieve design flexibility through atomic
+   utility classes that can be composed together to create sophisticated visual outcomes while
+   maintaining design system consistency and avoiding the proliferation of custom styles
+   throughout the application codebase.
+   
+   The Utility-First approach provides several architectural and development advantages:
+   1. **Rapid Development**: Common styling needs addressed through standardized utility classes
+   2. **Consistency Maintenance**: Utilities enforce design system constraints systematically
+   3. **Reduced Custom CSS**: Less need for one-off styles that create maintenance burden
+   4. **Composable Design**: Utilities can be combined to achieve complex visual outcomes
+   5. **Predictable Behavior**: Single-purpose classes have clear, understandable effects
+   6. **Performance Benefits**: Shared utilities reduce overall CSS file size compared to duplicated styles
+   
+   The utility system follows atomic design principles where each class has one clear responsibility
+   and can be combined with other utilities to achieve desired visual outcomes without creating
+   specificity conflicts or cascade unpredictability. Utilities load after components to ensure
+   they can override component defaults when needed, supporting design flexibility while
+   maintaining systematic consistency throughout the application interface development process.
+   
+   Design Pattern: Utility-First CSS - atomic classes for precise styling control
+   Design Pattern: Single Responsibility - each utility class has one clear purpose
+   Design Pattern: Composition Pattern - utilities combine to achieve complex visual outcomes
 */
 
-/* subtle brand border for cards/panels on light backgrounds */
-.border-subtle{ border-color: color-mix(in srgb, var(--weathered-wood-300) 55%, #fff) !important; }
+/* Border and Visual Separation Utilities
+   
+   Border utilities provide systematic approaches to visual separation and element definition
+   throughout the application interface, using design system colors and consistent styling
+   approaches that maintain visual harmony while supporting various layout and content
+   organization requirements across different interface contexts and component usage scenarios. */
 
-.badge-pill {
-  border-radius: 9999px;
+/* Subtle border utility that provides gentle visual separation using design system colors
+   optimized for light backgrounds and content organization contexts that need visual
+   definition without strong contrast or overwhelming visual emphasis throughout interfaces. */
+.border-subtle {
+  /* Border color uses sophisticated color mixing that creates appropriate visual separation
+     while maintaining design system consistency and ensuring that borders integrate well
+     with light background contexts throughout content areas and interface organization. */
+  border-color: color-mix(in srgb, var(--weathered-wood-300) 55%, #fff) !important;
 }
+
+/* Badge and Pill Styling Utilities
+   
+   Badge utilities provide specialized styling for content labeling, categorization, and
+   status indication throughout the application interface, supporting information architecture
+   and user interface patterns that require clear content organization and visual hierarchy
+   through systematic badge presentation and styling approaches. */
+
+/* Pill badge utility that creates fully rounded badges for content categorization and
+   status indication, using maximum border radius to achieve pill-like appearance that
+   works effectively across different content contexts and interface layout requirements. */
+.badge-pill {
+  /* Maximum border radius creates pill-shaped appearance that works consistently across
+     different badge sizes and content lengths while maintaining visual appeal and
+     design system integration throughout badge usage contexts and interface applications. */
+  border-radius: 9999px;  /* Extremely large radius ensures pill shape regardless of size */
+}
+
+/* Shadow and Depth Effect Utilities
+   
+   Shadow utilities provide systematic depth effects that create visual layering and hierarchy
+   throughout the application interface, using design system shadow definitions that maintain
+   consistency while supporting various elevation needs and visual emphasis requirements
+   across different component contexts and interface presentation patterns. */
+
+/* Soft shadow utility that applies subtle depth effects for cards, panels, and elevated
+   interface elements that need visual separation without harsh shadows or overwhelming
+   depth effects that could distract from content or create visual complexity issues. */
 .shadow-soft {
+  /* Shadow definition uses design system token that provides appropriate depth indication
+     while maintaining subtle, sophisticated appearance that integrates well with overall
+     design aesthetic and supports visual hierarchy without overwhelming interface elements. */
   box-shadow: var(--shadow-soft);
 }
+
+/* Border Radius and Corner Treatment Utilities
+   
+   Border radius utilities provide systematic corner treatment options that support the
+   modern aesthetic established by the design system while offering flexibility for
+   different interface contexts that require varying levels of visual softness and
+   contemporary styling approaches throughout component presentation and layout systems. */
+
+/* Large border radius utility that applies generous corner rounding for prominent interface
+   elements like cards, panels, and containers that benefit from strong visual softness
+   and contemporary styling that creates friendly, approachable visual character throughout
+   interface presentation and user experience contexts. */
 .rounded-4 {
+  /* Large radius token provides significant corner rounding that creates contemporary
+     visual character while maintaining design system consistency and supporting
+     sophisticated interface aesthetics across various component and layout contexts. */
   border-radius: var(--radius-lg) !important;
 }
+
+/* Utility System Architecture and Usage Guidelines:
+   
+   The utility system provides focused, single-purpose classes that enable precise styling
+   control while maintaining design system consistency and avoiding the proliferation of
+   custom styles throughout the application development process. The systematic approach
+   ensures that common styling needs are addressed through standardized solutions that
+   scale effectively across teams and maintain consistency over time.
+   
+   When working with utility classes, consider the following architectural principles:
+   
+   1. **Atomic Purpose**: Each utility class should have one clear, specific styling purpose
+      that can be understood and applied consistently across different interface contexts
+   
+   2. **Design System Integration**: All utilities should use design system tokens rather
+      than arbitrary values, ensuring systematic consistency and supporting design evolution
+   
+   3. **Composable Approach**: Utilities work best when combined thoughtfully to achieve
+      desired visual outcomes rather than creating one-off classes for specific use cases
+   
+   4. **Override Capability**: The !important declarations ensure utilities can override
+      component defaults when needed, supporting design flexibility and precise control
+   
+   5. **Minimal Specificity**: Utility classes should use class selectors only, avoiding
+      element or ID selectors that could create specificity conflicts or cascade issues
+   
+   The utility-first approach reduces the need for custom CSS while providing systematic
+   solutions for common styling requirements. As the application grows, additional utilities
+   can be added following the same atomic, single-purpose pattern while maintaining
+   integration with the design system token foundation.
+   
+   Performance Considerations and Maintenance Approach:
+   
+   Utility classes provide excellent performance characteristics because they enable CSS
+   reuse across multiple interface elements, reducing overall stylesheet size compared
+   to approaches that duplicate styling declarations in different component contexts.
+   The systematic approach also makes it easier to identify unused styles and optimize
+   CSS delivery for production deployment scenarios.
+   
+   The maintenance approach for utilities focuses on systematic expansion rather than
+   arbitrary addition. New utilities should address genuine reuse opportunities and
+   follow the established patterns for naming, token integration, and single-purpose
+   functionality. Regular review of utility usage can identify opportunities for
+   component extraction when utilities are consistently used together in specific patterns.
+   
+   Future expansion of the utility system might include additional spacing utilities,
+   color application utilities, typography modification utilities, and layout assistance
+   utilities, all following the same atomic design principles and design system integration
+   approaches demonstrated by the current utility foundation and systematic development patterns.
+*/

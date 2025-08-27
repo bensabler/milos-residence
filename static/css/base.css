@@ -1,96 +1,287 @@
-/* base.css
-   Purpose: global, element-level defaults only.
-   No component classes here.
+/* base.css - Semantic Element Foundation and Progressive Enhancement
+   
+   This file implements the Progressive Enhancement pattern through systematic styling of semantic
+   HTML elements, establishing a solid foundation where content remains accessible and well-designed
+   even without component-specific styling. It demonstrates how modern web applications can ensure
+   robust user experiences by making semantic HTML elements look excellent by default, supporting
+   both accessibility and maintainability through meaningful markup that functions correctly
+   regardless of CSS loading success or JavaScript availability.
+   
+   The Progressive Enhancement approach provides several critical advantages for web development:
+   1. **Accessibility First**: Semantic elements receive appropriate styling automatically
+   2. **Resilience**: Content remains usable even if advanced CSS or JavaScript fails to load
+   3. **Performance**: Base styles provide immediate visual hierarchy before component CSS loads
+   4. **SEO Benefits**: Well-structured semantic HTML improves search engine understanding
+   5. **Developer Experience**: Good defaults reduce the need for explicit styling on every element
+   6. **Maintenance Efficiency**: Element-level improvements benefit the entire application
+   
+   The styling approach focuses exclusively on element selectors (h1, p, a, etc.) rather than
+   classes, ensuring that semantic markup automatically receives appropriate visual treatment
+   without requiring developers to remember and apply specific CSS classes for basic functionality.
+   This approach creates a robust foundation that component styles can enhance rather than replace.
+   
+   Design Pattern: Progressive Enhancement - ensure functionality without advanced CSS/JavaScript
+   Design Pattern: Semantic HTML Foundation - meaningful markup receives meaningful styling
+   Design Pattern: Element-Scoped Styling - avoid class dependencies for basic element appearance
 */
 
-/* Document/base text */
+/* Document Foundation and Color Scheme Management
+   
+   The document root establishes the fundamental color scheme preference and provides the foundation
+   for all subsequent styling decisions. Modern browsers use color-scheme information to adjust
+   browser UI elements, form controls, and default colors to create consistent visual experiences
+   that respect user preferences while supporting the application's design system approach. */
+
+/* Color scheme declaration enables browser optimization for light interface preferences,
+   ensuring that browser UI elements, form controls, scrollbars, and other native interface
+   components align visually with the application's light design system. This creates
+   seamless integration between custom styling and browser-provided interface elements. */
 html {
   color-scheme: light;
 }
 
+/* Document and Body Foundation Styling
+   
+   The html and body elements establish the fundamental typography, color, and spacing foundation
+   that all other elements inherit from. This approach ensures consistent baseline characteristics
+   throughout the document while leveraging CSS inheritance to minimize redundant style
+   declarations and create predictable styling behavior across all content areas. */
+
 html,
 body {
+  /* Typography foundation using design system tokens for consistent text rendering across
+     the entire application. The font-family cascade ensures that design system fonts load
+     consistently while providing system font fallbacks for performance and compatibility. */
   font-family: var(--font-base);
   font-size: var(--bs-body-font-size);
   line-height: var(--body-line-height);
   letter-spacing: var(--body-letter-spacing);
   word-spacing: var(--body-word-spacing);
+  
+  /* Color foundation using design system tokens that create the basic text-on-background
+     relationship that supports readability and accessibility throughout the application.
+     These colors provide sufficient contrast for WCAG compliance while maintaining
+     the aesthetic character established by the design system color palette. */
   color: var(--color-ink);
   background: var(--color-bg);
-  font-kerning: normal;
-  font-feature-settings: "kern" 1;
-  font-optical-sizing: auto;
-  text-wrap: pretty; /* progressive enhancement */
+  
+  /* Advanced typography features that enhance text rendering quality and readability
+     on modern browsers and devices. These features are applied at the document level
+     to benefit all text content without requiring explicit declarations on individual elements. */
+  font-kerning: normal;                /* Enable automatic letter spacing optimization */
+  font-feature-settings: "kern" 1;     /* Activate kerning for improved character spacing */
+  font-optical-sizing: auto;           /* Enable optical sizing for variable fonts */
+  text-wrap: pretty;                   /* Progressive enhancement - improve line breaking */
+  
+  /* Reset default browser margins that can create inconsistent spacing patterns
+     and interfere with systematic layout approaches. Zero margins provide a clean
+     foundation that component and utility styles can build upon predictably. */
   margin: 0;
 }
 
-/* Headings */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* Heading System and Typography Hierarchy
+   
+   The heading system establishes systematic visual hierarchy through coordinated font sizing,
+   spacing, and visual weight that creates clear information architecture. The approach balances
+   accessibility requirements (meaningful heading sequences) with aesthetic goals (attractive
+   typography scales) while ensuring that heading styles scale appropriately across different
+   screen sizes and reading contexts through responsive typography techniques. */
+
+/* Universal heading characteristics that apply to all heading levels, establishing
+   consistent typographic treatment and spacing patterns that create cohesive visual
+   hierarchy throughout the application content areas and interface components. */
+h1, h2, h3, h4, h5, h6 {
+  /* Heading typography uses display font for visual contrast with body text,
+     creating clear hierarchy distinction while maintaining readability across
+     all heading sizes and usage contexts within the application interface. */
   font-family: var(--font-heading);
   color: var(--bs-heading-color);
   letter-spacing: var(--heading-letter-spacing);
+  
+  /* Advanced text wrapping for improved heading layout and readability on modern browsers.
+     Balance wrapping optimizes line breaks for visual appeal and readability, particularly
+     important for multi-line headings in responsive layout contexts. */
   text-wrap: balance;
+  
+  /* Consistent top margin reset eliminates browser inconsistencies in heading spacing
+     while allowing systematic spacing control through other CSS approaches like
+     margin utilities or component-specific spacing systems. */
   margin-top: 0;
 }
 
-/* Fluid sizes & weights */
+/* Responsive Typography Scale Implementation
+   
+   The heading scale uses fluid typography (clamp functions) to create responsive text sizes
+   that adapt smoothly to viewport changes without requiring breakpoint-specific declarations.
+   This approach ensures optimal readability across all device sizes while maintaining
+   proportional relationships between different heading levels and creating systematic
+   visual hierarchy that works consistently across responsive breakpoints. */
+
+/* Primary heading (H1) - Maximum visual impact for page titles and primary content headings.
+   The fluid sizing ensures that H1 elements remain prominent on large screens while staying
+   readable and appropriately sized on smaller devices without overwhelming mobile interfaces. */
 h1 {
-  font-weight: 800;
-  line-height: 1.1;
+  font-weight: 800;  /* Heavy weight for maximum visual impact and clear hierarchy */
+  line-height: 1.1;  /* Tight line height appropriate for large display text */
+  /* Fluid sizing: 36px minimum, scaling to 48px maximum based on viewport width.
+     The viewport-based scaling provides smooth responsive behavior without breakpoints. */
   font-size: clamp(2.25rem, 1.6rem + 2.2vw, 3rem);
 }
+
+/* Secondary heading (H2) - Major section headings and primary content subdivisions.
+   Slightly smaller than H1 but still prominent enough to create clear visual hierarchy
+   and content organization throughout page layouts and content areas. */
 h2 {
-  font-weight: 800;
-  line-height: var(--heading-line-height-tight);
+  font-weight: 800;  /* Heavy weight maintains strong hierarchy position */
+  line-height: var(--heading-line-height-tight);  /* Optimized for larger text sizes */
+  /* Fluid sizing: 30px minimum, scaling to 40px maximum for responsive hierarchy. */
   font-size: clamp(1.875rem, 1.4rem + 1.6vw, 2.5rem);
 }
+
+/* Tertiary heading (H3) - Subsection headings and content area subdivisions.
+   Balanced between prominence and integration, providing clear hierarchy while
+   supporting content density and readability within structured content layouts. */
 h3 {
-  font-weight: 700;
-  line-height: var(--heading-line-height-tight);
+  font-weight: 700;  /* Bold weight provides emphasis without overwhelming content */
+  line-height: var(--heading-line-height-tight);  /* Tight spacing for visual cohesion */
+  /* Fluid sizing: 24px minimum, scaling to 30px maximum for optimal readability. */
   font-size: clamp(1.5rem, 1.2rem + 0.8vw, 1.875rem);
 }
+
+/* Quaternary heading (H4) - Minor section headings and detailed content organization.
+   Provides clear hierarchy while maintaining compatibility with dense content layouts
+   and supporting detailed information architecture without overwhelming text content. */
 h4 {
-  font-weight: 700;
-  line-height: var(--heading-line-height);
+  font-weight: 700;  /* Bold weight maintains hierarchy while supporting content density */
+  line-height: var(--heading-line-height);  /* Standard heading line height */
+  /* Fluid sizing: 20px minimum, scaling to 24px maximum for balanced prominence. */
   font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
 }
+
+/* Fifth-level heading (H5) - Minor headings and detailed content subdivisions.
+   Fixed sizing at comfortable reading scale, optimized for integration with body text
+   while maintaining sufficient visual distinction for clear content organization. */
 h5 {
-  font-weight: 700;
-  line-height: var(--heading-line-height);
-  font-size: 1.125rem;
-}
-h6 {
-  font-weight: 700;
-  line-height: var(--heading-line-height);
-  font-size: 1rem;
+  font-weight: 700;  /* Bold weight provides hierarchy distinction */
+  line-height: var(--heading-line-height);  /* Standard heading spacing */
+  font-size: 1.125rem;  /* 18px - slightly larger than body text for clear hierarchy */
 }
 
-/* Links */
+/* Sixth-level heading (H6) - Minimal headings and inline content organization.
+   Smallest heading size while maintaining clear distinction from body text,
+   supporting detailed content structures and complex information hierarchies. */
+h6 {
+  font-weight: 700;  /* Bold weight maintains heading distinction */
+  line-height: var(--heading-line-height);  /* Standard heading spacing */
+  font-size: 1rem;  /* 16px - matches body text size but with weight distinction */
+}
+
+/* Link System and Interactive Text Elements
+   
+   The link system establishes consistent visual and interactive characteristics for all
+   text links throughout the application, balancing accessibility requirements with
+   aesthetic goals while providing clear interaction feedback through hover states and
+   visual emphasis that guides user attention and supports navigation workflows. */
+
+/* Universal link styling that creates consistent interactive text behavior throughout
+   the application while maintaining accessibility compliance through appropriate color
+   contrast, underline visibility, and hover feedback that works across different contexts. */
 a {
+  /* Link color uses primary brand color for consistency with call-to-action elements
+     and interactive components throughout the application, creating unified interaction
+     patterns and reinforcing brand identity through consistent color application. */
   color: var(--bs-link-color);
+  
+  /* Underline styling enhanced for improved visibility and aesthetic quality compared
+     to default browser underlines. The offset and thickness create more readable
+     underlines that don't interfere with descenders in the text. */
   text-decoration: underline;
-  text-underline-offset: 0.14em;
-  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.14em;  /* Space underline away from text for clarity */
+  text-decoration-thickness: 0.08em;  /* Subtle thickness for visibility without distraction */
+  
+  /* Smooth color transition for hover feedback that provides clear interaction response
+     while feeling natural and responsive to user actions across different devices and input methods. */
   transition: color 0.15s ease-in-out;
 }
+
+/* Link hover state that provides clear interactive feedback through subtle color darkening
+   that maintains accessibility while clearly indicating interactive capability and response
+   to user actions. The color-mix approach creates predictable darkening without requiring
+   additional color tokens or hard-coded color variations. */
 a:hover {
+  /* Darken the link color by mixing with black for consistent hover feedback that
+     works reliably across different link color contexts while maintaining accessibility
+     and creating clear visual response to user interaction. */
   color: color-mix(in srgb, var(--bs-link-color) 85%, black);
 }
 
-/* Text helpers bound to elements/utility classes that Bootstrap uses */
-small,
-.small {
+/* Text Utilities and Semantic Typography Elements
+   
+   Typography utilities provide consistent styling for semantic text elements and utility
+   classes that need special visual treatment. These styles support content hierarchy,
+   emphasis, and specialized text contexts while maintaining integration with the overall
+   typography system and design token foundation established by the base styles. */
+
+/* Small text styling for legal text, captions, and supplementary information that needs
+   reduced visual prominence while maintaining readability. The styling supports both
+   semantic small elements and utility classes for consistent secondary text treatment. */
+small, .small {
+  /* Reduced font size that maintains readability while clearly indicating secondary importance.
+     The 14px equivalent provides sufficient legibility while creating clear hierarchy distinction. */
   font-size: 0.875rem;
+  
+  /* Slightly tighter line height optimized for smaller text while maintaining readability
+     and visual rhythm within content layouts that include mixed text sizes. */
   line-height: 1.4;
+  
+  /* Softer text color for reduced visual prominence while maintaining accessibility compliance
+     and ensuring that secondary text remains readable across all background contexts. */
   color: var(--color-ink-soft);
 }
+
+/* Lead text styling for introductory paragraphs and prominent body text that needs
+   enhanced visual presence while maintaining body text characteristics. The lead style
+   bridges the gap between headings and standard body text for effective content hierarchy. */
 .lead {
-  font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+  /* Responsive sizing that creates prominent body text while maintaining readability
+     and proportion with other text elements across different viewport sizes and contexts. */
+  font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);  /* 18px to 22px fluid scale */
+  
+  /* Enhanced line height for comfortable reading of larger text while maintaining
+     visual rhythm and integration with other content elements within page layouts. */
   line-height: 1.6;
+  
+  /* Primary text color maintains full readability and prominence while integrating
+     with the overall typography hierarchy and color system throughout the application. */
   color: var(--color-ink);
 }
+
+/* Base CSS Architecture Notes and Usage Guidelines:
+   
+   The base CSS foundation provides systematic element-level styling that ensures good
+   typography and visual hierarchy regardless of component-specific styling. This approach
+   creates resilient, accessible interfaces that work correctly even when advanced CSS
+   fails to load or when content is viewed in simplified contexts.
+   
+   When working with base styles, consider the following architectural principles:
+   
+   1. **Semantic HTML First**: Use appropriate HTML elements for their semantic meaning,
+      and base styles will provide appropriate visual treatment automatically
+   
+   2. **Progressive Enhancement**: Base styles ensure that content is usable and attractive
+      before component styles load, supporting performance and accessibility
+   
+   3. **Systematic Typography**: The heading scale and text utilities create consistent
+      information hierarchy that works across all content contexts
+   
+   4. **Accessibility Integration**: Color contrast, font sizing, and interactive feedback
+      meet accessibility requirements by default, reducing the need for specialized fixes
+   
+   5. **Design System Integration**: All base styles use design tokens, ensuring that
+      systematic design changes propagate automatically to all content areas
+   
+   The element-focused approach means that content creators can focus on semantic markup
+   and receive appropriate styling automatically, while component developers can enhance
+   base styles rather than replacing them entirely, creating more maintainable and
+   resilient interface systems that support both current functionality and future evolution.
+*/

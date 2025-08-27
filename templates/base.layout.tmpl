@@ -1,18 +1,70 @@
+{{/* base.layout.tmpl - Master Template Foundation and Layout Architecture
+
+This template implements the Template Inheritance pattern, serving as the master layout that defines 
+the common structure, dependencies, and interface elements shared across all pages in the application.
+Think of this as the "skeleton" that every page in your application builds upon - it establishes the
+HTML document structure, loads all the necessary CSS and JavaScript dependencies, defines the navigation
+system, and provides the content areas where individual page templates inject their specific content.
+
+The Template Inheritance pattern provides several crucial architectural advantages that become more
+valuable as your application grows:
+1. **Consistency Assurance**: Every page automatically gets the same navigation, footer, and structure
+2. **Maintenance Efficiency**: Changes to common elements only need to be made in one place
+3. **Performance Optimization**: All dependency loading is centralized and can be optimized systematically
+4. **SEO Foundation**: Common meta tags, structured data, and semantic markup applied consistently
+5. **Accessibility Baseline**: ARIA labels, semantic structure, and accessibility features work uniformly
+
+The master layout approach scales beautifully because it separates concerns between the common interface
+framework (handled here) and specific page content (handled in individual page templates). This means
+you can evolve your navigation, update dependencies, or enhance accessibility features across the entire
+application by updating this single template, while page-specific templates focus purely on their unique
+content and functionality.
+
+Design Pattern: Template Inheritance - child templates extend master layout with specific content
+Design Pattern: Dependency Injection - centralized loading of CSS, JavaScript, and external resources
+Design Pattern: Separation of Concerns - common layout separated from page-specific content
+*/}}
+
 {{define "base"}}
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <!-- Required meta -->
+    {{/* Document Foundation and Meta Configuration
+    
+    The head section establishes the fundamental document properties that affect how browsers,
+    search engines, and other tools interpret and display your application. Think of this as
+    setting the "rules of engagement" for how your application presents itself to the world.
+    */}}
+    
+    <!-- Required meta tags for modern web standards and responsive behavior -->
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+    {{/* SEO and Social Media Foundation
+    
+    These meta tags create the foundation for search engine optimization and social media sharing.
+    They tell search engines and social platforms what your site is about and how it should be
+    presented when people search for it or share it. This is like creating a "business card" for
+    your application that appears in search results and social media posts.
+    */}}
     <title>Milo's Residence • Cozy Riverside Airbnb</title>
     <meta
       name="description"
       content="A cozy riverside Airbnb with modern comforts, fast Wi‑Fi, and stunning views. Sleeps 3. Walk to cafes and trails. Book your getaway."
     />
 
-    <!-- Nunito via Google Fonts -->
+    {{/* Typography Foundation - Progressive Font Loading Strategy
+    
+    The font loading strategy uses Google Fonts with performance optimizations that ensure text
+    remains readable even while custom fonts are downloading. The preconnect hints tell the browser
+    to establish connections to Google's servers early, while the display=swap parameter ensures
+    that fallback fonts are used until custom fonts are ready, preventing invisible text during loading.
+    
+    This approach balances design quality (custom fonts enhance the visual brand) with performance
+    (users can read content immediately) and reliability (fallback fonts ensure text is always visible).
+    */}}
+    
+    <!-- Nunito font family for headings and interface elements -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -20,7 +72,7 @@
       rel="stylesheet"
     />
 
-    <!-- Crimson Pro via Google Fonts -->
+    <!-- Crimson Pro font family for body text and readable content -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -28,7 +80,19 @@
       rel="stylesheet"
     />
 
-    <!-- Bootstrap 5 (latest v5) -->
+    {{/* CSS Framework and Styling Architecture
+    
+    The CSS loading strategy layers frameworks and custom styles in a specific order that ensures
+    proper cascade behavior and optimal performance. Bootstrap provides the structural foundation
+    and component library, while custom CSS builds upon and enhances these foundations with
+    brand-specific design system implementation.
+    
+    Loading external CSS from CDNs (like Bootstrap) provides performance benefits through global
+    caching and reduced server load, while integrity hashes ensure that the files haven't been
+    tampered with. This creates a secure, fast-loading foundation for your application's styling.
+    */}}
+    
+    <!-- Bootstrap 5 framework for layout, components, and responsive behavior -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css"
       rel="stylesheet"
@@ -36,35 +100,69 @@
       crossorigin="anonymous"
     />
 
-    <!-- Bootstrap Icons -->
+    <!-- Bootstrap Icons for consistent iconography throughout the interface -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1/font/bootstrap-icons.css"
       rel="stylesheet"
     />
 
-    <!-- Vanillajs DateRangePicker -->
+    {{/* Specialized JavaScript Library CSS Dependencies
+    
+    These CSS files support specific JavaScript functionality that enhances user experience
+    through interactive elements like date pickers and notifications. Loading CSS before JavaScript
+    prevents layout shifts and ensures that interactive elements are styled correctly when they
+    first appear to users.
+    */}}
+    
+    <!-- Vanillajs DateRangePicker for calendar-based date selection -->
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/css/datepicker.min.css"
     />
 
-    <!-- Notie -->
+    <!-- Notie for elegant notification displays -->
     <link
       rel="stylesheet"
       type="text/css"
       href="https://unpkg.com/notie/dist/notie.min.css"
     />
 
-    <!-- Custom CSS -->
+    <!-- Custom CSS that implements the design system and brand-specific styling -->
     <link rel="stylesheet" type="text/css" href="/static/css/styles.css" />
   </head>
   <body>
-    <!-- Nav -->
+    {{/* Primary Navigation System - Responsive Bootstrap Navbar
+    
+    The navigation system provides the primary wayfinding and brand identity for the application.
+    It uses Bootstrap's sophisticated responsive navbar component enhanced with custom styling
+    that implements the design system colors and interaction patterns. The navigation scales
+    from mobile-first hamburger menus to full horizontal navigation on larger screens.
+    
+    The navigation structure follows accessibility best practices with proper ARIA labels,
+    semantic markup, and keyboard navigation support. The brand link provides immediate
+    context about the application identity, while navigation links are organized logically
+    to support common user tasks and information discovery patterns.
+    */}}
+    
     <nav class="navbar navbar-expand-lg sticky-top">
       <div class="container">
+        {{/* Brand Identity and Home Link
+        
+        The brand element serves dual purposes: it provides visual identity that helps users
+        recognize and remember the application, and it serves as a consistent "home" link that
+        users can rely on for navigation. The icon adds visual interest while reinforcing
+        the accommodation theme of the application.
+        */}}
         <a class="navbar-brand fw-semibold" href="/">
           <i class="bi bi-house-heart me-2"></i>Milo's Residence
         </a>
+        
+        {{/* Mobile Navigation Toggle
+        
+        The hamburger menu button provides navigation access on smaller screens where horizontal
+        navigation would be cramped. Bootstrap handles the JavaScript functionality automatically,
+        while custom CSS enhances the visual design to match the application's design system.
+        */}}
         <button
           class="navbar-toggler"
           type="button"
@@ -73,8 +171,21 @@
         >
           <span class="navbar-toggler-icon"></span>
         </button>
+        
+        {{/* Main Navigation Menu
+        
+        The collapsible navigation menu provides access to all major application sections.
+        The structure follows common web application patterns with primary pages listed first,
+        followed by specialized content (room details in a dropdown), and ending with primary
+        actions (booking and contact).
+        
+        The navigation order reflects the user journey: users typically want to learn about the
+        property (About, Photos), explore accommodation options (Snooze Spots dropdown), check
+        availability, and then contact for booking or questions.
+        */}}
         <div id="nav" class="collapse navbar-collapse">
           <ul class="navbar-nav ms-auto mb-2 mb-lg-0 gap-lg-3">
+            <!-- Primary informational pages -->
             <li class="nav-item">
               <a class="nav-link" href="/about">About</a>
             </li>
@@ -82,6 +193,13 @@
               <a class="nav-link" href="/photos">Photos</a>
             </li>
 
+            {{/* Accommodation Dropdown - Room Details Organization
+            
+            The dropdown organization groups related room pages together, preventing navigation
+            clutter while providing clear access to detailed accommodation information. This
+            approach scales well if additional rooms are added and provides better information
+            architecture than listing every room in the main navigation bar.
+            */}}
             <li class="nav-item dropdown">
               <a
                 class="nav-link dropdown-toggle"
@@ -107,6 +225,7 @@
               </ul>
             </li>
 
+            <!-- Primary action items positioned prominently -->
             <li class="nav-item">
               <a class="nav-link" href="/search-availability"
                 >Check Availability</a
@@ -120,17 +239,41 @@
       </div>
     </nav>
 
+    {{/* Main Content Area - Template Inheritance Content Injection
+    
+    This is where the magic of template inheritance happens. The {{block "content" .}} directive
+    creates a named content area that child templates can fill with their specific content.
+    Think of this as a "slot" where each page template can insert its unique content while
+    inheriting all the common layout structure, navigation, and dependencies defined above.
+    
+    The block system allows child templates to completely override this content area or extend
+    it with additional functionality, providing flexibility while maintaining consistent structure.
+    */}}
+
     {{block "content" .}}
 
     {{ end }}
 
-    <!-- Footer -->
+    {{/* Footer System - Secondary Navigation and Information Architecture
+    
+    The footer provides supplementary information and secondary navigation that supports the
+    primary interface without competing for attention. Footer content typically includes
+    business information, social media links, legal information, and additional navigation
+    paths that aren't essential for primary user tasks.
+    
+    The footer design uses a more subdued visual treatment that provides information accessibility
+    while maintaining clear visual hierarchy that keeps primary attention on main content areas.
+    */}}
+    
     <footer class="mt-5 py-5">
       <div class="container">
         <div class="row g-4">
           <div class="col-md-6">
+            {{/* Business Identity and Location Information */}}
             <h5 class="fw-semibold">Milo's Residence</h5>
             <p class="mb-2">A cozy riverside stay in Mohawk, NY.</p>
+            
+            {{/* Social Media Links - Brand Extension and Community Building */}}
             <div class="d-flex gap-3">
               <a class="footer-link" href="#"
                 ><i class="bi bi-instagram"></i
@@ -140,6 +283,7 @@
             </div>
           </div>
           <div class="col-md-6 text-md-end">
+            {{/* Copyright and Legal Information */}}
             <div class="small">
               © <span id="year"></span> Milo's Residence. All rights reserved.
             </div>
@@ -148,79 +292,208 @@
       </div>
     </footer>
 
-    <!-- Bootstrap JS -->
+    {{/* JavaScript Dependencies and Enhancement Layer
+    
+    JavaScript loading at the end of the document ensures that HTML content is available for
+    interaction before scripts attempt to manipulate it. This approach prevents errors and
+    provides better user experience by showing content immediately while interactive features
+    enhance the experience progressively.
+    
+    The script loading order progresses from foundational libraries (Bootstrap for component
+    behavior) through specialized functionality (date pickers, notifications) to application-specific
+    interaction code that ties everything together with custom functionality.
+    */}}
+    
+    <!-- Bootstrap JavaScript for component interactivity -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5/dist/js/bootstrap.bundle.min.js"></script>
 
-    <!-- Vanillajs DateRangePicker -->
+    <!-- Specialized functionality libraries -->
+    <!-- Date picker for calendar-based date selection -->
     <script src="https://cdn.jsdelivr.net/npm/vanillajs-datepicker@1.3.4/dist/js/datepicker-full.min.js"></script>
-
-    <!-- Notie -->
+    
+    <!-- Notification system for user feedback -->
     <script src="https://unpkg.com/notie"></script>
 
-    <!-- SweetAlert2 -->
+    <!-- Modal and dialog system for sophisticated user interactions -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    {{/* Page-Specific JavaScript Block
+    
+    This block allows individual page templates to inject their own JavaScript code while
+    maintaining the common dependency loading managed by the base template. Page-specific
+    scripts can depend on all the libraries loaded above, creating a consistent and predictable
+    JavaScript environment for enhanced functionality.
+    */}}
     {{block "js" .}}
 
     {{ end }}
 
+  {{/* Application JavaScript Module and User Interface Integration
+  
+  The application JavaScript module provides the primary interactive functionality that enhances
+  the user experience beyond basic HTML and CSS. The module-based approach enables modern
+  JavaScript patterns while maintaining clear separation between framework code and
+  application-specific functionality.
+  
+  The script integration demonstrates several modern web development patterns including ES modules,
+  progressive enhancement, and systematic user interface management that builds upon the HTML
+  foundation with JavaScript-enhanced functionality.
+  */}}
   <script type="module">
-      // Import ES module
+      {{/* ES Module Integration and Application Interface Setup
+      
+      This section demonstrates how modern web applications integrate ES modules with template-generated
+      content, creating sophisticated user interfaces that combine server-rendered content with
+      client-side interactivity. The module import provides access to sophisticated interaction
+      utilities while the inline code handles application-specific setup and integration.
+      */}}
+      
+      // Import ES module functionality for sophisticated user interface interactions
       import { prompty } from "/static/js/app.js";
 
+      // Create convenient alias for imported functionality throughout template JavaScript
       const attention = prompty;
 
+      {{/* Bootstrap Form Validation Integration
+      
+      This immediately-invoked function expression (IIFE) sets up Bootstrap's form validation
+      system that provides client-side validation feedback while maintaining server-side
+      validation security. The approach enhances user experience by providing immediate
+      feedback while ensuring that validation is also enforced on the server side.
+      
+      Client-side validation improves user experience by catching obvious errors before
+      form submission, while server-side validation ensures security and data integrity
+      regardless of client-side manipulation or JavaScript availability.
+      */}}
       (() => {
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
+        // Identify all forms that should use Bootstrap validation styling
         const forms = document.querySelectorAll(".needs-validation");
 
-        // Loop over them and prevent submission
+        // Apply validation behavior to each form that requires it
         Array.from(forms).forEach((form) => {
           form.addEventListener(
             "submit",
             (event) => {
+              // Check form validity using browser's built-in validation
               if (!form.checkValidity()) {
+                // Prevent form submission if validation fails
                 event.preventDefault();
                 event.stopPropagation();
               }
+              // Add Bootstrap styling classes to show validation state
               form.classList.add("was-validated");
             },
-            false
+            false // Use capturing phase for reliable event handling
           );
         });
       })();
 
-      // `notify` uses Notie; `notifyModal` uses SweetAlert2
+      {{/* User Notification System Integration
+      
+      These helper functions provide convenient interfaces to the notification systems
+      that were loaded as external dependencies. The abstraction layer enables consistent
+      notification behavior throughout the application while providing flexibility to
+      change underlying implementations if needed.
+      
+      The notification system supports both inline notifications (using Notie) and modal
+      dialogs (using SweetAlert2), providing different levels of user attention and
+      interaction requirements based on message importance and user workflow context.
+      */}}
+      
+      // Inline notification system for subtle user feedback
       function notify(msg, msgType) {
         notie.alert({
-          type: msgType,
-          text: msg,
+          type: msgType,    // Determines notification styling and icon
+          text: msg,        // User-visible message content
         });
       }
 
+      // Modal notification system for important messages requiring user acknowledgment
       function notifyModal(title, html, icon, confirmButtonText) {
         Swal.fire({
-          title: title,
-          html: html,
-          icon: icon,
-          confirmButtonText: confirmButtonText,
+          title: title,                         // Modal dialog title
+          html: html,                          // Rich HTML content support
+          icon: icon,                          // Visual categorization icon
+          confirmButtonText: confirmButtonText, // Customizable button text
         });
       }
 
-      // Flash messages from Go template
+      {{/* Server-Generated Flash Message Integration
+      
+      This section demonstrates how template-generated content integrates with client-side
+      JavaScript to provide seamless user feedback across the request-response cycle.
+      Server-side logic can set flash messages that are then displayed using client-side
+      notification systems, creating a smooth user experience that bridges server and client.
+      
+      The Go template integration shows how server-side data can be safely injected into
+      JavaScript while maintaining security and providing rich user interface functionality.
+      */}}
+      
+      // Success message integration from server-side flash data
       {{with .Flash}}
       notify("{{.}}", "success")
       {{end}}
 
+      // Error message integration from server-side flash data  
       {{with .Error}}
       notify("{{.}}", "error")
       {{end}}
 
+      // Warning message integration from server-side flash data
       {{with .Warning}}
       notify("{{.}}", "warning")
       {{end}}
     </script>
   </body>
 </html>
+
+{{/* Template Architecture Documentation and Usage Guidelines
+
+This base layout template demonstrates several important patterns that scale effectively
+as web applications grow in complexity and functionality:
+
+Template Inheritance Pattern:
+The master layout approach separates common interface elements (navigation, footer, dependencies)
+from page-specific content, enabling consistent branding and functionality while supporting
+diverse page content requirements. This pattern becomes more valuable as applications grow
+because changes to common elements automatically propagate to all pages.
+
+Progressive Enhancement Strategy:
+The template loads and structures content in layers, from semantic HTML through CSS styling
+to JavaScript enhancement. This ensures that users can access content and basic functionality
+regardless of network conditions or JavaScript availability, while providing enhanced
+experiences when possible.
+
+Performance Optimization Integration:
+Font loading, CSS organization, and JavaScript positioning all optimize for perceived performance
+and actual loading speed. The template prioritizes visible content loading while deferring
+enhancement features that don't block basic functionality.
+
+Accessibility Foundation:
+Semantic HTML structure, proper ARIA labeling, keyboard navigation support, and screen reader
+compatibility are built into the template foundation rather than added as an afterthought.
+This approach ensures that accessibility improvements benefit the entire application consistently.
+
+When extending this template system, consider:
+
+1. **Block Organization**: Use meaningful block names that clearly indicate their purpose
+   and support maintainable template inheritance patterns across the application
+
+2. **Dependency Management**: Add new CSS or JavaScript dependencies thoughtfully, considering
+   their impact on loading performance and potential conflicts with existing functionality
+
+3. **Responsive Design**: Ensure that template modifications support the mobile-first
+   responsive approach established by Bootstrap and enhanced through custom CSS
+
+4. **SEO Integration**: Leverage the centralized head section for consistent meta tag
+   implementation, structured data, and search engine optimization across all pages
+
+5. **Security Considerations**: Be mindful of how server-side data is injected into
+   client-side JavaScript, using proper escaping and validation to prevent XSS attacks
+
+The master layout approach provides a scalable foundation that supports both current
+functionality and future enhancement while maintaining consistent user experience and
+development efficiency across the entire application development and maintenance lifecycle.
+*/}}
 
 {{ end }}
