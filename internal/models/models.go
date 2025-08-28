@@ -1,6 +1,8 @@
 package models
 
-import "time"
+import (
+	"time"
+)
 
 // User implements the Domain Model pattern for user account representation and management.
 // This struct encapsulates all the data and behavior related to user accounts within the
@@ -294,4 +296,12 @@ type RoomRestriction struct {
 	// information needed for administrative interfaces, reports, and business logic
 	// that needs to handle different restriction types with different rules
 	Restriction Restriction
+}
+
+// MailData holds an email message
+type MailData struct {
+	To      string
+	From    string
+	Subject string
+	Content string
 }

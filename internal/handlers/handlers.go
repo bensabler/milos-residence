@@ -4,17 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bensabler/milos-residence/internal/config"
 	"github.com/bensabler/milos-residence/internal/driver"
 	"github.com/bensabler/milos-residence/internal/forms"
-	"github.com/bensabler/milos-residence/internal/helpers"
 	"github.com/bensabler/milos-residence/internal/models"
 	"github.com/bensabler/milos-residence/internal/render"
 	"github.com/bensabler/milos-residence/internal/repository"
 	"github.com/bensabler/milos-residence/internal/repository/dbrepo"
-	"github.com/go-chi/chi/v5"
 )
 
 // Repo implements the Singleton pattern for global handler access.
@@ -222,33 +221,49 @@ func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 // HTTP Method: POST
 // Route: /make-reservation
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
-	// Retrieve reservation context from session
-	// This demonstrates how multi-step forms maintain state across requests
-	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
-	if !ok {
-		// Session data is missing or corrupted - implement graceful error handling
-		// Store error message in session for display on redirect target page
+
+	err := r.ParseForm()
+	if err != nil {
 		m.App.Session.Put(r.Context(), "error", "can't parse form!")
-		// Redirect to home page rather than showing a broken form
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
-	// Parse incoming form data using standard HTTP form parsing
-	// This populates r.Form and r.PostForm with submitted values
-	err := r.ParseForm()
+	sd := r.Form.Get("start_date")
+	ed := r.Form.Get("end_date")
+
+	layout := "01/02/2006"
+
+	startDate, err := time.Parse(layout, sd)
 	if err != nil {
-		// Form parsing failed - this is a server error, not user error
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "can't parse start date")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
-	// Extract form values and update reservation model
-	// This demonstrates the Data Transfer Object pattern - copying from HTTP form to domain model
-	reservation.FirstName = r.Form.Get("first_name") // User's first name
-	reservation.LastName = r.Form.Get("last_name")   // User's last name
-	reservation.Phone = r.Form.Get("phone")          // Contact phone number
-	reservation.Email = r.Form.Get("email")          // Contact email address
+	endDate, err := time.Parse(layout, ed)
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "can't get parse end date")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	roomID, err := strconv.Atoi(r.Form.Get("room_id"))
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "invalid data!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	reservation := models.Reservation{
+		FirstName: r.Form.Get("first_name"),
+		LastName:  r.Form.Get("last_name"),
+		Phone:     r.Form.Get("phone"),
+		Email:     r.Form.Get("email"),
+		StartDate: startDate,
+		EndDate:   endDate,
+		RoomID:    roomID,
+	}
 
 	// Initialize form validation using the Validation pattern
 	// This creates a wrapper around the raw form data with validation capabilities
@@ -292,22 +307,17 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Create room restriction to block availability using Domain Model pattern
-	// This demonstrates how business rules (room blocking) are enforced through data
 	restriction := models.RoomRestriction{
-		StartDate:     reservation.StartDate, // Block start date matches reservation
-		EndDate:       reservation.EndDate,   // Block end date matches reservation
-		RoomID:        reservation.RoomID,    // Room being blocked
-		ReservationID: newReservationID,      // Link to the reservation
-		RestrictionID: 1,                     // Type 1 = reservation restriction
+		StartDate:     startDate,
+		EndDate:       endDate,
+		RoomID:        roomID,
+		ReservationID: newReservationID,
+		RestrictionID: 1,
 	}
 
-	// Persist the room restriction to prevent double-bookings
 	err = m.DB.InsertRoomRestriction(restriction)
 	if err != nil {
-		// Session data is missing or corrupted - implement graceful error handling
-		// Store error message in session for display on redirect target page
-		// Redirect to home page rather than showing a broken form
+		m.App.Session.Put(r.Context(), "error", "can't insert room restriction!")
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -373,30 +383,15 @@ func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "search-availability.page.tmpl", &models.TemplateData{})
 }
 
-// jsonResponse implements the Data Transfer Object pattern for API responses.
-// This struct defines the contract for JSON responses sent to AJAX clients,
-// providing a consistent API interface for availability checking functionality.
-//
-// Design Pattern: Data Transfer Object - structured data for API communication
-type jsonResponse struct {
-	OK        bool   `json:"ok"`         // Success/failure flag for client logic
-	Message   string `json:"message"`    // Human-readable status message
-	RoomID    string `json:"room_id"`    // Room identifier for booking
-	StartDate string `json:"start_date"` // Formatted start date string
-	EndDate   string `json:"end_date"`   // Formatted end date string
-}
-
-// PostAvailability implements the Controller pattern for processing availability search forms.
-// This handler demonstrates complex business logic coordination, including date parsing,
-// database queries, session state management, and conditional redirects based on results.
-// It shows how controllers orchestrate multiple system components to fulfill user requests.
-//
-// Design Pattern: Controller (from MVC) - search processing controller
-// Design Pattern: Repository - database access abstraction
-// Design Pattern: Session State - temporary result storage
-// HTTP Method: POST
-// Route: /search-availability
+// PostAvailability renders the search availability page
 func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "can't parse form!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
 	// Extract search parameters from form submission
 	// These represent the user's desired check-in and check-out dates
 	start := r.Form.Get("start") // Start date as string (MM/dd/yyyy format)
@@ -404,17 +399,18 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 
 	// Parse date strings into Go time.Time objects for database queries
 	// This demonstrates input validation and data type conversion
-	const layout = "01/02/2006" // US date format template for parsing
+	layout := "01/02/2006" // US date format template for parsing
 	startDate, err := time.Parse(layout, start)
 	if err != nil {
-		// Date parsing failed - this indicates invalid user input or system error
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "can't parse start date!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+
 	endDate, err := time.Parse(layout, end)
 	if err != nil {
-		// End date parsing failed
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "can't parse end date!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -422,8 +418,8 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	// This abstracts the complex SQL logic behind a clean interface
 	rooms, err := m.DB.SearchAvailabilityForAllRooms(startDate, endDate)
 	if err != nil {
-		// Database query failed - this is a server error
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "can't get availability for rooms")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
@@ -460,18 +456,36 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
-// AvailabilityJSON implements the API Controller pattern for AJAX availability checking.
-// This handler provides a JSON API endpoint that allows JavaScript clients to check
-// room availability without full page reloads. It demonstrates how to create REST-like
-// endpoints within a server-rendered application architecture.
+// jsonResponse implements the Data Transfer Object pattern for API responses.
+// This struct defines the contract for JSON responses sent to AJAX clients,
+// providing a consistent API interface for availability checking functionality.
 //
-// Design Pattern: API Controller - JSON endpoint for AJAX clients
-// Design Pattern: Repository - database access abstraction
-// Design Pattern: Data Transfer Object - structured JSON response
-// HTTP Method: POST
-// Route: /search-availability-json
-// Content-Type: application/json
+// Design Pattern: Data Transfer Object - structured data for API communication
+type jsonResponse struct {
+	OK        bool   `json:"ok"`         // Success/failure flag for client logic
+	Message   string `json:"message"`    // Human-readable status message
+	RoomID    string `json:"room_id"`    // Room identifier for booking
+	StartDate string `json:"start_date"` // Formatted start date string
+	EndDate   string `json:"end_date"`   // Formatted end date string
+}
+
+// AvailabilityJSON handles request for availability and send JSON response
 func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
+	// need to parse request body
+	err := r.ParseForm()
+	if err != nil {
+		// can't parse form, so return appropriate json
+		resp := jsonResponse{
+			OK:      false,
+			Message: "Internal server error",
+		}
+
+		out, _ := json.MarshalIndent(resp, "", "     ")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+		return
+	}
+
 	// Extract search parameters from AJAX form submission
 	sd := r.Form.Get("start") // Start date string from client
 	ed := r.Form.Get("end")   // End date string from client
@@ -485,9 +499,19 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	// Extract room ID and convert to integer for database query
 	roomID, _ := strconv.Atoi(r.Form.Get("room_id"))
 
-	// Check availability for specific room using Repository pattern
-	// This is more targeted than the general availability search
 	available, err := m.DB.SearchAvailabilityByDatesByRoomID(startDate, endDate, roomID)
+	if err != nil {
+		// got a database error, so return appropriate json
+		resp := jsonResponse{
+			OK:      false,
+			Message: "Error querying database",
+		}
+
+		out, _ := json.MarshalIndent(resp, "", "     ")
+		w.Header().Set("Content-Type", "application/json")
+		w.Write(out)
+		return
+	}
 
 	// Prepare JSON response using Data Transfer Object pattern
 	// This provides consistent API responses for JavaScript consumption
@@ -499,26 +523,9 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 		RoomID:    strconv.Itoa(roomID), // Convert back to string for JSON
 	}
 
-	// Handle database errors by setting error response
-	if err != nil {
-		helpers.ServerError(w, err)
-		return
-	}
+	out, _ := json.MarshalIndent(resp, "", "     ")
 
-	// Serialize response to JSON with formatting for debugging
-	// Production systems might remove indentation for smaller payloads
-	out, err := json.MarshalIndent(resp, "", "     ")
-	if err != nil {
-		// JSON serialization failed - this is a server error
-		helpers.ServerError(w, err)
-		return
-	}
-
-	// Set appropriate content type header for JSON response
-	// This ensures clients interpret the response correctly
 	w.Header().Set("Content-Type", "application/json")
-
-	// Write JSON response body to client
 	w.Write(out)
 }
 
@@ -534,29 +541,11 @@ func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "contact.page.tmpl", &models.TemplateData{})
 }
 
-// ReservationSummary implements the Controller pattern for displaying booking confirmation.
-// This handler demonstrates the conclusion of a multi-step workflow, showing how to
-// retrieve session data, clean up temporary state, and present a confirmation page
-// to users. It implements several important UX and security patterns.
-//
-// Design Pattern: Controller (from MVC) - confirmation page controller
-// Design Pattern: Session State - retrieves and cleans up workflow data
-// Design Pattern: Error Handling - graceful handling of missing data
-// HTTP Method: GET
-// Route: /reservation-summary
+// ReservationSummary displays the reservation summary page
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
-	// Retrieve completed reservation from session
-	// This demonstrates the final step in a session-based workflow
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		// Reservation data is missing - user may have accessed page directly
-		// Log the error for debugging while providing user-friendly feedback
-		m.App.ErrorLog.Println("Can't get reservation from session")
-
-		// Use Flash Message pattern to inform user of the problem
 		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
-
-		// Redirect to home page rather than showing broken confirmation
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
@@ -586,47 +575,26 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
-// ChooseRoom implements the Controller pattern for room selection from search results.
-// This handler processes room selection from the availability search results,
-// demonstrating how to handle URL parameters and update session state as part
-// of a multi-step booking workflow.
-//
-// Design Pattern: Controller (from MVC) - selection processing controller
-// Design Pattern: Session State - updates workflow state
-// HTTP Method: GET
-// Route: /choose-room/{id}
 func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
-	// Extract room ID from URL path parameter using chi router
-	// This demonstrates RESTful URL design with resource identifiers
-	roomID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	exploded := strings.Split(r.RequestURI, "/")
+	roomID, err := strconv.Atoi(exploded[2])
 	if err != nil {
-		// Invalid room ID in URL - this is a client error
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "missing url parameter")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
-	// Retrieve current reservation state from session
-	// This demonstrates how multi-step workflows maintain state
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
-		// Session state is missing - user may have accessed URL directly
-		// Use Flash Message pattern to explain the problem
-		m.App.Session.Put(r.Context(), "error", "Reservation data not found in session")
-		// Redirect to start of booking flow
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		m.App.Session.Put(r.Context(), "error", "Can't get reservation from session")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 
-	// Update reservation with selected room
-	// This demonstrates how user selections modify workflow state
 	res.RoomID = roomID
 
-	// Store updated reservation back in session for next step
-	// This maintains the workflow state across HTTP requests
 	m.App.Session.Put(r.Context(), "reservation", res)
 
-	// Redirect to reservation form using workflow progression pattern
-	// This moves the user to the next step in the booking process
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 }
 
@@ -642,43 +610,22 @@ func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	// Extract booking parameters from URL query string
 	// This demonstrates how to handle bookings initiated from room detail pages
-	roomID, err := strconv.Atoi(r.URL.Query().Get("id"))
-	if err != nil {
-		// Invalid room ID parameter
-		helpers.ServerError(w, err)
-		return
-	}
+	roomID, _ := strconv.Atoi(r.URL.Query().Get("id"))
 
 	// Extract date parameters from query string
 	sd := r.URL.Query().Get("s") // Start date string
 	ed := r.URL.Query().Get("e") // End date string
 
-	// Parse date strings into Go time objects
-	// This demonstrates input validation for URL parameters
 	layout := "01/02/2006"
-	startDate, err := time.Parse(layout, sd)
-	if err != nil {
-		// Invalid start date format
-		helpers.ServerError(w, err)
-		return
-	}
-	endDate, err := time.Parse(layout, ed)
-	if err != nil {
-		// Invalid end date format
-		helpers.ServerError(w, err)
-		return
-	}
+	startDate, _ := time.Parse(layout, sd)
+	endDate, _ := time.Parse(layout, ed)
 
-	// Initialize new reservation object for booking workflow
-	// This demonstrates how direct bookings initialize session state
 	var res models.Reservation
 
-	// Fetch room details to enrich reservation data
-	// This shows how controllers coordinate data from multiple sources
 	room, err := m.DB.GetRoomByID(roomID)
 	if err != nil {
-		// Database error or room not found
-		helpers.ServerError(w, err)
+		m.App.Session.Put(r.Context(), "error", "Can't get room from db!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
 

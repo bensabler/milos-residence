@@ -110,6 +110,20 @@ func main() {
 	// This implements the Resource Management pattern using defer
 	defer db.SQL.Close()
 
+	defer close(app.MailChan)
+
+	fmt.Println("Starting mail listener...")
+	listenForMail()
+
+	// msg := models.MailData{
+	// 	To:      "ben@sabler.com",
+	// 	From:    "me@here.com",
+	// 	Subject: "Some subject",
+	// 	Content: "",
+	// }
+
+	// app.MailChan <- msg
+
 	// Configure HTTP server with application routes and middleware
 	// The server address uses environment-based configuration with sensible defaults
 	addr := ":" + env("PORT", "8080") // Default to port 8080 for development
@@ -146,6 +160,9 @@ func run() (*driver.DB, error) {
 	gob.Register(models.User{})            // User data for authentication
 	gob.Register(models.Room{})            // Room data for availability
 	gob.Register(models.RoomRestriction{}) // Room restriction data for booking rules
+
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
 
 	// Configure production vs development behavior using the Strategy pattern
 	// This single flag controls multiple behaviors: cookie security, template caching, etc.
@@ -187,10 +204,6 @@ func run() (*driver.DB, error) {
 		return nil, fmt.Errorf("cannot connect to database: %s", err)
 	}
 
-	// Verify database connection and log connection details
-	// This provides operational visibility into which database we're connected to
-	var dbName, dbUser, schema, host string
-	_ = db.SQL.QueryRow(`select current_database(), current_user, current_schema(), inet_server_addr()::text`).Scan(&dbName, &dbUser, &schema, &host)
 	infoLog.Println("Connected to database")
 
 	// Initialize template system using the Template Method pattern

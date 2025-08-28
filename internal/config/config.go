@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"github.com/alexedwards/scs/v2"
+	"github.com/bensabler/milos-residence/internal/models"
 )
 
 // AppConfig implements the Configuration Object pattern for centralized application settings.
@@ -125,5 +126,6 @@ type AppConfig struct {
 	//   - Multi-step form data (like reservation workflows)
 	//   - Flash messages for user feedback across redirects
 	//   - User interface state and personalization settings
-	Session *scs.SessionManager
+	Session  *scs.SessionManager
+	MailChan chan models.MailData
 }
