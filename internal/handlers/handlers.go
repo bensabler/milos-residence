@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 	"strings"
@@ -295,6 +296,16 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	room, err := m.DB.GetRoomByID(roomID)
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "can't find room!")
+		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
+		return
+	}
+
+	// Set the room name in the reservation object
+	reservation.Room.RoomName = room.RoomName
+
 	// Validation passed - persist reservation using Repository pattern
 	// The repository abstracts away database implementation details
 	newReservationID, err := m.DB.InsertReservation(reservation)
@@ -321,6 +332,38 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 		http.Redirect(w, r, "/", http.StatusTemporaryRedirect)
 		return
 	}
+
+	// send notifications - first to guest
+	htmlMessage := fmt.Sprintf(`
+			<strong>Reservation Confirmation</strong><br>
+			Dear %s, <br>
+			This is to confirm your reservation from %s to %s.
+	`, reservation.FirstName, reservation.StartDate.Format("01/02/2006"), reservation.EndDate.Format("01/02/2006"))
+
+	msg := models.MailData{
+		To:       reservation.Email,
+		From:     "milo@milos-residence.com",
+		Subject:  "Reservation Confirmation",
+		Content:  htmlMessage,
+		Template: "basic.html",
+	}
+
+	m.App.MailChan <- msg
+
+	// send notifications - first to guest
+	htmlMessage = fmt.Sprintf(`
+			<strong>Reservation Notification</strong><br>
+			A reservation has been made at Milo's Residence for the %s snooze spot from %s to %s.
+	`, reservation.Room.RoomName, reservation.StartDate.Format("01/02/2006"), reservation.EndDate.Format("01/02/2006"))
+
+	msg = models.MailData{
+		To:      "you@there.com",
+		From:    "milo@milos-residence.com",
+		Subject: "Reservation Notification",
+		Content: htmlMessage,
+	}
+
+	m.App.MailChan <- msg
 
 	// Success! Store reservation in session for confirmation page
 	// This implements the Flash Message pattern through session storage

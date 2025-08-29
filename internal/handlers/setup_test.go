@@ -174,6 +174,12 @@ func TestMain(m *testing.M) {
 	// maintaining the same dependency injection patterns used in production
 	app.Session = session
 
+	mailChan := make(chan models.MailData)
+	app.MailChan = mailChan
+	defer close(mailChan)
+
+	listenForMail()
+
 	// Create template cache for handler testing with template rendering
 	// Template cache enables handlers to render complete HTML responses during
 	// testing, supporting comprehensive integration testing that validates
@@ -204,6 +210,14 @@ func TestMain(m *testing.M) {
 	// os.Exit ensures that test process terminates with correct exit status
 	// for integration with build systems and continuous integration pipelines
 	os.Exit(m.Run())
+}
+
+func listenForMail() {
+	go func() {
+		for {
+			_ = <-app.MailChan
+		}
+	}()
 }
 
 // getRoutes implements the Test Router Factory pattern for handler integration testing.

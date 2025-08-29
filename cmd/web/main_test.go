@@ -29,7 +29,8 @@ import "testing"
 // Design Pattern: Smoke Testing - provides early detection of fundamental application startup problems
 // Design Pattern: Integration Testing - tests coordination between multiple application subsystems
 // Parameters:
-//   t: Testing framework controller for test execution, reporting, and failure management
+//
+//	t: Testing framework controller for test execution, reporting, and failure management
 func TestRun(t *testing.T) {
 	// Execute the complete application initialization sequence using the same code path
 	// that production deployments use during startup. This ensures that testing validates

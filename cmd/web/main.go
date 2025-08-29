@@ -115,15 +115,6 @@ func main() {
 	fmt.Println("Starting mail listener...")
 	listenForMail()
 
-	// msg := models.MailData{
-	// 	To:      "ben@sabler.com",
-	// 	From:    "me@here.com",
-	// 	Subject: "Some subject",
-	// 	Content: "",
-	// }
-
-	// app.MailChan <- msg
-
 	// Configure HTTP server with application routes and middleware
 	// The server address uses environment-based configuration with sensible defaults
 	addr := ":" + env("PORT", "8080") // Default to port 8080 for development
