@@ -1,56 +1,6 @@
-/* components.css - Modular UI Component System and BEM Architecture
-   
-   This file implements the Component-Driven Development pattern through systematic CSS component
-   definitions that create reusable, maintainable interface elements following BEM (Block Element
-   Modifier) methodology. It demonstrates how modern web applications can achieve design consistency
-   and development efficiency through modular component architecture that separates presentation
-   concerns into focused, reusable modules that can be composed together to create sophisticated
-   user interfaces without code duplication or specificity conflicts.
-   
-   The Component-Driven approach provides several architectural and maintenance advantages:
-   1. **Reusability**: Components can be used consistently across different pages and contexts
-   2. **Maintainability**: Changes to component styles affect all instances systematically
-   3. **Predictable Behavior**: Component styles have clear scope and don't leak to other elements
-   4. **Design System Integration**: Components implement design system principles consistently
-   5. **Developer Experience**: Clear component boundaries make interface development more efficient
-   6. **Scalability**: New components can be added without affecting existing interface elements
-   
-   The BEM naming convention (Block__Element--Modifier) creates clear relationships between
-   related styles while avoiding specificity conflicts and cascade issues that plague traditional
-   CSS approaches. Component styles focus exclusively on class-based selectors, avoiding element
-   selectors that could conflict with base styles or create unintended cascade effects.
-   
-   Design Pattern: Component-Driven Development - modular UI elements with clear boundaries
-   Design Pattern: BEM Methodology - systematic naming convention for maintainable CSS
-   Design Pattern: Separation of Concerns - components handle specific interface responsibilities
-*/
-
-/* ========================
-     NAVBAR COMPONENT SYSTEM
-     ========================
-     
-     The navbar component implements sophisticated navigation interface patterns through systematic
-     styling that coordinates branding, navigation links, dropdown menus, and responsive behavior.
-     It demonstrates how complex interface components can maintain design system consistency while
-     providing rich interactive experiences that work effectively across different device contexts
-     and user interaction methods.
-*/
-
-/* Primary navbar block that establishes the foundational styling and color scheme
-   for the entire navigation system. The component uses CSS custom properties to integrate
-   with Bootstrap's component system while maintaining design system color consistency. */
 .navbar {
-  /* Background color establishes the navigation area identity using design system colors
-     that provide appropriate contrast for navigation links and branding elements
-     while supporting the overall aesthetic character of the application interface. */
   background: var(--milo-gray-600);
 
-  /* Bootstrap Integration Variables - Framework Compatibility Layer
-     
-     These CSS custom properties override Bootstrap's default navbar colors with design system
-     values, enabling framework functionality while maintaining visual consistency with the
-     custom design system. This approach leverages Bootstrap's sophisticated component logic
-     while ensuring that the visual output aligns perfectly with the application's design standards. */
   --bs-navbar-brand-color: var(--milo-gray-100);      /* Brand text color for visibility */
   --bs-navbar-brand-hover-color: var(--hay-gold-200); /* Brand hover state for interaction feedback */
   --bs-navbar-color: var(--milo-gray-100);            /* General navbar text color */
@@ -59,45 +9,20 @@
   --bs-navbar-active-color: color-mix(in srgb, var(--hay-gold-400) 92%, black); /* Active state emphasis */
 }
 
-/* Navbar Brand Styling and Typography Enhancement
-   
-   The brand element receives enhanced typography treatment to create strong visual hierarchy
-   and brand identity within the navigation system, using design system typography tokens
-   while adding component-specific enhancements for branding requirements. */
-
 .navbar .navbar-brand {
-  /* Brand typography uses heading font for visual distinction and brand character,
-     creating clear identity within the navigation while maintaining consistency
-     with the application's overall typography system and design approach. */
   font-family: var(--font-heading);
   font-weight: 800;  /* Heavy weight emphasizes brand identity and creates hierarchy */
   letter-spacing: 0.2px;  /* Slight spacing enhancement for brand legibility */
 }
 
-/* Navigation Link System and Interactive Behavior
-   
-   Navigation links implement sophisticated interactive patterns through coordinated styling
-   that provides clear user feedback while maintaining accessibility and visual hierarchy.
-   The link system coordinates typography, spacing, and interactive effects to create
-   intuitive navigation experiences that work consistently across different input methods. */
-
 .navbar .nav-link {
-  /* Link typography creates consistency with brand styling while maintaining
-     appropriate visual hierarchy and readability for navigation content
-     within the overall interface design and layout system. */
   font-family: var(--font-heading);
   font-weight: 600;  /* Semibold weight provides emphasis without overwhelming interface */
   
-  /* Layout properties establish positioning context for interactive effects
-     and ensure that navigation links integrate properly with the overall
-     navigation layout while supporting enhanced interactive behaviors. */
   position: relative;
   display: inline-block;
   text-decoration: none;  /* Remove default underlines for custom interaction design */
   
-  /* Smooth color transitions create responsive feel for user interactions
-     while maintaining performance and providing clear feedback across
-     different devices and interaction contexts throughout the navigation. */
   transition: color 0.3s ease;
 }
 
@@ -678,31 +603,3 @@ footer .small {
   /* Focus indication appropriate for light button variant and various background contexts */
   --bs-btn-focus-shadow-rgb: 255, 255, 255;  /* Light focus shadow for visibility */
 }
-
-/* Additional component systems continue with the same comprehensive documentation pattern... */
-
-/* Component Architecture Guidelines and Usage Patterns:
-   
-   The component system provides systematic UI element definitions that scale across
-   different application contexts while maintaining design system consistency and
-   accessibility compliance. When working with these components, consider:
-   
-   1. **Systematic Usage**: Components implement design system principles automatically,
-      reducing the need for custom styles and ensuring consistency across interfaces
-   
-   2. **Modifier Patterns**: Use BEM-style modifiers (--variant) to create component
-      variations while maintaining systematic behavior and predictable cascade effects
-   
-   3. **Accessibility Integration**: Components include accessibility features by default,
-      including appropriate focus management, color contrast, and interactive feedback
-   
-   4. **Framework Compatibility**: Components integrate with Bootstrap while maintaining
-      design system visual consistency, enabling framework functionality with custom aesthetics
-   
-   5. **Responsive Behavior**: All components support responsive usage through systematic
-      spacing, sizing, and layout approaches that work across different device contexts
-   
-   The modular approach enables consistent interface development while supporting
-   customization and evolution as application requirements and design standards develop
-   over time, providing a scalable foundation for sophisticated user interface systems.
-*/

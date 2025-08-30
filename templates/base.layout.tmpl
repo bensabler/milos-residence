@@ -183,74 +183,65 @@
     <!-- Modal and dialog system for sophisticated user interactions -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
+    <script src="/static/js/app.js"></script>
+
+
     {{block "js" .}}
 
-    {{ end }}
+    {{end}}
 
-  <script type="module">      
-      // Import ES module functionality for sophisticated user interface interactions
-      import { prompty } from "/static/js/app.js";
+    <script>
+        let attention = Prompt();
 
-      // Create convenient alias for imported functionality throughout template JavaScript
-      const attention = prompty;
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                let forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
 
-      (() => {
-        // Identify all forms that should use Bootstrap validation styling
-        const forms = document.querySelectorAll(".needs-validation");
 
-        // Apply validation behavior to each form that requires it
-        Array.from(forms).forEach((form) => {
-          form.addEventListener(
-            "submit",
-            (event) => {
-              // Check form validity using browser's built-in validation
-              if (!form.checkValidity()) {
-                // Prevent form submission if validation fails
-                event.preventDefault();
-                event.stopPropagation();
-              }
-              // Add Bootstrap styling classes to show validation state
-              form.classList.add("was-validated");
-            },
-            false // Use capturing phase for reliable event handling
-          );
-        });
-      })();
+        function notify(msg, msgType) {
+            notie.alert({
+                type: msgType,
+                text: msg,
+            })
+        }
 
-      // Inline notification system for subtle user feedback
-      function notify(msg, msgType) {
-        notie.alert({
-          type: msgType,    // Determines notification styling and icon
-          text: msg,        // User-visible message content
-        });
-      }
+        function notifyModal(title, text, icon, confirmationButtonText) {
+            Swal.fire({
+                title: title,
+                html: text,
+                icon: icon,
+                confirmButtonText: confirmationButtonText
+            })
+        }
 
-      // Modal notification system for important messages requiring user acknowledgment
-      function notifyModal(title, html, icon, confirmButtonText) {
-        Swal.fire({
-          title: title,                         // Modal dialog title
-          html: html,                          // Rich HTML content support
-          icon: icon,                          // Visual categorization icon
-          confirmButtonText: confirmButtonText, // Customizable button text
-        });
-      }
-      
-      // Success message integration from server-side flash data
-      {{with .Flash}}
-      notify("{{.}}", "success")
-      {{end}}
+        {{with .Error}}
+        notify("{{.}}", "error")
+        {{end}}
 
-      // Error message integration from server-side flash data  
-      {{with .Error}}
-      notify("{{.}}", "error")
-      {{end}}
+        {{with .Flash}}
+        notify("{{.}}", "success")
+        {{end}}
 
-      // Warning message integration from server-side flash data
-      {{with .Warning}}
-      notify("{{.}}", "warning")
-      {{end}}
+        {{with .Warning}}
+        notify("{{.}}", "warning")
+        {{end}}
     </script>
-  </body>
-</html>
 
-{{ end }}
+    </body>
+
+    </html>
+{{end}}

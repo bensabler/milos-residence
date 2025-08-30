@@ -15,7 +15,7 @@ DB_SSLMODE?= disable
 
 MIG       ?= ./migrations
 
-DSN ?= host=$(DB_HOST) port=$(DB_PORT) user=$(DB_USER) password=$(DB_PASSWORD) dbname=$(DB_NAME) sslmode=$(DB_SSLMODE)
+DSN ?= host=$(DB_HOST) port=$(DB_PORT) user=$(DB_USER) dbname=$(DB_NAME) sslmode=$(DB_SSLMODE)
 
 GOOSE = GOOSE_DRIVER=$(DB) GOOSE_DBSTRING="$(DSN)" GOOSE_MIGRATION_DIR=$(MIG) goose
 
@@ -91,4 +91,3 @@ fix:
 	@echo DB_HOST=$(DB_HOST) DB_PORT=$(DB_PORT) DB_USER=$(DB_USER) DB_NAME=$(DB_NAME) DB_SSLMODE=$(DB_SSLMODE)
 	@echo MIG=$(MIG)
 	@which goose || true
-
