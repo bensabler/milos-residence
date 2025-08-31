@@ -3,7 +3,6 @@
   box-shadow: none;
 }
 
-/* DateRangePicker z-index fix for SweetAlert2 modals */
 .datepicker-dropdown {
   z-index: 9999 !important;
 }
@@ -12,23 +11,20 @@
   z-index: 9999 !important;
 }
 
-/* Ensure SweetAlert2 content allows overflow for datepicker */
 .swal2-html-container {
   overflow: visible !important;
 }
 
 #gallery .carousel-item img {
-  height: 400px;  /* Consistent height for visual uniformity */
-  object-fit: cover;  /* Maintain aspect ratios while filling container */
-}
+  height: 400px;  
+  object-fit: cover;  
 
 
 .map-embed {
-  min-height: 360px;  /* Sufficient height for map interaction and geographic context */
-}
+  min-height: 360px; 
 
 
 .rating i {
-  color: #f5c518;  /* Golden rating color for clear visual association */
+  color: #f5c518; 
 }
 
