@@ -15,6 +15,12 @@
   <!-- plugin css for this page -->
   <!-- End plugin css for this page -->
   <!-- inject:css -->
+       <!-- Notie for elegant notification displays -->
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://unpkg.com/notie/dist/notie.min.css"
+    />
   <link rel="stylesheet" href="/static/admin/css/style.css">
   <!-- endinject -->
   <link rel="shortcut icon" href="/static/admin/images/favicon.png" />
@@ -308,12 +314,72 @@
   <script src="/static/admin/js/todolist.js"></script>
   <!-- endinject -->
   <!-- Custom js for this page-->
+
+  <!-- Notification system for user feedback -->
+  <script src="https://unpkg.com/notie"></script>
+
+    <!-- Modal and dialog system for sophisticated user interactions -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
   <script src="/static/admin/js/dashboard.js"></script>
+  <script src="/static/js/app.js"></script>
   <!-- End custom js for this page-->
 
   {{block "js" .}}
 
   {{end}}
+
+      <script>
+        let attention = Prompt();
+
+        (function () {
+            'use strict';
+            window.addEventListener('load', function () {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                let forms = document.getElementsByClassName('needs-validation');
+                // Loop over them and prevent submission
+                Array.prototype.filter.call(forms, function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+
+
+        function notify(msg, msgType) {
+            notie.alert({
+                type: msgType,
+                text: msg,
+            })
+        }
+
+        function notifyModal(title, text, icon, confirmationButtonText) {
+            Swal.fire({
+                title: title,
+                html: text,
+                icon: icon,
+                confirmButtonText: confirmationButtonText
+            })
+        }
+
+        {{with .Error}}
+        notify("{{.}}", "error")
+        {{end}}
+
+        {{with .Flash}}
+        notify("{{.}}", "success")
+        {{end}}
+
+        {{with .Warning}}
+        notify("{{.}}", "warning")
+        {{end}}
+    </script>
+
 
 </body>
 
