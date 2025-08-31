@@ -12,6 +12,7 @@ import (
 	"github.com/bensabler/milos-residence/internal/config"
 	"github.com/bensabler/milos-residence/internal/driver"
 	"github.com/bensabler/milos-residence/internal/forms"
+	"github.com/bensabler/milos-residence/internal/helpers"
 	"github.com/bensabler/milos-residence/internal/models"
 	"github.com/bensabler/milos-residence/internal/render"
 	"github.com/bensabler/milos-residence/internal/repository"
@@ -481,18 +482,29 @@ func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
-func (*Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-dashboard.page.tmpl", &models.TemplateData{})
 }
 
-func (*Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
+	reservations, err := m.DB.AllReservations()
+	if err != nil {
+		helpers.ServerError(w, err)
+		return
+	}
+
+	data := make(map[string]interface{})
+	data["reservations"] = reservations
+
+	render.Template(w, r, "admin-all-reservations.page.tmpl", &models.TemplateData{
+		Data: data,
+	})
+}
+
+func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-new-reservations.page.tmpl", &models.TemplateData{})
 }
 
-func (*Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "admin-all-reservations..page.tmpl", &models.TemplateData{})
-}
-
-func (*Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
+func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-reservations-calendar.page.tmpl", &models.TemplateData{})
 }
