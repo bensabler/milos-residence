@@ -11,6 +11,7 @@ CREATE TABLE reservations (
     room_id INTEGER,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    processed INTEGER DEFAULT 0,
     CONSTRAINT chk_dates CHECK (start_date < end_date)
 
 );
