@@ -20,7 +20,18 @@ import (
 	"github.com/justinas/nosurf"
 )
 
-var functions = template.FuncMap{}
+var functions = template.FuncMap{
+	"humanDate":  func(t time.Time) string { return t.Format("01-02-2006") },
+	"formatDate": func(t time.Time, f string) string { return t.Format(f) },
+	"iterate": func(count int) []int {
+		var items []int
+		for i := 0; i < count; i++ {
+			items = append(items, i)
+		}
+		return items
+	},
+	"add": func(a, b int) int { return a + b },
+}
 
 var app config.AppConfig
 
@@ -80,7 +91,7 @@ func getRoutes() http.Handler {
 	mux := chi.NewRouter()
 
 	mux.Use(middleware.Recoverer)
-
+	mux.Use(NoSurf)
 	mux.Use(SessionLoad)
 
 	mux.Get("/", Repo.Home)
@@ -146,7 +157,8 @@ func CreateTestTemplateCache() (map[string]*template.Template, error) {
 		}
 
 		if len(matches) > 0 {
-			if ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates)); err != nil {
+			ts, err = ts.ParseGlob(fmt.Sprintf("%s/*.layout.tmpl", pathToTemplates))
+			if err != nil {
 				return myCache, err
 			}
 		}
