@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -545,6 +546,9 @@ func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request
 		log.Printf("Trying to convert exploded[4]: '%s'", exploded[4])
 	} else {
 		log.Printf("Not enough URL parts. Length: %d", len(exploded))
+		helpers.ServerError(w, errors.New("malformed admin reservation URL"))
+		return
+
 	}
 
 	id, err := strconv.Atoi(exploded[4])
