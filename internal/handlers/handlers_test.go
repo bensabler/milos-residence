@@ -2,9 +2,8 @@ package handlers
 
 import (
 	"context"
+	"database/sql"
 	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -12,195 +11,210 @@ import (
 	"testing"
 	"time"
 
+	"github.com/bensabler/milos-residence/internal/config"
+	"github.com/bensabler/milos-residence/internal/driver"
 	"github.com/bensabler/milos-residence/internal/models"
+	"github.com/bensabler/milos-residence/internal/repository/dbrepo"
 	"github.com/go-chi/chi/v5"
 )
 
-// postData represents form data structure for POST request testing
-type postData struct {
-	key   string
-	value string
+//
+// ------------------------------
+// Small helpers (DRY)
+// ------------------------------
+
+func sessionize(req *http.Request) *http.Request {
+	// session.Load attaches the session data to the request context.
+	ctx, _ := session.Load(req.Context(), req.Header.Get("X-Session"))
+	return req.WithContext(ctx)
 }
 
-// routeTest defines the structure for testing HTTP routes with expected status codes
-type routeTest struct {
-	name               string     // descriptive name for the test case
-	url                string     // the URL path to test
-	method             string     // HTTP method (GET, POST, etc.)
-	params             []postData // form parameters for POST requests
-	expectedStatusCode int        // expected HTTP status code
-	expectedLocation   string     // expected redirect location (for redirects)
-	expectedInBody     string     // expected content in response body
+func newGET(path string) *http.Request {
+	return sessionize(httptest.NewRequest(http.MethodGet, path, nil))
 }
 
-// TestHandlers validates that all main application routes return correct HTTP status codes.
-// This test ensures basic route accessibility and proper handler registration.
-func TestHandlers(t *testing.T) {
-	// Define comprehensive test cases covering all public routes
-	tests := []routeTest{
-		// Main informational pages - should all return 200 OK
-		{"home", "/", "GET", []postData{}, http.StatusOK, "", ""},
-		{"about", "/about", "GET", []postData{}, http.StatusOK, "", ""},
-		{"photos", "/photos", "GET", []postData{}, http.StatusOK, "", ""},
+func newPOSTForm(path string, form url.Values) *http.Request {
+	req := httptest.NewRequest(http.MethodPost, path, strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	return sessionize(req)
+}
 
-		// Room detail pages - individual snooze spot information
-		{"golden-haybeam-loft", "/golden-haybeam-loft", "GET", []postData{}, http.StatusOK, "", ""},
-		{"window-perch-theater", "/window-perch-theater", "GET", []postData{}, http.StatusOK, "", ""},
-		{"laundry-basket-nook", "/laundry-basket-nook", "GET", []postData{}, http.StatusOK, "", ""},
+func do(h http.HandlerFunc, req *http.Request) *httptest.ResponseRecorder {
+	rr := httptest.NewRecorder()
+	h.ServeHTTP(rr, req)
+	return rr
+}
 
-		// Availability and booking workflow pages
-		{"search-availability", "/search-availability", "GET", []postData{}, http.StatusOK, "", ""},
-		{"contact", "/contact", "GET", []postData{}, http.StatusOK, "", ""},
-
-		// Note: Authentication routes tested separately due to middleware requirements
-	}
-
-	// Initialize the HTTP routes for testing
-	routes := getRoutes()
-	// Create test server with TLS support for realistic testing environment
-	ts := httptest.NewTLSServer(routes)
-	defer ts.Close()
-
-	// Execute each test case systematically
-	for _, e := range tests {
-		t.Run(e.name, func(t *testing.T) {
-			var resp *http.Response
-			var err error
-
-			// Handle different HTTP methods appropriately
-			if e.method == "GET" {
-				// Perform GET request to the test server
-				resp, err = ts.Client().Get(ts.URL + e.url)
-			} else {
-				// Prepare form data for POST requests
-				values := url.Values{}
-				for _, x := range e.params {
-					values.Add(x.key, x.value)
-				}
-				// Execute POST request with form data
-				resp, err = ts.Client().PostForm(ts.URL+e.url, values)
-			}
-
-			// Verify request execution succeeded
-			if err != nil {
-				t.Log(err)
-				t.Fatal(err)
-			}
-
-			// Validate response status code matches expectation
-			if resp.StatusCode != e.expectedStatusCode {
-				t.Errorf("for %s expected %d but got %d", e.name, e.expectedStatusCode, resp.StatusCode)
-			}
-
-			// Check redirect location if specified in test case
-			if e.expectedLocation != "" {
-				actualLoc, _ := resp.Location()
-				if actualLoc.String() != e.expectedLocation {
-					t.Errorf("for %s expected location %s but got %s", e.name, e.expectedLocation, actualLoc.String())
-				}
-			}
-
-			// Verify expected content is present in response body
-			if e.expectedInBody != "" {
-				// Read response body content
-				buf := make([]byte, 1024)
-				n, _ := resp.Body.Read(buf)
-				body := string(buf[:n])
-
-				if !strings.Contains(body, e.expectedInBody) {
-					t.Errorf("for %s expected to find %s in body", e.name, e.expectedInBody)
-				}
-			}
-		})
+func mustStatus(t *testing.T, rr *httptest.ResponseRecorder, want int) {
+	t.Helper()
+	if rr.Code != want {
+		t.Fatalf("status: got %d, want %d", rr.Code, want)
 	}
 }
 
-// TestRepository_MakeReservation validates the reservation display handler functionality.
-// This test verifies proper session handling, reservation data display, and error conditions.
-func TestRepository_MakeReservation(t *testing.T) {
-	// Define test cases for different reservation scenarios
+func mustRedirectContains(t *testing.T, rr *httptest.ResponseRecorder, wantSub string) {
+	t.Helper()
+	loc := rr.Header().Get("Location")
+	if !strings.Contains(loc, wantSub) {
+		t.Fatalf("redirect: got %q, want contains %q", loc, wantSub)
+	}
+}
+
+func toForm(m map[string]string) url.Values {
+	v := url.Values{}
+	for k, val := range m {
+		v.Set(k, val)
+	}
+	return v
+}
+
+func ptrBool(b bool) *bool { return &b }
+
+//
+// ------------------------------
+// Smoke tests for constructors
+// ------------------------------
+
+/*
+TestNewRepo verifies NewRepo constructs a Repository with a non-nil DB and the provided AppConfig.
+*/
+func TestNewRepo(t *testing.T) {
+	app := &config.AppConfig{}
+	// NewRepo only wires up the repo; a zero sql.DB is fine for this unit test.
+	d := &driver.DB{SQL: &sql.DB{}}
+
+	r := NewRepo(app, d)
+
+	if r == nil {
+		t.Fatal("NewRepo returned nil")
+	}
+	if r.App != app {
+		t.Errorf("NewRepo.App mismatch: got %p want %p", r.App, app)
+	}
+	if r.DB == nil {
+		t.Error("NewRepo.DB is nil; expected a concrete DatabaseRepo")
+	}
+}
+
+/*
+TestNewHandlers verifies NewHandlers sets the global Repo pointer.
+*/
+func TestNewHandlers(t *testing.T) {
+	orig := Repo
+	t.Cleanup(func() { NewHandlers(orig) })
+
+	app := &config.AppConfig{Session: session}
+	r := NewTestRepo(app)
+	NewHandlers(r)
+
+	if Repo == nil {
+		t.Fatal("Repo is nil after NewHandlers")
+	}
+	if Repo != r {
+		t.Errorf("Repo != passed repository; got %p want %p", Repo, r)
+	}
+}
+
+//
+// ------------------------------
+// Router smoke test
+// ------------------------------
+
+/*
+TestRoutes_Smoke ensures public routes are registered and return HTTP 200 OK.
+*/
+func TestRoutes_Smoke(t *testing.T) {
 	tests := []struct {
-		name           string
-		reservation    *models.Reservation
-		setupSession   bool
-		expectedStatus int
+		name string
+		path string
 	}{
-		{
-			name: "valid reservation in session",
-			reservation: &models.Reservation{
-				RoomID: 1,
-				Room: models.Room{
-					ID:       1,
-					RoomName: "Golden Haybeam Loft",
-				},
-			},
-			setupSession:   true,
-			expectedStatus: http.StatusOK,
-		},
-		{
-			name:           "no reservation in session",
-			reservation:    nil,
-			setupSession:   false,
-			expectedStatus: http.StatusSeeOther,
-		},
-		{
-			name: "invalid room ID in reservation",
-			reservation: &models.Reservation{
-				RoomID: 100, // Non-existent room ID that will trigger error
-				Room: models.Room{
-					ID:       100,
-					RoomName: "Non-existent Room",
-				},
-			},
-			setupSession:   true,
-			expectedStatus: http.StatusSeeOther,
-		},
+		{"home", "/"},
+		{"about", "/about"},
+		{"photos", "/photos"},
+		{"search-availability", "/search-availability"},
+		{"golden-haybeam-loft", "/golden-haybeam-loft"},
+		{"window-perch-theater", "/window-perch-theater"},
+		{"laundry-basket-nook", "/laundry-basket-nook"},
+		{"contact", "/contact"},
 	}
+
+	ts := httptest.NewTLSServer(getRoutes())
+	defer ts.Close()
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			// Create HTTP request for the make-reservation endpoint
-			req, _ := http.NewRequest("GET", "/make-reservation", nil)
-
-			// Set up request context with session support
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-
-			// Create response recorder to capture handler output
-			rr := httptest.NewRecorder()
-
-			// Configure session state based on test case requirements
-			if tt.setupSession && tt.reservation != nil {
-				// Store reservation data in session for positive test cases
-				session.Put(ctx, "reservation", *tt.reservation)
+			resp, err := ts.Client().Get(ts.URL + tt.path)
+			if err != nil {
+				t.Fatalf("GET %s error: %v", tt.path, err)
 			}
-
-			// Execute the handler function
-			handler := http.HandlerFunc(Repo.MakeReservation)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status code matches expectation
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("MakeReservation handler returned wrong response code: got %d, wanted %d",
-					rr.Code, tt.expectedStatus)
+			if resp.StatusCode != http.StatusOK {
+				t.Fatalf("GET %s: status %d want %d", tt.path, resp.StatusCode, http.StatusOK)
 			}
 		})
 	}
 }
 
-// TestRepository_PostReservation validates the reservation submission processing.
-// This comprehensive test covers form validation, database operations, and error handling.
-func TestRepository_PostReservation(t *testing.T) {
-	// Define test cases covering various submission scenarios
+//
+// ------------------------------
+// Reservation flow
+// ------------------------------
+
+/*
+TestRepository_MakeReservation verifies session preconditions and room lookup.
+*/
+func TestRepository_MakeReservation(t *testing.T) {
 	tests := []struct {
-		name           string
-		formData       map[string]string
-		expectedStatus int
-		description    string
+		name       string
+		seed       *models.Reservation
+		wantStatus int
 	}{
 		{
-			name: "successful reservation",
-			formData: map[string]string{
+			name: "reservation present",
+			seed: &models.Reservation{
+				RoomID: 1,
+				Room:   models.Room{ID: 1, RoomName: "Golden Haybeam Loft"},
+			},
+			wantStatus: http.StatusOK,
+		},
+		{
+			name:       "missing reservation",
+			seed:       nil,
+			wantStatus: http.StatusSeeOther,
+		},
+		{
+			name: "invalid room id",
+			seed: &models.Reservation{
+				RoomID: 100, // test repo returns error
+				Room:   models.Room{ID: 100},
+			},
+			wantStatus: http.StatusSeeOther,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET("/make-reservation")
+			if tc.seed != nil {
+				session.Put(req.Context(), "reservation", *tc.seed)
+			}
+			rr := do(Repo.MakeReservation, req)
+			mustStatus(t, rr, tc.wantStatus)
+		})
+	}
+}
+
+/*
+TestRepository_PostReservation covers parse errors, validation, DB errors, and success.
+*/
+func TestRepository_PostReservation(t *testing.T) {
+	tests := []struct {
+		name       string
+		form       map[string]string
+		wantStatus int
+	}{
+		{
+			name: "success",
+			form: map[string]string{
 				"start_date": "01/01/2100",
 				"end_date":   "01/02/2100",
 				"first_name": "John",
@@ -209,12 +223,11 @@ func TestRepository_PostReservation(t *testing.T) {
 				"phone":      "1234567891",
 				"room_id":    "1",
 			},
-			expectedStatus: http.StatusSeeOther,
-			description:    "Valid form data should redirect to confirmation",
+			wantStatus: http.StatusSeeOther,
 		},
 		{
 			name: "invalid start date",
-			formData: map[string]string{
+			form: map[string]string{
 				"start_date": "invalid",
 				"end_date":   "01/02/2100",
 				"first_name": "John",
@@ -223,12 +236,11 @@ func TestRepository_PostReservation(t *testing.T) {
 				"phone":      "1234567891",
 				"room_id":    "1",
 			},
-			expectedStatus: http.StatusSeeOther,
-			description:    "Invalid date format should redirect with error",
+			wantStatus: http.StatusSeeOther,
 		},
 		{
-			name: "validation failure - short first name",
-			formData: map[string]string{
+			name: "validation failure (short first name)",
+			form: map[string]string{
 				"start_date": "01/01/2100",
 				"end_date":   "01/02/2100",
 				"first_name": "J",
@@ -237,633 +249,454 @@ func TestRepository_PostReservation(t *testing.T) {
 				"phone":      "1234567891",
 				"room_id":    "1",
 			},
-			expectedStatus: http.StatusOK,
-			description:    "Form validation errors should re-render form",
+			wantStatus: http.StatusOK, // re-render form
 		},
 		{
-			name: "database error simulation",
-			formData: map[string]string{
+			name: "insert reservation DB error",
+			form: map[string]string{
 				"start_date": "01/01/2100",
 				"end_date":   "01/02/2100",
 				"first_name": "John",
 				"last_name":  "Smith",
 				"email":      "john@smith.com",
 				"phone":      "1234567891",
-				"room_id":    "2", // Room ID 2 triggers error in test repo
+				"room_id":    "2", // triggers test repo error
 			},
-			expectedStatus: http.StatusSeeOther,
-			description:    "Database errors should redirect with error message",
+			wantStatus: http.StatusSeeOther,
+		},
+		{
+			name: "room restriction insert error",
+			form: map[string]string{
+				"start_date": "01/01/2100",
+				"end_date":   "01/02/2100",
+				"first_name": "John",
+				"last_name":  "Smith",
+				"email":      "john@smith.com",
+				"phone":      "1234567891",
+				"room_id":    "1000", // triggers test repo restriction error
+			},
+			wantStatus: http.StatusSeeOther,
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Construct form data string from test parameters
-			var reqBody strings.Builder
-			first := true
-			for key, value := range tt.formData {
-				if !first {
-					reqBody.WriteString("&")
-				}
-				reqBody.WriteString(fmt.Sprintf("%s=%s", key, value))
-				first = false
-			}
-
-			// Create POST request with form data
-			req, _ := http.NewRequest("POST", "/make-reservation", strings.NewReader(reqBody.String()))
-
-			// Set up request context and headers
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-			// Create response recorder for capturing handler output
-			rr := httptest.NewRecorder()
-
-			// Execute the PostReservation handler
-			handler := http.HandlerFunc(Repo.PostReservation)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status matches expected outcome
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("PostReservation %s: expected status %d, got %d - %s",
-					tt.name, tt.expectedStatus, rr.Code, tt.description)
-			}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newPOSTForm("/make-reservation", toForm(tc.form))
+			rr := do(Repo.PostReservation, req)
+			mustStatus(t, rr, tc.wantStatus)
 		})
 	}
 }
 
-// TestRepository_AvailabilityJSON validates the JSON API endpoint for room availability.
-// This test ensures proper JSON response format and availability checking logic.
-func TestRepository_AvailabilityJSON(t *testing.T) {
-	// Define test cases for different availability scenarios
-	tests := []struct {
-		name         string
-		formData     map[string]string
-		expectedOK   bool
-		expectedCode int
-	}{
-		{
-			name: "valid availability request",
-			formData: map[string]string{
-				"start":   "01/01/2100",
-				"end":     "01/02/2100",
-				"room_id": "1",
-			},
-			expectedOK:   false, // Test repo returns false for availability
-			expectedCode: http.StatusOK,
-		},
-		{
-			name: "invalid date format",
-			formData: map[string]string{
-				"start":   "invalid",
-				"end":     "01/02/2100",
-				"room_id": "1",
-			},
-			expectedOK:   false,
-			expectedCode: http.StatusOK,
-		},
-	}
+func TestRepository_PostReservation_EdgeCases(t *testing.T) {
+	// invalid end date
+	req := newPOSTForm("/make-reservation", toForm(map[string]string{
+		"start_date": "01/01/2100",
+		"end_date":   "not-a-date",
+		"first_name": "John",
+		"last_name":  "Smith",
+		"email":      "john@smith.com",
+		"phone":      "1234567891",
+		"room_id":    "1",
+	}))
+	rr := do(Repo.PostReservation, req)
+	mustStatus(t, rr, http.StatusSeeOther)
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Prepare form data for the request
-			formData := url.Values{}
-			for key, value := range tt.formData {
-				formData.Add(key, value)
-			}
-
-			// Create POST request with form data
-			req, _ := http.NewRequest("POST", "/search-availability-json",
-				strings.NewReader(formData.Encode()))
-
-			// Configure request headers and context
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute the availability JSON handler
-			handler := http.HandlerFunc(Repo.AvailabilityJSON)
-			handler.ServeHTTP(rr, req)
-
-			// Verify response status code
-			if rr.Code != tt.expectedCode {
-				t.Errorf("AvailabilityJSON %s: expected status %d, got %d",
-					tt.name, tt.expectedCode, rr.Code)
-			}
-
-			// Parse and validate JSON response structure
-			var response jsonResponse
-			err := json.Unmarshal(rr.Body.Bytes(), &response)
-			if err != nil {
-				t.Errorf("Failed to parse JSON response: %v", err)
-			}
-
-			// Validate response contains expected availability result
-			if response.OK != tt.expectedOK {
-				t.Errorf("AvailabilityJSON %s: expected OK=%v, got OK=%v",
-					tt.name, tt.expectedOK, response.OK)
-			}
-		})
-	}
+	// invalid room_id (non-integer)
+	req = newPOSTForm("/make-reservation", toForm(map[string]string{
+		"start_date": "01/01/2100",
+		"end_date":   "01/02/2100",
+		"first_name": "John",
+		"last_name":  "Smith",
+		"email":      "john@smith.com",
+		"phone":      "1234567891",
+		"room_id":    "x",
+	}))
+	rr = do(Repo.PostReservation, req)
+	mustStatus(t, rr, http.StatusSeeOther)
 }
 
-// TestRepository_PostAvailability validates the availability search form submission.
-// This test checks date processing, database queries, and result handling.
-func TestRepository_PostAvailability(t *testing.T) {
-	// Define test scenarios for availability search
-	tests := []struct {
-		name           string
-		start          string
-		end            string
-		expectedStatus int
-		expectRedirect bool
-	}{
-		{
-			name:           "valid date range",
-			start:          "01/01/2100",
-			end:            "01/02/2100",
-			expectedStatus: http.StatusSeeOther, // No rooms available redirects with error
-			expectRedirect: true,
-		},
-		{
-			name:           "invalid start date",
-			start:          "invalid",
-			end:            "01/02/2100",
-			expectedStatus: http.StatusSeeOther,
-			expectRedirect: true,
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create form data with date parameters
-			formData := url.Values{}
-			formData.Add("start", tt.start)
-			formData.Add("end", tt.end)
-
-			// Construct POST request
-			req, _ := http.NewRequest("POST", "/search-availability",
-				strings.NewReader(formData.Encode()))
-
-			// Set up request context and headers
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-			// Create response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute the availability search handler
-			handler := http.HandlerFunc(Repo.PostAvailability)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status code
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("PostAvailability %s: expected status %d, got %d",
-					tt.name, tt.expectedStatus, rr.Code)
-			}
-		})
-	}
-}
-
-// TestRepository_ReservationSummary validates the reservation confirmation display.
-// This test ensures proper session data retrieval and summary page rendering.
+/*
+TestRepository_ReservationSummary verifies summary rendering and missing session handling.
+*/
 func TestRepository_ReservationSummary(t *testing.T) {
+	now := time.Now()
 	tests := []struct {
-		name           string
-		reservation    *models.Reservation
-		setupSession   bool
-		expectedStatus int
+		name       string
+		seed       *models.Reservation
+		wantStatus int
 	}{
 		{
-			name: "valid reservation summary",
-			reservation: &models.Reservation{
+			name: "ok",
+			seed: &models.Reservation{
 				ID:        1,
 				FirstName: "John",
 				LastName:  "Doe",
 				Email:     "john@example.com",
 				RoomID:    1,
-				StartDate: time.Now(),
-				EndDate:   time.Now().AddDate(0, 0, 2),
+				StartDate: now,
+				EndDate:   now.AddDate(0, 0, 2),
 			},
-			setupSession:   true,
-			expectedStatus: http.StatusOK,
+			wantStatus: http.StatusOK,
 		},
-		{
-			name:           "no reservation in session",
-			reservation:    nil,
-			setupSession:   false,
-			expectedStatus: http.StatusSeeOther,
-		},
+		{name: "missing session", seed: nil, wantStatus: http.StatusSeeOther},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create request for reservation summary page
-			req, _ := http.NewRequest("GET", "/reservation-summary", nil)
-
-			// Set up request context with session
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-
-			// Configure session data based on test requirements
-			if tt.setupSession && tt.reservation != nil {
-				session.Put(ctx, "reservation", *tt.reservation)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET("/reservation-summary")
+			if tc.seed != nil {
+				session.Put(req.Context(), "reservation", *tc.seed)
 			}
+			rr := do(Repo.ReservationSummary, req)
+			mustStatus(t, rr, tc.wantStatus)
+		})
+	}
+}
 
-			// Set up response recorder
-			rr := httptest.NewRecorder()
+//
+// ------------------------------
+// Availability endpoints
+// ------------------------------
 
-			// Execute reservation summary handler
-			handler := http.HandlerFunc(Repo.ReservationSummary)
-			handler.ServeHTTP(rr, req)
+/*
+TestRepository_PostAvailability exercises invalid date, empty results, and rooms found.
+*/
+func TestRepository_PostAvailability(t *testing.T) {
+	tests := []struct {
+		name           string
+		start, end     string
+		wantStatus     int
+		wantRedirectTo string // empty means no redirect expected
+	}{
+		{"invalid start date", "invalid", "01/02/2100", http.StatusSeeOther, "/"},
+		{"no rooms", "01/01/2100", "01/02/2100", http.StatusSeeOther, "/search-availability"},
+		{"rooms found", "01/01/2101", "01/02/2101", http.StatusOK, ""},
+	}
 
-			// Verify response status code
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("ReservationSummary %s: expected status %d, got %d",
-					tt.name, tt.expectedStatus, rr.Code)
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			form := url.Values{}
+			form.Set("start", tc.start)
+			form.Set("end", tc.end)
+
+			req := newPOSTForm("/search-availability", form)
+			rr := do(Repo.PostAvailability, req)
+
+			mustStatus(t, rr, tc.wantStatus)
+			if tc.wantRedirectTo != "" {
+				mustRedirectContains(t, rr, tc.wantRedirectTo)
 			}
 		})
 	}
 }
 
-// TestRepository_ChooseRoom validates room selection functionality.
-// This test verifies URL parameter parsing and session management.
+func TestRepository_PostAvailability_DBError(t *testing.T) {
+	// Trip the test repo's ForceAllRoomsErr toggle.
+	dbrepo.ForceAllRoomsErr = true
+	defer func() { dbrepo.ForceAllRoomsErr = false }()
+
+	req := newPOSTForm("/search-availability", toForm(map[string]string{
+		"start": "01/01/2100",
+		"end":   "01/02/2100",
+	}))
+	rr := do(Repo.PostAvailability, req)
+	mustStatus(t, rr, http.StatusSeeOther)
+	mustRedirectContains(t, rr, "/") // you redirect to "/" on DB error
+}
+
+/*
+TestRepository_AvailabilityJSON covers parse error, DB error, and OK true/false paths.
+*/
+func TestRepository_AvailabilityJSON(t *testing.T) {
+	tests := []struct {
+		name       string
+		body       string
+		wantCode   int
+		wantOK     *bool
+		wantMsgSub string
+	}{
+		{"parse form error", "%not-urlencoded", http.StatusOK, ptrBool(false), "Internal server error"},
+		{"DB error (room 2)", "start=01/01/2102&end=01/02/2102&room_id=2", http.StatusOK, ptrBool(false), "Error querying database"},
+		{"OK=false", "start=01/01/2100&end=01/02/2100&room_id=1", http.StatusOK, ptrBool(false), ""},
+		{"OK=true", "start=01/01/2101&end=01/02/2101&room_id=1", http.StatusOK, ptrBool(true), ""},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, "/search-availability-json", strings.NewReader(tc.body))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req = sessionize(req)
+
+			rr := do(Repo.AvailabilityJSON, req)
+			mustStatus(t, rr, tc.wantCode)
+
+			var resp jsonResponse
+			if err := json.Unmarshal(rr.Body.Bytes(), &resp); err != nil {
+				t.Fatalf("json unmarshal: %v", err)
+			}
+			if tc.wantOK != nil && resp.OK != *tc.wantOK {
+				t.Fatalf("OK: got %v, want %v", resp.OK, *tc.wantOK)
+			}
+			if tc.wantMsgSub != "" && !strings.Contains(resp.Message, tc.wantMsgSub) {
+				t.Fatalf("Message: got %q, want contains %q", resp.Message, tc.wantMsgSub)
+			}
+		})
+	}
+}
+
+//
+// ------------------------------
+// Choose/Book
+// ------------------------------
+
+/*
+TestRepository_ChooseRoom verifies URL parsing and session updates.
+*/
 func TestRepository_ChooseRoom(t *testing.T) {
 	tests := []struct {
-		name           string
-		roomID         string
-		setupSession   bool
-		expectedStatus int
+		name       string
+		roomID     string
+		seedSess   bool
+		wantStatus int
 	}{
-		{
-			name:           "valid room selection",
-			roomID:         "1",
-			setupSession:   true,
-			expectedStatus: http.StatusSeeOther,
-		},
-		{
-			name:           "invalid room ID",
-			roomID:         "invalid",
-			setupSession:   true,
-			expectedStatus: http.StatusSeeOther,
-		},
-		{
-			name:           "no session reservation",
-			roomID:         "1",
-			setupSession:   false,
-			expectedStatus: http.StatusSeeOther,
-		},
+		{"valid", "1", true, http.StatusSeeOther},
+		{"invalid id", "not-an-id", true, http.StatusSeeOther},
+		{"missing session", "1", false, http.StatusSeeOther},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create request with proper RequestURI format for handler
-			req, _ := http.NewRequest("GET", "/choose-room/"+tt.roomID, nil)
-			req.RequestURI = "/choose-room/" + tt.roomID // Set RequestURI explicitly for handler parsing
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET("/choose-room/" + tc.roomID)
+			// Handler parses RequestURI directly.
+			req.RequestURI = "/choose-room/" + tc.roomID
 
-			// Set up request context
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-
-			// Configure session with reservation data if needed
-			if tt.setupSession {
-				reservation := models.Reservation{RoomID: 1}
-				session.Put(ctx, "reservation", reservation)
+			if tc.seedSess {
+				session.Put(req.Context(), "reservation", models.Reservation{RoomID: 1})
 			}
 
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute choose room handler
-			handler := http.HandlerFunc(Repo.ChooseRoom)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status code
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("ChooseRoom %s: expected status %d, got %d",
-					tt.name, tt.expectedStatus, rr.Code)
-			}
+			rr := do(Repo.ChooseRoom, req)
+			mustStatus(t, rr, tc.wantStatus)
 		})
 	}
 }
 
-// TestRepository_BookRoom validates direct room booking from URL parameters.
-// This test checks query parameter processing and reservation setup.
+/*
+TestRepository_BookRoom checks query parsing and reservation setup.
+*/
 func TestRepository_BookRoom(t *testing.T) {
 	tests := []struct {
-		name           string
-		queryParams    string
-		expectedStatus int
+		name       string
+		q          string
+		wantStatus int
 	}{
-		{
-			name:           "valid booking parameters",
-			queryParams:    "?id=1&s=01/01/2100&e=01/02/2100",
-			expectedStatus: http.StatusSeeOther,
-		},
-		{
-			name:           "missing parameters",
-			queryParams:    "?id=1",
-			expectedStatus: http.StatusSeeOther, // Should handle gracefully
-		},
-		{
-			name:           "invalid room ID",
-			queryParams:    "?id=100&s=01/01/2100&e=01/02/2100",
-			expectedStatus: http.StatusSeeOther,
-		},
+		{"valid", "?id=1&s=01/01/2100&e=01/02/2100", http.StatusSeeOther},
+		{"missing params", "?id=1", http.StatusSeeOther},
+		{"room lookup error", "?id=100&s=01/01/2100&e=01/02/2100", http.StatusSeeOther},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create request with query parameters
-			req, _ := http.NewRequest("GET", "/book-room"+tt.queryParams, nil)
-
-			// Set up request context
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute book room handler
-			handler := http.HandlerFunc(Repo.BookRoom)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status code
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("BookRoom %s: expected status %d, got %d",
-					tt.name, tt.expectedStatus, rr.Code)
-			}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET("/book-room" + tc.q)
+			rr := do(Repo.BookRoom, req)
+			mustStatus(t, rr, tc.wantStatus)
 		})
 	}
 }
 
-// TestRepository_ShowLogin validates the login page display functionality.
-// This test ensures proper form rendering and CSRF token inclusion.
+//
+// ------------------------------
+// Auth
+// ------------------------------
+
+/*
+TestRepository_ShowLogin verifies login page renders.
+*/
 func TestRepository_ShowLogin(t *testing.T) {
-	// Create request for login page
-	req, _ := http.NewRequest("GET", "/user/login", nil)
-
-	// Set up request context
-	ctx := getCtx(req)
-	req = req.WithContext(ctx)
-
-	// Set up response recorder
-	rr := httptest.NewRecorder()
-
-	// Execute show login handler
-	handler := http.HandlerFunc(Repo.ShowLogin)
-	handler.ServeHTTP(rr, req)
-
-	// Validate successful page rendering
-	if rr.Code != http.StatusOK {
-		t.Errorf("ShowLogin handler returned wrong response code: got %d, wanted %d",
-			rr.Code, http.StatusOK)
-	}
+	req := newGET("/user/login")
+	rr := do(Repo.ShowLogin, req)
+	mustStatus(t, rr, http.StatusOK)
 }
 
-// TestRepository_LoginRouteIntegration validates login page through routing.
-// This test verifies the login route is properly configured in the router.
+func TestRepository_PostShowLogin_AuthFailure(t *testing.T) {
+	req := newPOSTForm("/user/login", toForm(map[string]string{
+		"email":    "badlogin@example.com",
+		"password": "whatever",
+	}))
+	rr := do(Repo.PostShowLogin, req)
+	mustStatus(t, rr, http.StatusSeeOther)
+	// Optionally assert redirect path or that session has "error" flash.
+}
+
+/*
+TestRepository_LoginRouteIntegration confirms the /user/login route is wired in the router.
+*/
 func TestRepository_LoginRouteIntegration(t *testing.T) {
-	// Get the configured routes
-	routes := getRoutes()
-	ts := httptest.NewTLSServer(routes)
+	ts := httptest.NewTLSServer(getRoutes())
 	defer ts.Close()
 
-	// Test login page access through router
 	resp, err := ts.Client().Get(ts.URL + "/user/login")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	// Validate login page is accessible
 	if resp.StatusCode != http.StatusOK {
-		t.Errorf("Login page via router: expected %d but got %d", http.StatusOK, resp.StatusCode)
+		t.Fatalf("status: got %d want %d", resp.StatusCode, http.StatusOK)
 	}
 }
 
-// TestRepository_PostShowLogin validates user authentication processing.
-// This test covers login form submission, validation, and authentication flow.
+/*
+TestRepository_PostShowLogin covers validation and successful login.
+*/
 func TestRepository_PostShowLogin(t *testing.T) {
 	tests := []struct {
-		name           string
-		email          string
-		password       string
-		expectedStatus int
+		name       string
+		email      string
+		pass       string
+		wantStatus int
 	}{
-		{
-			name:           "successful login",
-			email:          "test@example.com",
-			password:       "password",
-			expectedStatus: http.StatusSeeOther,
-		},
-		{
-			name:           "missing email",
-			email:          "",
-			password:       "password",
-			expectedStatus: http.StatusOK, // Re-render form with validation errors
-		},
-		{
-			name:           "invalid email format",
-			email:          "invalid-email",
-			password:       "password",
-			expectedStatus: http.StatusOK,
-		},
+		{"success", "test@example.com", "password", http.StatusSeeOther},
+		{"missing email", "", "password", http.StatusOK},
+		{"invalid email", "bad@", "password", http.StatusOK},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create form data for login submission
-			formData := url.Values{}
-			formData.Add("email", tt.email)
-			formData.Add("password", tt.password)
-
-			// Create POST request with login credentials
-			req, _ := http.NewRequest("POST", "/user/login",
-				strings.NewReader(formData.Encode()))
-
-			// Configure request headers and context
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute login processing handler
-			handler := http.HandlerFunc(Repo.PostShowLogin)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status code
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("PostShowLogin %s: expected status %d, got %d",
-					tt.name, tt.expectedStatus, rr.Code)
-			}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			form := url.Values{}
+			form.Set("email", tc.email)
+			form.Set("password", tc.pass)
+			req := newPOSTForm("/user/login", form)
+			rr := do(Repo.PostShowLogin, req)
+			mustStatus(t, rr, tc.wantStatus)
 		})
 	}
 }
 
-// TestRepository_Logout validates user session termination functionality.
-// This test ensures proper session cleanup and redirect behavior.
+/*
+TestRepository_Logout verifies session destroy + redirect.
+*/
 func TestRepository_Logout(t *testing.T) {
-	// Create logout request
-	req, _ := http.NewRequest("GET", "/user/logout", nil)
-
-	// Set up authenticated session context
-	ctx := getCtx(req)
-	req = req.WithContext(ctx)
-
-	// Set up user session to simulate authenticated state
-	session.Put(ctx, "user_id", 1)
-
-	// Set up response recorder
-	rr := httptest.NewRecorder()
-
-	// Execute logout handler
-	handler := http.HandlerFunc(Repo.Logout)
-	handler.ServeHTTP(rr, req)
-
-	// Validate redirect to login page
-	if rr.Code != http.StatusSeeOther {
-		t.Errorf("Logout handler returned wrong response code: got %d, wanted %d",
-			rr.Code, http.StatusSeeOther)
-	}
+	req := newGET("/user/logout")
+	session.Put(req.Context(), "user_id", 1)
+	rr := do(Repo.Logout, req)
+	mustStatus(t, rr, http.StatusSeeOther)
 }
 
-// getCtx creates a request context with session support for testing.
-// This helper function simplifies session-based test setup.
-func getCtx(req *http.Request) context.Context {
-	// Load session from request headers (simulated for testing)
-	ctx, err := session.Load(req.Context(), req.Header.Get("X-Session"))
-	if err != nil {
-		log.Println(err)
-	}
-	return ctx
-}
+//
+// ------------------------------
+// Admin pages
+// ------------------------------
 
-// TestRepository_StaticRoomPages validates individual room detail page handlers.
-// This test ensures all room-specific pages render correctly.
+/*
+TestRepository_StaticRoomPages renders room and info pages directly.
+*/
 func TestRepository_StaticRoomPages(t *testing.T) {
-	tests := []struct {
-		name    string
-		handler http.HandlerFunc
-		url     string
+	pages := []struct {
+		name string
+		h    http.HandlerFunc
+		u    string
 	}{
 		{"golden haybeam loft", Repo.GoldenHaybeamLoft, "/golden-haybeam-loft"},
 		{"window perch theater", Repo.WindowPerchTheater, "/window-perch-theater"},
 		{"laundry basket nook", Repo.LaundryBasketNook, "/laundry-basket-nook"},
-		{"about page", Repo.About, "/about"},
-		{"photos page", Repo.Photos, "/photos"},
-		{"contact page", Repo.Contact, "/contact"},
-		{"home page", Repo.Home, "/"},
+		{"about", Repo.About, "/about"},
+		{"photos", Repo.Photos, "/photos"},
+		{"contact", Repo.Contact, "/contact"},
+		{"home", Repo.Home, "/"},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create request for the specific page
-			req, _ := http.NewRequest("GET", tt.url, nil)
-
-			// Set up request context
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute the page handler
-			tt.handler.ServeHTTP(rr, req)
-
-			// Validate successful page rendering
-			if rr.Code != http.StatusOK {
-				t.Errorf("%s handler returned wrong response code: got %d, wanted %d",
-					tt.name, rr.Code, http.StatusOK)
-			}
+	for _, p := range pages {
+		t.Run(p.name, func(t *testing.T) {
+			req := newGET(p.u)
+			rr := do(p.h, req)
+			mustStatus(t, rr, http.StatusOK)
 		})
 	}
 }
 
-// TestRepository_AdminShowReservation validates reservation detail display in admin interface.
-// This test covers URL parsing, database operations, and template rendering for admin reservation views.
+/*
+TestRepository_AdminDashboard verifies the admin dashboard page.
+*/
+func TestRepository_AdminDashboard(t *testing.T) {
+	req := newGET("/admin/dashboard")
+	rr := do(Repo.AdminDashboard, req)
+	mustStatus(t, rr, http.StatusOK)
+}
+
+/*
+TestRepository_AdminAllReservations verifies list of all reservations.
+*/
+func TestRepository_AdminAllReservations(t *testing.T) {
+	req := newGET("/admin/reservations-all")
+	rr := do(Repo.AdminAllReservations, req)
+	mustStatus(t, rr, http.StatusOK)
+}
+
+func TestRepository_AdminAllReservations_DBError(t *testing.T) {
+	dbrepo.ForceAllReservationsErr = true
+	defer func() { dbrepo.ForceAllReservationsErr = false }()
+
+	req := newGET("/admin/reservations-all")
+	rr := do(Repo.AdminAllReservations, req)
+	mustStatus(t, rr, http.StatusInternalServerError)
+}
+
+/*
+TestRepository_AdminNewReservations verifies list of new reservations.
+*/
+func TestRepository_AdminNewReservations(t *testing.T) {
+	req := newGET("/admin/reservations-new")
+	rr := do(Repo.AdminNewReservations, req)
+	mustStatus(t, rr, http.StatusOK)
+}
+
+func TestRepository_AdminNewReservations_DBError(t *testing.T) {
+	dbrepo.ForceAllNewReservationsErr = true
+	defer func() { dbrepo.ForceAllNewReservationsErr = false }()
+
+	req := newGET("/admin/reservations-new")
+	rr := do(Repo.AdminNewReservations, req)
+	mustStatus(t, rr, http.StatusInternalServerError)
+}
+
+/*
+TestRepository_AdminShowReservation verifies admin detail view parsing and render.
+*/
 func TestRepository_AdminShowReservation(t *testing.T) {
 	tests := []struct {
-		name           string
-		requestURI     string
-		queryParams    string
-		reservationID  int
-		expectedStatus int
-		shouldError    bool
+		name       string
+		reqURI     string
+		q          string
+		wantStatus int
 	}{
-		{
-			name:           "valid reservation display",
-			requestURI:     "/admin/reservations/new/1/show",
-			queryParams:    "?y=2025&m=12",
-			reservationID:  1,
-			expectedStatus: http.StatusOK,
-			shouldError:    false,
-		},
-
-		{
-			name:           "invalid reservation ID",
-			requestURI:     "/admin/reservations/new/invalid/show",
-			queryParams:    "",
-			reservationID:  0,
-			expectedStatus: http.StatusInternalServerError,
-			shouldError:    true,
-		},
-		{
-			name:           "database error - reservation not found",
-			requestURI:     "/admin/reservations/new/999/show",
-			queryParams:    "",
-			reservationID:  999,
-			expectedStatus: http.StatusOK, // Test repo returns empty reservation, no error
-			shouldError:    false,
-		},
+		{"valid", "/admin/reservations/new/1/show", "?y=2025&m=12", http.StatusOK},
+		{"invalid id", "/admin/reservations/new/invalid/show", "", http.StatusInternalServerError},
+		{"not found but ok", "/admin/reservations/new/999/show", "", http.StatusOK},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Create request with specific RequestURI for URL parsing
-			req, _ := http.NewRequest("GET", tt.requestURI+tt.queryParams, nil)
-			req.RequestURI = tt.requestURI
-
-			// Set up request context
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute admin show reservation handler
-			handler := http.HandlerFunc(Repo.AdminShowReservation)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status matches expectation
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("AdminShowReservation %s: expected status %d, got %d",
-					tt.name, tt.expectedStatus, rr.Code)
-			}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET(tc.reqURI + tc.q)
+			// Handler parses RequestURI; set it exactly.
+			req.RequestURI = tc.reqURI
+			rr := do(Repo.AdminShowReservation, req)
+			mustStatus(t, rr, tc.wantStatus)
 		})
 	}
 }
 
-// TestRepository_AdminPostShowReservation validates reservation update processing in admin interface.
-// This test covers form processing, database updates, and redirect logic for admin reservation edits.
+/*
+TestRepository_AdminPostShowReservation verifies update and redirect logic.
+*/
 func TestRepository_AdminPostShowReservation(t *testing.T) {
 	tests := []struct {
-		name           string
-		requestURI     string
-		formData       map[string]string
-		reservationID  int
-		expectedStatus int
+		name       string
+		reqURI     string
+		form       map[string]string
+		wantStatus int
 	}{
 		{
-			name:       "successful reservation update",
-			requestURI: "/admin/reservations/new/1/show",
-			formData: map[string]string{
+			name:   "update ok -> list",
+			reqURI: "/admin/reservations/new/1/show",
+			form: map[string]string{
 				"first_name": "UpdatedJohn",
 				"last_name":  "UpdatedDoe",
 				"email":      "updated@example.com",
@@ -871,13 +704,12 @@ func TestRepository_AdminPostShowReservation(t *testing.T) {
 				"month":      "",
 				"year":       "",
 			},
-			reservationID:  1,
-			expectedStatus: http.StatusSeeOther,
+			wantStatus: http.StatusSeeOther,
 		},
 		{
-			name:       "successful update with calendar redirect",
-			requestURI: "/admin/reservations/cal/1/show",
-			formData: map[string]string{
+			name:   "update ok -> calendar",
+			reqURI: "/admin/reservations/cal/1/show",
+			form: map[string]string{
 				"first_name": "CalendarJohn",
 				"last_name":  "CalendarDoe",
 				"email":      "calendar@example.com",
@@ -885,418 +717,207 @@ func TestRepository_AdminPostShowReservation(t *testing.T) {
 				"month":      "12",
 				"year":       "2025",
 			},
-			reservationID:  1,
-			expectedStatus: http.StatusSeeOther,
-		},
-
-		{
-			name:       "invalid reservation ID",
-			requestURI: "/admin/reservations/new/invalid/show",
-			formData: map[string]string{
-				"first_name": "Test",
-			},
-			reservationID:  0,
-			expectedStatus: http.StatusInternalServerError,
+			wantStatus: http.StatusSeeOther,
 		},
 		{
-			name:       "database error - reservation not found",
-			requestURI: "/admin/reservations/new/999/show",
-			formData: map[string]string{
-				"first_name": "Test",
-			},
-			reservationID:  999,
-			expectedStatus: http.StatusSeeOther, // Test repo returns empty reservation, redirects
+			name:       "invalid id",
+			reqURI:     "/admin/reservations/new/invalid/show",
+			form:       map[string]string{"first_name": "Test"},
+			wantStatus: http.StatusInternalServerError,
+		},
+		{
+			name:       "not found -> still redirects (test repo returns empty)",
+			reqURI:     "/admin/reservations/new/999/show",
+			form:       map[string]string{"first_name": "Test"},
+			wantStatus: http.StatusSeeOther,
 		},
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Prepare form data for POST request
-			formData := url.Values{}
-			for key, value := range tt.formData {
-				formData.Add(key, value)
-			}
-
-			// Create POST request with form data
-			req, _ := http.NewRequest("POST", tt.requestURI, strings.NewReader(formData.Encode()))
-			req.RequestURI = tt.requestURI
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-			// Set up request context
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute admin post show reservation handler
-			handler := http.HandlerFunc(Repo.AdminPostShowReservation)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status matches expectation
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("AdminPostShowReservation %s: expected status %d, got %d",
-					tt.name, tt.expectedStatus, rr.Code)
-			}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newPOSTForm(tc.reqURI, toForm(tc.form))
+			// Handler parses RequestURI directly.
+			req.RequestURI = tc.reqURI
+			rr := do(Repo.AdminPostShowReservation, req)
+			mustStatus(t, rr, tc.wantStatus)
 		})
 	}
 }
 
-// TestRepository_PostReservation_CompleteCoverage provides comprehensive testing for reservation processing.
-// This test specifically targets the uncovered success paths and error scenarios.
-func TestRepository_PostReservation_CompleteCoverage(t *testing.T) {
-	tests := []struct {
-		name           string
-		formData       map[string]string
-		expectedStatus int
-		description    string
-	}{
-		{
-			name:     "form parsing error - simulate malformed request",
-			formData: map[string]string{
-				// Empty form data to potentially trigger parsing issues
-			},
-			expectedStatus: http.StatusSeeOther,
-			description:    "Malformed form should redirect with error",
-		},
-		{
-			name: "room not found during validation error handling",
-			formData: map[string]string{
-				"start_date": "01/01/2100",
-				"end_date":   "01/02/2100",
-				"first_name": "J", // Too short to trigger validation error
-				"last_name":  "Smith",
-				"email":      "john@smith.com",
-				"phone":      "1234567891",
-				"room_id":    "100", // Non-existent room for validation error path
-			},
-			expectedStatus: http.StatusSeeOther,
-			description:    "Room not found during validation should redirect",
-		},
-		{
-			name: "successful reservation with room restriction failure",
-			formData: map[string]string{
-				"start_date": "01/01/2100",
-				"end_date":   "01/02/2100",
-				"first_name": "John",
-				"last_name":  "Smith",
-				"email":      "john@smith.com",
-				"phone":      "1234567891",
-				"room_id":    "1000", // Room ID that triggers restriction error in test repo
-			},
-			expectedStatus: http.StatusSeeOther,
-			description:    "Room restriction error should redirect with error",
-		},
-	}
+func TestRepository_AdminPostShowReservation_UpdateError(t *testing.T) {
+	dbrepo.ForceUpdateReservationErr = true
+	defer func() { dbrepo.ForceUpdateReservationErr = false }()
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Construct form data string from test parameters
-			var reqBody strings.Builder
-			first := true
-			for key, value := range tt.formData {
-				if !first {
-					reqBody.WriteString("&")
-				}
-				reqBody.WriteString(fmt.Sprintf("%s=%s", key, value))
-				first = false
-			}
+	reqURI := "/admin/reservations/new/1/show"
+	req := newPOSTForm(reqURI, toForm(map[string]string{
+		"first_name": "X",
+		"last_name":  "Y",
+		"email":      "x@y.com",
+		"phone":      "1",
+	}))
+	req.RequestURI = reqURI
+	rr := do(Repo.AdminPostShowReservation, req)
+	mustStatus(t, rr, http.StatusInternalServerError)
+}
 
-			// Create POST request with form data
-			req, _ := http.NewRequest("POST", "/make-reservation", strings.NewReader(reqBody.String()))
+/*
+TestRepository_AdminReservationsCalendar_SessionSeeds ensures per-room maps are saved to session.
+*/
+func TestRepository_AdminReservationsCalendar_SessionSeeds(t *testing.T) {
+	req := newGET("/admin/reservations-calendar?y=2050&m=1")
+	rr := do(Repo.AdminReservationsCalendar, req)
+	mustStatus(t, rr, http.StatusOK)
 
-			// Set up request context and headers
-			ctx := getCtx(req)
-			req = req.WithContext(ctx)
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-
-			// Set up response recorder
-			rr := httptest.NewRecorder()
-
-			// Execute the PostReservation handler
-			handler := http.HandlerFunc(Repo.PostReservation)
-			handler.ServeHTTP(rr, req)
-
-			// Validate response status matches expected outcome
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("PostReservation_CompleteCoverage %s: expected status %d, got %d - %s",
-					tt.name, tt.expectedStatus, rr.Code, tt.description)
-			}
-		})
+	// AllRooms returns room 1 in test repo; block_map_1 should be populated.
+	val := session.Get(req.Context(), "block_map_1")
+	m, ok := val.(map[string]int)
+	if !ok || len(m) == 0 {
+		t.Fatalf("expected non-empty block_map_1 in session; got %#v", val)
 	}
 }
 
-// TestRepository_AdminReservationsCalendar covers multiple scenarios of the calendar view.
+/*
+TestRepository_AdminReservationsCalendar verifies default and custom month renders.
+*/
 func TestRepository_AdminReservationsCalendar(t *testing.T) {
 	tests := []struct {
-		name           string
-		url            string
-		forceDBError   bool
-		expectedStatus int
+		name string
+		url  string
 	}{
-		{
-			name:           "default current month",
-			url:            "/admin/reservations-calendar",
-			expectedStatus: http.StatusOK,
-		},
-		{
-			name:           "custom year and month",
-			url:            "/admin/reservations-calendar?y=2050&m=1", // still works with single digit
-			expectedStatus: http.StatusOK,
-		},
+		{"default month", "/admin/reservations-calendar"},
+		{"custom month", "/admin/reservations-calendar?y=2050&m=1"},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", tt.url, nil)
-			req = addContextAndSession(req)
-			rr := httptest.NewRecorder()
-
-			if tt.forceDBError {
-				// In your test repo, you can set a flag in context/session to simulate DB error.
-				session.Put(req.Context(), "force_allrooms_error", true)
-			}
-
-			handler := http.HandlerFunc(Repo.AdminReservationsCalendar)
-			handler.ServeHTTP(rr, req)
-
-			if rr.Code != tt.expectedStatus {
-				t.Errorf("%s: expected %d, got %d", tt.name, tt.expectedStatus, rr.Code)
-			}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET(tc.url)
+			rr := do(Repo.AdminReservationsCalendar, req)
+			mustStatus(t, rr, http.StatusOK)
 		})
 	}
 }
 
-// TestRepository_AdminProcessReservation verifies reservation processing and redirects.
+/*
+TestRepository_AdminProcessReservation verifies redirect behavior (list vs calendar).
+*/
 func TestRepository_AdminProcessReservation(t *testing.T) {
 	tests := []struct {
-		name             string
-		url              string
-		id               string
-		src              string
-		expectedLocation string
+		name       string
+		url        string
+		id, src    string
+		wantSubLoc string
 	}{
-		{
-			name:             "redirect to reservations-new",
-			url:              "/admin/process-reservation/new/1/do",
-			id:               "1",
-			src:              "new",
-			expectedLocation: "/admin/reservations-new",
-		},
-		{
-			name:             "redirect to calendar with year/month",
-			url:              "/admin/process-reservation/new/1/do?y=2050&m=01",
-			id:               "1",
-			src:              "new",
-			expectedLocation: "/admin/reservations-calendar?y=2050&m=01",
-		},
+		{"to new list", "/admin/process-reservation/new/1/do", "1", "new", "/admin/reservations-new"},
+		{"to calendar", "/admin/process-reservation/new/1/do?y=2050&m=01", "1", "new", "/admin/reservations-calendar?y=2050&m=01"},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", tt.url, nil)
-			req = addContextAndSession(req)
-			rr := httptest.NewRecorder()
-
-			// Inject chi params
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET(tc.url)
+			// Set chi params.
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("id", tt.id)
-			rctx.URLParams.Add("src", tt.src)
+			rctx.URLParams.Add("id", tc.id)
+			rctx.URLParams.Add("src", tc.src)
 			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
 
-			handler := http.HandlerFunc(Repo.AdminProcessReservation)
-			handler.ServeHTTP(rr, req)
-
-			if rr.Code != http.StatusSeeOther {
-				t.Errorf("%s: expected status 303, got %d", tt.name, rr.Code)
-			}
-			if !strings.Contains(rr.Header().Get("Location"), tt.expectedLocation) {
-				t.Errorf("%s: expected redirect to %s, got %s", tt.name,
-					tt.expectedLocation, rr.Header().Get("Location"))
-			}
+			rr := do(Repo.AdminProcessReservation, req)
+			mustStatus(t, rr, http.StatusSeeOther)
+			mustRedirectContains(t, rr, tc.wantSubLoc)
 		})
 	}
 }
 
-// TestRepository_AdminDeleteReservation verifies reservation deletion and redirects.
+/*
+TestRepository_AdminDeleteReservation verifies deletion redirects.
+*/
 func TestRepository_AdminDeleteReservation(t *testing.T) {
 	tests := []struct {
-		name             string
-		url              string
-		id               string
-		src              string
-		expectedLocation string
+		name       string
+		url        string
+		id, src    string
+		wantSubLoc string
 	}{
-		{
-			name:             "redirect to reservations-new",
-			url:              "/admin/delete-reservation/new/1/do",
-			id:               "1",
-			src:              "new",
-			expectedLocation: "/admin/reservations-new",
-		},
-		{
-			name:             "redirect to calendar with year/month",
-			url:              "/admin/delete-reservation/new/1/do?y=2050&m=01",
-			id:               "1",
-			src:              "new",
-			expectedLocation: "/admin/reservations-calendar?y=2050&m=01",
-		},
+		{"to new list", "/admin/delete-reservation/new/1/do", "1", "new", "/admin/reservations-new"},
+		{"to calendar", "/admin/delete-reservation/new/1/do?y=2050&m=01", "1", "new", "/admin/reservations-calendar?y=2050&m=01"},
 	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("GET", tt.url, nil)
-			req = addContextAndSession(req)
-			rr := httptest.NewRecorder()
-
-			// Inject chi params
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newGET(tc.url)
 			rctx := chi.NewRouteContext()
-			rctx.URLParams.Add("id", tt.id)
-			rctx.URLParams.Add("src", tt.src)
+			rctx.URLParams.Add("id", tc.id)
+			rctx.URLParams.Add("src", tc.src)
 			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
 
-			handler := http.HandlerFunc(Repo.AdminDeleteReservation)
-			handler.ServeHTTP(rr, req)
-
-			if rr.Code != http.StatusSeeOther {
-				t.Errorf("%s: expected status 303, got %d", tt.name, rr.Code)
-			}
-			if !strings.Contains(rr.Header().Get("Location"), tt.expectedLocation) {
-				t.Errorf("%s: expected redirect to %s, got %s", tt.name,
-					tt.expectedLocation, rr.Header().Get("Location"))
-			}
+			rr := do(Repo.AdminDeleteReservation, req)
+			mustStatus(t, rr, http.StatusSeeOther)
+			mustRedirectContains(t, rr, tc.wantSubLoc)
 		})
 	}
 }
 
-// TestRepository_AdminPostReservationsCalendar verifies block add/remove logic and redirects.
+/*
+TestRepository_AdminPostReservationsCalendar exercises add/remove block loops and redirect.
+*/
 func TestRepository_AdminPostReservationsCalendar(t *testing.T) {
 	tests := []struct {
-		name             string
-		form             url.Values
-		expectedLocation string
+		name       string
+		form       url.Values
+		wantSubLoc string
 	}{
 		{
-			name: "basic save",
-			form: url.Values{
-				"y": {"2050"},
-				"m": {"1"},
-			},
-			expectedLocation: "/admin/reservations-calendar?y=2050&m=1",
+			name:       "basic save",
+			form:       url.Values{"y": {"2050"}, "m": {"1"}},
+			wantSubLoc: "/admin/reservations-calendar?y=2050&m=1",
 		},
 		{
 			name: "add block",
 			form: url.Values{
-				"y":                      {"2050"},
-				"m":                      {"1"},
+				"y": {"2050"}, "m": {"1"},
 				"add_block_1_01/01/2050": {""},
 			},
-			expectedLocation: "/admin/reservations-calendar?y=2050&m=1",
+			wantSubLoc: "/admin/reservations-calendar?y=2050&m=1",
 		},
 		{
-			name: "remove block",
+			name: "remove block (kept because flag present)",
 			form: url.Values{
-				"y":                         {"2050"},
-				"m":                         {"1"},
+				"y": {"2050"}, "m": {"1"},
 				"remove_block_1_01/01/2050": {""},
 			},
-			expectedLocation: "/admin/reservations-calendar?y=2050&m=1",
+			wantSubLoc: "/admin/reservations-calendar?y=2050&m=1",
 		},
 	}
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			req := newPOSTForm("/admin/reservations-calendar", tc.form)
+			// Seed a block so the "remove" scan iterates an existing entry.
+			session.Put(req.Context(), "block_map_1", map[string]int{"01/01/2050": 123})
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest("POST", "/admin/reservations-calendar", strings.NewReader(tt.form.Encode()))
-			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
-			req = addContextAndSession(req)
-
-			// Seed block map into session so handler has something to work with
-			blockMap := map[string]int{"01/01/2050": 123}
-			session.Put(req.Context(), "block_map_1", blockMap)
-
-			rr := httptest.NewRecorder()
-			handler := http.HandlerFunc(Repo.AdminPostReservationsCalendar)
-			handler.ServeHTTP(rr, req)
-
-			if rr.Code != http.StatusSeeOther {
-				t.Errorf("%s: expected status 303, got %d", tt.name, rr.Code)
-			}
-			if !strings.Contains(rr.Header().Get("Location"), tt.expectedLocation) {
-				t.Errorf("%s: expected redirect to %s, got %s", tt.name,
-					tt.expectedLocation, rr.Header().Get("Location"))
-			}
+			rr := do(Repo.AdminPostReservationsCalendar, req)
+			mustStatus(t, rr, http.StatusSeeOther)
+			mustRedirectContains(t, rr, tc.wantSubLoc)
 		})
 	}
 }
 
-// addContextAndSession attaches session and context to a test request.
-func addContextAndSession(req *http.Request) *http.Request {
-	ctx := req.Context()
-	ctx, _ = session.Load(ctx, req.Header.Get("X-Session"))
-	return req.WithContext(ctx)
-}
-
-// TestRepository_AdminDashboard verifies the admin dashboard renders with 200 OK.
-func TestRepository_AdminDashboard(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/admin/dashboard", nil)
-	req = addContextAndSession(req)
-	rr := httptest.NewRecorder()
-
-	http.HandlerFunc(Repo.AdminDashboard).ServeHTTP(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Errorf("AdminDashboard: got %d, want %d", rr.Code, http.StatusOK)
-	}
-}
-
-// TestRepository_AdminAllReservations verifies the all-reservations page renders with 200 OK.
-func TestRepository_AdminAllReservations(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/admin/reservations-all", nil)
-	req = addContextAndSession(req)
-	rr := httptest.NewRecorder()
-
-	http.HandlerFunc(Repo.AdminAllReservations).ServeHTTP(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Errorf("AdminAllReservations: got %d, want %d", rr.Code, http.StatusOK)
-	}
-}
-
-// TestRepository_AdminNewReservations verifies the new-reservations page renders with 200 OK.
-func TestRepository_AdminNewReservations(t *testing.T) {
-	req := httptest.NewRequest(http.MethodGet, "/admin/reservations-new", nil)
-	req = addContextAndSession(req)
-	rr := httptest.NewRecorder()
-
-	http.HandlerFunc(Repo.AdminNewReservations).ServeHTTP(rr, req)
-
-	if rr.Code != http.StatusOK {
-		t.Errorf("AdminNewReservations: got %d, want %d", rr.Code, http.StatusOK)
-	}
-}
-
-// TestRepository_AdminPages_Router ensures admin routes are wired and return 200 OK.
+/*
+TestRepository_AdminPages_Router ensures top-level admin routes are wired.
+*/
 func TestRepository_AdminPages_Router(t *testing.T) {
 	ts := httptest.NewTLSServer(getRoutes())
 	defer ts.Close()
 
-	cases := []struct {
-		name string
-		path string
-	}{
-		{"dashboard", "/admin/dashboard"},
-		{"all", "/admin/reservations-all"},
-		{"new", "/admin/reservations-new"},
+	paths := []string{
+		"/admin/dashboard",
+		"/admin/reservations-all",
+		"/admin/reservations-new",
 	}
 
-	for _, tc := range cases {
-		t.Run(tc.name, func(t *testing.T) {
-			resp, err := ts.Client().Get(ts.URL + tc.path)
+	for _, p := range paths {
+		t.Run(p, func(t *testing.T) {
+			resp, err := ts.Client().Get(ts.URL + p)
 			if err != nil {
-				t.Fatalf("request error: %v", err)
+				t.Fatalf("GET %s error: %v", p, err)
 			}
 			if resp.StatusCode != http.StatusOK {
-				t.Errorf("%s: got %d, want %d", tc.name, resp.StatusCode, http.StatusOK)
+				t.Fatalf("GET %s: status %d want %d", p, resp.StatusCode, http.StatusOK)
 			}
 		})
 	}
