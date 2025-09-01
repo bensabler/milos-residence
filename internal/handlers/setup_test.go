@@ -4,6 +4,7 @@ import (
 	"encoding/gob"
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -96,6 +97,8 @@ func TestMain(m *testing.M) {
 
 	// Initialize helpers with app config to prevent nil pointer panics
 	helpers.NewHelpers(&app)
+
+	errorLog.SetOutput(io.Discard)
 
 	// Execute all tests and exit with appropriate code
 	os.Exit(m.Run())

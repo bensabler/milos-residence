@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/bensabler/milos-residence/internal/models"
+	"github.com/go-chi/chi/v5"
 )
 
 // postData represents form data structure for POST request testing
@@ -1020,6 +1021,282 @@ func TestRepository_PostReservation_CompleteCoverage(t *testing.T) {
 			if rr.Code != tt.expectedStatus {
 				t.Errorf("PostReservation_CompleteCoverage %s: expected status %d, got %d - %s",
 					tt.name, tt.expectedStatus, rr.Code, tt.description)
+			}
+		})
+	}
+}
+
+// TestRepository_AdminReservationsCalendar covers multiple scenarios of the calendar view.
+func TestRepository_AdminReservationsCalendar(t *testing.T) {
+	tests := []struct {
+		name           string
+		url            string
+		forceDBError   bool
+		expectedStatus int
+	}{
+		{
+			name:           "default current month",
+			url:            "/admin/reservations-calendar",
+			expectedStatus: http.StatusOK,
+		},
+		{
+			name:           "custom year and month",
+			url:            "/admin/reservations-calendar?y=2050&m=1", // still works with single digit
+			expectedStatus: http.StatusOK,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", tt.url, nil)
+			req = addContextAndSession(req)
+			rr := httptest.NewRecorder()
+
+			if tt.forceDBError {
+				// In your test repo, you can set a flag in context/session to simulate DB error.
+				session.Put(req.Context(), "force_allrooms_error", true)
+			}
+
+			handler := http.HandlerFunc(Repo.AdminReservationsCalendar)
+			handler.ServeHTTP(rr, req)
+
+			if rr.Code != tt.expectedStatus {
+				t.Errorf("%s: expected %d, got %d", tt.name, tt.expectedStatus, rr.Code)
+			}
+		})
+	}
+}
+
+// TestRepository_AdminProcessReservation verifies reservation processing and redirects.
+func TestRepository_AdminProcessReservation(t *testing.T) {
+	tests := []struct {
+		name             string
+		url              string
+		id               string
+		src              string
+		expectedLocation string
+	}{
+		{
+			name:             "redirect to reservations-new",
+			url:              "/admin/process-reservation/new/1/do",
+			id:               "1",
+			src:              "new",
+			expectedLocation: "/admin/reservations-new",
+		},
+		{
+			name:             "redirect to calendar with year/month",
+			url:              "/admin/process-reservation/new/1/do?y=2050&m=01",
+			id:               "1",
+			src:              "new",
+			expectedLocation: "/admin/reservations-calendar?y=2050&m=01",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", tt.url, nil)
+			req = addContextAndSession(req)
+			rr := httptest.NewRecorder()
+
+			// Inject chi params
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", tt.id)
+			rctx.URLParams.Add("src", tt.src)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			handler := http.HandlerFunc(Repo.AdminProcessReservation)
+			handler.ServeHTTP(rr, req)
+
+			if rr.Code != http.StatusSeeOther {
+				t.Errorf("%s: expected status 303, got %d", tt.name, rr.Code)
+			}
+			if !strings.Contains(rr.Header().Get("Location"), tt.expectedLocation) {
+				t.Errorf("%s: expected redirect to %s, got %s", tt.name,
+					tt.expectedLocation, rr.Header().Get("Location"))
+			}
+		})
+	}
+}
+
+// TestRepository_AdminDeleteReservation verifies reservation deletion and redirects.
+func TestRepository_AdminDeleteReservation(t *testing.T) {
+	tests := []struct {
+		name             string
+		url              string
+		id               string
+		src              string
+		expectedLocation string
+	}{
+		{
+			name:             "redirect to reservations-new",
+			url:              "/admin/delete-reservation/new/1/do",
+			id:               "1",
+			src:              "new",
+			expectedLocation: "/admin/reservations-new",
+		},
+		{
+			name:             "redirect to calendar with year/month",
+			url:              "/admin/delete-reservation/new/1/do?y=2050&m=01",
+			id:               "1",
+			src:              "new",
+			expectedLocation: "/admin/reservations-calendar?y=2050&m=01",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("GET", tt.url, nil)
+			req = addContextAndSession(req)
+			rr := httptest.NewRecorder()
+
+			// Inject chi params
+			rctx := chi.NewRouteContext()
+			rctx.URLParams.Add("id", tt.id)
+			rctx.URLParams.Add("src", tt.src)
+			req = req.WithContext(context.WithValue(req.Context(), chi.RouteCtxKey, rctx))
+
+			handler := http.HandlerFunc(Repo.AdminDeleteReservation)
+			handler.ServeHTTP(rr, req)
+
+			if rr.Code != http.StatusSeeOther {
+				t.Errorf("%s: expected status 303, got %d", tt.name, rr.Code)
+			}
+			if !strings.Contains(rr.Header().Get("Location"), tt.expectedLocation) {
+				t.Errorf("%s: expected redirect to %s, got %s", tt.name,
+					tt.expectedLocation, rr.Header().Get("Location"))
+			}
+		})
+	}
+}
+
+// TestRepository_AdminPostReservationsCalendar verifies block add/remove logic and redirects.
+func TestRepository_AdminPostReservationsCalendar(t *testing.T) {
+	tests := []struct {
+		name             string
+		form             url.Values
+		expectedLocation string
+	}{
+		{
+			name: "basic save",
+			form: url.Values{
+				"y": {"2050"},
+				"m": {"1"},
+			},
+			expectedLocation: "/admin/reservations-calendar?y=2050&m=1",
+		},
+		{
+			name: "add block",
+			form: url.Values{
+				"y":                      {"2050"},
+				"m":                      {"1"},
+				"add_block_1_01/01/2050": {""},
+			},
+			expectedLocation: "/admin/reservations-calendar?y=2050&m=1",
+		},
+		{
+			name: "remove block",
+			form: url.Values{
+				"y":                         {"2050"},
+				"m":                         {"1"},
+				"remove_block_1_01/01/2050": {""},
+			},
+			expectedLocation: "/admin/reservations-calendar?y=2050&m=1",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest("POST", "/admin/reservations-calendar", strings.NewReader(tt.form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req = addContextAndSession(req)
+
+			// Seed block map into session so handler has something to work with
+			blockMap := map[string]int{"01/01/2050": 123}
+			session.Put(req.Context(), "block_map_1", blockMap)
+
+			rr := httptest.NewRecorder()
+			handler := http.HandlerFunc(Repo.AdminPostReservationsCalendar)
+			handler.ServeHTTP(rr, req)
+
+			if rr.Code != http.StatusSeeOther {
+				t.Errorf("%s: expected status 303, got %d", tt.name, rr.Code)
+			}
+			if !strings.Contains(rr.Header().Get("Location"), tt.expectedLocation) {
+				t.Errorf("%s: expected redirect to %s, got %s", tt.name,
+					tt.expectedLocation, rr.Header().Get("Location"))
+			}
+		})
+	}
+}
+
+// addContextAndSession attaches session and context to a test request.
+func addContextAndSession(req *http.Request) *http.Request {
+	ctx := req.Context()
+	ctx, _ = session.Load(ctx, req.Header.Get("X-Session"))
+	return req.WithContext(ctx)
+}
+
+// TestRepository_AdminDashboard verifies the admin dashboard renders with 200 OK.
+func TestRepository_AdminDashboard(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/admin/dashboard", nil)
+	req = addContextAndSession(req)
+	rr := httptest.NewRecorder()
+
+	http.HandlerFunc(Repo.AdminDashboard).ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("AdminDashboard: got %d, want %d", rr.Code, http.StatusOK)
+	}
+}
+
+// TestRepository_AdminAllReservations verifies the all-reservations page renders with 200 OK.
+func TestRepository_AdminAllReservations(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/admin/reservations-all", nil)
+	req = addContextAndSession(req)
+	rr := httptest.NewRecorder()
+
+	http.HandlerFunc(Repo.AdminAllReservations).ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("AdminAllReservations: got %d, want %d", rr.Code, http.StatusOK)
+	}
+}
+
+// TestRepository_AdminNewReservations verifies the new-reservations page renders with 200 OK.
+func TestRepository_AdminNewReservations(t *testing.T) {
+	req := httptest.NewRequest(http.MethodGet, "/admin/reservations-new", nil)
+	req = addContextAndSession(req)
+	rr := httptest.NewRecorder()
+
+	http.HandlerFunc(Repo.AdminNewReservations).ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("AdminNewReservations: got %d, want %d", rr.Code, http.StatusOK)
+	}
+}
+
+// TestRepository_AdminPages_Router ensures admin routes are wired and return 200 OK.
+func TestRepository_AdminPages_Router(t *testing.T) {
+	ts := httptest.NewTLSServer(getRoutes())
+	defer ts.Close()
+
+	cases := []struct {
+		name string
+		path string
+	}{
+		{"dashboard", "/admin/dashboard"},
+		{"all", "/admin/reservations-all"},
+		{"new", "/admin/reservations-new"},
+	}
+
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			resp, err := ts.Client().Get(ts.URL + tc.path)
+			if err != nil {
+				t.Fatalf("request error: %v", err)
+			}
+			if resp.StatusCode != http.StatusOK {
+				t.Errorf("%s: got %d, want %d", tc.name, resp.StatusCode, http.StatusOK)
 			}
 		})
 	}
