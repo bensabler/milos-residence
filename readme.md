@@ -1,76 +1,176 @@
-<!-- Improved compatibility of back to top link -->
-<a id="readme-top"></a>
+# Milo's Residence
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://github.com/bensabler/milos-residence">
-    <img src="static/images/hero-milo.png" alt="Milo’s Residence" width="120" height="120">
-  </a>
+A production-ready, cat-themed bed & breakfast booking system built with Go. Features room reservations, availability checking, and an admin dashboard.
 
-  <h3 align="center">Milo’s Residence</h3>
+## Architecture
 
-  <p align="center">
-    A small Go web app demonstrating routing, templates, sessions, CSRF, and basic form handling.
-    <br />
-    <a href="#about-the-project"><strong>Learn more »</strong></a>
-  </p>
-</div>
+- **Pattern**: Repository pattern with dependency injection
+- **Structure**: Clean architecture with separated concerns (handlers, models, repository, rendering)
+- **Database**: PostgreSQL with connection pooling and prepared statements
+- **Sessions**: Server-side session management with secure cookie handling
+- **Security**: CSRF protection, input validation, and SQL injection prevention
 
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About the Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#testing">Testing</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
+## Tech Stack
 
-## About the Project
+**Backend**
+- Go 1.24.6 with modules
+- [Chi](https://github.com/go-chi/chi) - Lightweight HTTP router with middleware support
+- [SCS](https://github.com/alexedwards/scs) - Session management
+- [Goose](https://github.com/pressly/goose) - Database migrations
+- [pgx](https://github.com/jackc/pgx) - PostgreSQL driver with connection pooling
 
-Milo’s Residence is a focused, server-rendered Go application. It showcases:
+**Frontend**
+- Bootstrap 5 with responsive design
+- Vanilla JavaScript with modern ES6+ features
+- Template-driven server-side rendering
 
-- HTTP routing with middleware
-- Server-side HTML templates with a cache toggle for dev/prod
-- Session-based flash/warn/error messaging
-- CSRF protection for POST forms
-- Form validation helpers and table-driven tests
+**Security & Validation**
+- [nosurf](https://github.com/justinas/nosurf) - CSRF protection
+- [govalidator](https://github.com/asaskevich/govalidator) - Input validation
+- bcrypt password hashing
 
-Feature pages:
-- Home, About, Photos, Contact
-- “Snooze spots”: Golden Haybeam Loft, Window Perch Theater, Laundry Basket Nook
-- Reservations: `/make-reservation` (GET/POST), `/reservation-summary`
-- Availability: `/search-availability` (GET/POST), `/search-availability-json` (POST JSON)
+## Project Structure
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+```
+├── cmd/web/                 # Application entry point
+├── internal/
+│   ├── config/             # Application configuration
+│   ├── driver/             # Database connection management
+│   ├── forms/              # Form validation and error handling
+│   ├── handlers/           # HTTP request handlers
+│   ├── helpers/            # Utility functions
+│   ├── models/             # Data models and structures
+│   ├── render/             # Template rendering engine
+│   └── repository/         # Data access layer
+├── migrations/             # Database schema migrations
+├── templates/              # HTML templates
+└── static/                # Static assets (CSS, JS, images)
+```
 
-### Built With
+## Key Features
 
-- Go 1.24.6
-- Router: [chi]
-- Sessions: [scs]
-- CSRF: [nosurf]
-- Templates: Go `html/template`
+**Core Functionality**
+- Real-time room availability checking
+- Reservation management with conflict detection
+- Email notifications with template system
+- Administrative dashboard with calendar view
+- User authentication and session management
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+**Technical Highlights**
+- Template caching with development/production toggle
+- Database connection pooling with health checks
+- Comprehensive input validation and sanitization
+- Middleware-based request processing pipeline
+- Graceful error handling and user feedback
+
+## API Endpoints
+
+**Public Routes**
+```
+GET  /                           # Homepage
+GET  /about                      # About page  
+GET  /search-availability        # Availability search form
+POST /search-availability        # Process availability search
+POST /search-availability-json   # JSON API for availability
+GET  /make-reservation           # Reservation form
+POST /make-reservation           # Process reservation
+```
+
+**Admin Routes** (Authentication Required)
+```
+GET  /admin/dashboard                    # Admin overview
+GET  /admin/reservations-all            # All reservations
+GET  /admin/reservations-new            # New reservations  
+GET  /admin/reservations-calendar       # Calendar view
+POST /admin/reservations-calendar       # Update room blocks
+```
 
 ## Getting Started
 
 ### Prerequisites
-- Go 1.24.6 (or compatible with your `go.mod`)
+
+- Go 1.24.6+
+- PostgreSQL 12+
+- Make (recommended)
+
+### Setup
+
+1. **Environment Configuration**:
+   ```bash
+   cp .env.example .env
+   # Configure database credentials and settings
+   ```
+
+2. **Database Setup**:
+   ```bash
+   # Apply migrations
+   make up
+   
+   # Seed initial data (optional)
+   make seed
+   ```
+
+3. **Development**:
+   ```bash
+   # Install dependencies
+   go mod tidy
+   
+   # Run with hot reload
+   make dev
+   
+   # Or build and run
+   make run
+   ```
+
+## Testing
+
+- **Unit Tests**: Comprehensive handler and form validation testing
+- **Integration Tests**: Database repository testing with test doubles
+- **Coverage**: `go test -cover ./...`
+
+```bash
+make test     # Run all tests
+make vet      # Static analysis
+make fmt      # Code formatting
+```
+
+## Security Features
+
+- **CSRF Protection**: Token-based request validation
+- **Session Security**: HttpOnly cookies with SameSite protection
+- **Input Validation**: Server-side validation with user-friendly error messages
+- **SQL Injection Prevention**: Parameterized queries and prepared statements
+- **Authentication**: Secure password hashing with bcrypt
+
+## Performance Optimizations
+
+- **Database**: Connection pooling with configurable limits
+- **Templates**: Production template caching with development bypass
+- **Static Assets**: Efficient serving with proper cache headers
+- **Middleware**: Optimized request processing pipeline
+
+## Deployment
+
+**Production Build**:
+```bash
+make build-linux    # Linux binary
+make build-windows  # Windows binary  
+make build-macos    # macOS binary
+```
+
+**Environment Variables**:
+- `APP_ENV=prod` - Enables production optimizations
+- `USE_TEMPLATE_CACHE=true` - Template caching
+- `DB_*` - Database configuration
+
+## Development Tools
+
+```bash
+make clean    # Remove build artifacts
+make tidy     # Clean up dependencies
+make help     # Show all available commands
+```
+
+## License
+
+All rights reserved.
