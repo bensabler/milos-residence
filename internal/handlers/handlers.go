@@ -373,7 +373,90 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
-	render.Template(w, r, "contact.page.tmpl", &models.TemplateData{})
+	render.Template(w, r, "contact.page.tmpl", &models.TemplateData{
+		Form: forms.New(nil),
+	})
+}
+
+func (m *Repository) PostContact(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		m.App.Session.Put(r.Context(), "error", "can't parse form!")
+		http.Redirect(w, r, "/contact", http.StatusSeeOther)
+		return
+	}
+
+	// Honeypot check should be early
+	website := r.Form.Get("website")
+	if website != "" {
+		m.App.Session.Put(r.Context(), "error", "Spam detected")
+		http.Redirect(w, r, "/contact", http.StatusSeeOther)
+		return
+	}
+
+	name := r.Form.Get("name")
+	email := r.Form.Get("email")
+	topic := r.Form.Get("topic")
+	message := r.Form.Get("message")
+
+	form := forms.New(r.PostForm)
+	form.Required("name", "email", "message")
+	form.MinLength("name", 3)
+	form.IsEmail("email")
+	form.MinLength("message", 10)
+
+	if !form.Valid() {
+		render.Template(w, r, "contact.page.tmpl", &models.TemplateData{
+			Form: form,
+		})
+		return
+	}
+
+	// Send email notification
+	htmlMessage := fmt.Sprintf(`
+		<strong>New Contact Form Message</strong><br><br>
+		<strong>From:</strong> %s (%s)<br>
+		<strong>Topic:</strong> %s<br><br>
+		<strong>Message:</strong><br>
+		%s
+	`, name, email, topic, message)
+
+	msg := models.MailData{
+		To:       "admin@milosresidence.com", // Change to your email
+		From:     email,
+		Subject:  fmt.Sprintf("Contact Form: %s", topic),
+		Content:  htmlMessage,
+		Template: "basic.html",
+	}
+
+	m.App.MailChan <- msg
+
+	// Send confirmation email to user
+	confirmationMessage := fmt.Sprintf(`
+		Hi %s,<br><br>
+		Thank you for contacting Milo's Residence! We've received your message and will get back to you within 24 hours.<br><br>
+		Best purrs,<br>
+		The Milo's Residence Team
+	`, name)
+
+	confirmMsg := models.MailData{
+		To:       email,
+		From:     "hello@milosresidence.com",
+		Subject:  "Thanks for contacting Milo's Residence",
+		Content:  confirmationMessage,
+		Template: "basic.html",
+	}
+
+	m.App.MailChan <- confirmMsg
+	// If the honeypot field is filled, treat it as spam and do not process further
+	if website != "" {
+		m.App.Session.Put(r.Context(), "error", "Spam detected")
+		http.Redirect(w, r, "/contact", http.StatusSeeOther)
+		return
+	}
+
+	m.App.Session.Put(r.Context(), "flash", "Thank you for your message! We'll get back to you soon.")
+	http.Redirect(w, r, "/contact", http.StatusSeeOther)
 }
 
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
