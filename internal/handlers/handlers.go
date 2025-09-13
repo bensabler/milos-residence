@@ -1,3 +1,6 @@
+// Package handlers implements HTTP request handlers for Milo's Residence reservation system.
+// It provides handlers for public pages, reservation management, availability checking,
+// user authentication, and administrative functions using the Repository pattern.
 package handlers
 
 import (
@@ -21,13 +24,29 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
+// Repo is the global repository instance used by all handlers.
+// It provides access to application configuration and database operations
+// throughout the handler functions.
 var Repo *Repository
 
+// Repository implements the Repository pattern for HTTP handlers.
+// It encapsulates application configuration and database access,
+// providing a clean interface for handling HTTP requests while
+// maintaining separation of concerns between web layer and business logic.
 type Repository struct {
-	App *config.AppConfig
-	DB  repository.DatabaseRepo
+	App *config.AppConfig       // Application configuration and shared services
+	DB  repository.DatabaseRepo // Database operations interface
 }
 
+// NewRepo creates a new Repository instance with the provided application configuration
+// and database connection. It initializes the repository with a PostgreSQL database
+// implementation and returns a configured Repository ready for use by handlers.
+//
+// Parameters:
+//   - a: Application configuration containing session management, logging, and other settings
+//   - db: Database connection wrapper with connection pool and health checking
+//
+// Returns a configured Repository instance with PostgreSQL database access.
 func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	return &Repository{
 		App: a,
@@ -35,6 +54,14 @@ func NewRepo(a *config.AppConfig, db *driver.DB) *Repository {
 	}
 }
 
+// NewTestRepo creates a new Repository instance configured for testing.
+// It uses a test database implementation that provides controlled responses
+// for unit testing without requiring an actual database connection.
+//
+// Parameters:
+//   - a: Application configuration for the test environment
+//
+// Returns a Repository instance with test database implementation.
 func NewTestRepo(a *config.AppConfig) *Repository {
 	return &Repository{
 		App: a,
@@ -42,23 +69,44 @@ func NewTestRepo(a *config.AppConfig) *Repository {
 	}
 }
 
+// NewHandlers sets the global repository instance for use by handler functions.
+// This function should be called during application initialization to configure
+// the handlers with the appropriate repository implementation.
+//
+// Parameters:
+//   - r: Repository instance to be used by all handler functions
 func NewHandlers(r *Repository) {
 	Repo = r
 }
 
+// Home handles GET requests to the homepage route (/).
+// It renders the home page template with basic template data,
+// demonstrating a simple handler that calls a database method
+// and renders a template without complex business logic.
 func (m *Repository) Home(w http.ResponseWriter, r *http.Request) {
 	m.DB.AllUsers()
 	render.Template(w, r, "home.page.tmpl", &models.TemplateData{})
 }
 
+// About handles GET requests to the about page route (/about).
+// It renders the about page template with empty template data,
+// providing information about the residence and its amenities.
 func (m *Repository) About(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "about.page.tmpl", &models.TemplateData{})
 }
 
+// Photos handles GET requests to the photos page route (/photos).
+// It renders the photos page template displaying images of the residence
+// and its various room offerings.
 func (m *Repository) Photos(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "photos.page.tmpl", &models.TemplateData{})
 }
 
+// MakeReservation handles GET requests to display the reservation form.
+// It retrieves reservation data from the user session, validates the room exists,
+// and renders the reservation form with pre-populated data. If the session
+// doesn't contain valid reservation data or the room cannot be found,
+// it redirects to the home page with an error message.
 func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 	res, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
@@ -97,6 +145,18 @@ func (m *Repository) MakeReservation(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "make-reservation.page.tmpl", td)
 }
 
+// PostReservation handles POST requests to process reservation form submissions.
+// It validates form data, creates a reservation record in the database,
+// creates corresponding room restrictions, sends confirmation emails,
+// and redirects to the reservation summary page. If validation fails,
+// it re-renders the form with error messages.
+//
+// The handler performs the following steps:
+// 1. Parses and validates form data including dates and guest information
+// 2. Validates required fields and data formats using the forms package
+// 3. Creates reservation and room restriction records in the database
+// 4. Sends confirmation email to guest and notification email to staff
+// 5. Stores reservation in session and redirects to summary page
 func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 
 	err := r.ParseForm()
@@ -244,22 +304,44 @@ func (m *Repository) PostReservation(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/reservation-summary", http.StatusSeeOther)
 }
 
+// GoldenHaybeamLoft handles GET requests to display the Golden Haybeam Loft room page.
+// It renders a detailed page showcasing this specific room with its amenities,
+// photos, and booking options.
 func (m *Repository) GoldenHaybeamLoft(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "golden-haybeam-loft.page.tmpl", &models.TemplateData{})
 }
 
+// WindowPerchTheater handles GET requests to display the Window Perch Theater room page.
+// It renders a detailed page showcasing this specific room with its amenities,
+// photos, and booking options.
 func (m *Repository) WindowPerchTheater(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "window-perch-theater.page.tmpl", &models.TemplateData{})
 }
 
+// LaundryBasketNook handles GET requests to display the Laundry Basket Nook room page.
+// It renders a detailed page showcasing this specific room with its amenities,
+// photos, and booking options.
 func (m *Repository) LaundryBasketNook(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "laundry-basket-nook.page.tmpl", &models.TemplateData{})
 }
 
+// Availability handles GET requests to display the availability search form.
+// It renders a form where users can input their desired check-in and check-out
+// dates to search for available rooms.
 func (m *Repository) Availability(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "search-availability.page.tmpl", &models.TemplateData{})
 }
 
+// PostAvailability handles POST requests to search for available rooms.
+// It processes the search form, queries the database for available rooms
+// during the specified date range, and either displays available rooms
+// or redirects with an error message if no rooms are available.
+//
+// The handler:
+// 1. Parses and validates the date inputs from the form
+// 2. Queries the database for rooms available during the date range
+// 3. If rooms are found, stores search criteria in session and shows room selection
+// 4. If no rooms are available, redirects back to search with error message
 func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -314,14 +396,27 @@ func (m *Repository) PostAvailability(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+// jsonResponse represents the structure of JSON responses returned by the AvailabilityJSON handler.
+// It provides a consistent format for AJAX availability checking requests,
+// including success status, error messages, and booking details.
 type jsonResponse struct {
-	OK        bool   `json:"ok"`
-	Message   string `json:"message"`
-	RoomID    string `json:"room_id"`
-	StartDate string `json:"start_date"`
-	EndDate   string `json:"end_date"`
+	OK        bool   `json:"ok"`         // Whether the room is available
+	Message   string `json:"message"`    // Error message if not available
+	RoomID    string `json:"room_id"`    // ID of the requested room
+	StartDate string `json:"start_date"` // Formatted start date
+	EndDate   string `json:"end_date"`   // Formatted end date
 }
 
+// AvailabilityJSON handles POST requests for AJAX availability checking.
+// It processes room availability requests and returns JSON responses
+// indicating whether the specified room is available for the given dates.
+// This endpoint is used by frontend JavaScript to provide real-time
+// availability feedback without page refreshes.
+//
+// The response includes:
+// - ok: boolean indicating availability
+// - message: error message if request failed
+// - room_id, start_date, end_date: echoed back for frontend processing
 func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -372,12 +467,24 @@ func (m *Repository) AvailabilityJSON(w http.ResponseWriter, r *http.Request) {
 	w.Write(out)
 }
 
+// Contact handles GET requests to display the contact form.
+// It renders the contact page with an empty form ready for user input,
+// allowing visitors to send messages to the residence administrators.
 func (m *Repository) Contact(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "contact.page.tmpl", &models.TemplateData{
 		Form: forms.New(nil),
 	})
 }
 
+// PostContact handles POST requests to process contact form submissions.
+// It validates the form data, performs spam detection using a honeypot field,
+// sends email notifications to both the administration and the sender,
+// and redirects with success or error messages.
+//
+// Security features:
+// - Honeypot field detection to prevent automated spam submissions
+// - Form validation for required fields and email format
+// - Dual email notifications for proper message handling
 func (m *Repository) PostContact(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -459,6 +566,11 @@ func (m *Repository) PostContact(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/contact", http.StatusSeeOther)
 }
 
+// ReservationSummary handles GET requests to display reservation confirmation details.
+// It retrieves the completed reservation from the session, displays the summary
+// information to the user, and removes the reservation data from the session
+// to prevent reuse. If no reservation data exists in the session,
+// it redirects to the home page with an error message.
 func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) {
 	reservation, ok := m.App.Session.Get(r.Context(), "reservation").(models.Reservation)
 	if !ok {
@@ -484,6 +596,11 @@ func (m *Repository) ReservationSummary(w http.ResponseWriter, r *http.Request) 
 	})
 }
 
+// ChooseRoom handles GET requests to select a specific room for reservation.
+// It extracts the room ID from the URL path, validates the room exists,
+// updates the reservation in the session with the selected room,
+// and redirects to the reservation form. If the session doesn't contain
+// valid reservation data or the URL is malformed, it redirects with an error.
 func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	exploded := strings.Split(r.RequestURI, "/")
 	roomID, err := strconv.Atoi(exploded[2])
@@ -507,6 +624,11 @@ func (m *Repository) ChooseRoom(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 }
 
+// BookRoom handles GET requests to initiate room booking from external links.
+// It extracts booking parameters (room ID, start date, end date) from URL query parameters,
+// validates the room exists, creates a reservation object, stores it in the session,
+// and redirects to the reservation form. This handler enables direct booking links
+// from room pages or external sources.
 func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	roomID, _ := strconv.Atoi(r.URL.Query().Get("id"))
 
@@ -536,11 +658,25 @@ func (m *Repository) BookRoom(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/make-reservation", http.StatusSeeOther)
 }
 
+// ShowLogin handles GET requests to display the login form.
+// It renders the login page with an empty form for user authentication,
+// allowing staff and administrators to access protected areas of the application.
 func (m *Repository) ShowLogin(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "login.page.tmpl", &models.TemplateData{
 		Form: forms.New(nil),
 	})
 }
+
+// PostShowLogin handles POST requests to process user login attempts.
+// It validates the login form, attempts to authenticate the user credentials
+// against the database, creates a new session upon successful authentication,
+// and redirects to the home page. If authentication fails, it re-displays
+// the login form with error messages.
+//
+// Security features:
+// - Session token renewal to prevent session fixation attacks
+// - Credential validation against hashed passwords in database
+// - Error logging for failed authentication attempts
 func (m *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
 	_ = m.App.Session.RenewToken(r.Context())
 
@@ -577,6 +713,10 @@ func (m *Repository) PostShowLogin(w http.ResponseWriter, r *http.Request) {
 
 }
 
+// Logout handles GET requests to log users out of the application.
+// It destroys the current session, creates a new session token for security,
+// and redirects to the login page. This ensures complete session cleanup
+// and prevents unauthorized access to protected resources.
 func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	_ = m.App.Session.Destroy(r.Context())
 	_ = m.App.Session.RenewToken(r.Context())
@@ -584,10 +724,18 @@ func (m *Repository) Logout(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/user/login", http.StatusSeeOther)
 }
 
+// AdminDashboard handles GET requests to display the administrative dashboard.
+// It renders the main admin interface page providing access to reservation
+// management, reports, and other administrative functions. This handler
+// requires authentication and is protected by middleware.
 func (m *Repository) AdminDashboard(w http.ResponseWriter, r *http.Request) {
 	render.Template(w, r, "admin-dashboard.page.tmpl", &models.TemplateData{})
 }
 
+// AdminAllReservations handles GET requests to display all reservations.
+// It retrieves all reservations from the database and renders them in
+// a table format for administrative review. If database access fails,
+// it returns an internal server error response.
 func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request) {
 	reservations, err := m.DB.AllReservations()
 	if err != nil {
@@ -603,6 +751,10 @@ func (m *Repository) AdminAllReservations(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// AdminNewReservations handles GET requests to display unprocessed reservations.
+// It retrieves all new (unprocessed) reservations from the database and
+// renders them in a table format for administrative processing. This allows
+// staff to review and handle new booking requests efficiently.
 func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request) {
 	reservations, err := m.DB.AllNewReservations()
 	if err != nil {
@@ -618,6 +770,11 @@ func (m *Repository) AdminNewReservations(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// AdminShowReservation handles GET requests to display detailed reservation information.
+// It extracts the reservation ID from the URL path, retrieves the complete
+// reservation details from the database, and renders a detailed view with
+// editing capabilities. URL parameters for year and month are preserved
+// for navigation context when coming from calendar views.
 func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request) {
 
 	exploded := strings.Split(r.RequestURI, "/")
@@ -666,6 +823,11 @@ func (m *Repository) AdminShowReservation(w http.ResponseWriter, r *http.Request
 	})
 }
 
+// AdminPostShowReservation handles POST requests to update reservation details.
+// It processes form submissions from the reservation detail page, updates
+// the reservation information in the database, and redirects back to the
+// appropriate listing (calendar or reservation list) based on the source context.
+// Navigation context is preserved through hidden form fields.
 func (m *Repository) AdminPostShowReservation(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -714,6 +876,18 @@ func (m *Repository) AdminPostShowReservation(w http.ResponseWriter, r *http.Req
 
 }
 
+// AdminReservationsCalendar handles GET requests to display the reservation calendar view.
+// It renders a monthly calendar showing room availability, existing reservations,
+// and owner-blocked dates. The calendar supports navigation between months
+// via query parameters and provides visual indicators for different types
+// of room restrictions.
+//
+// Features:
+// - Monthly calendar view with room-by-room availability
+// - Visual distinction between reservations and owner blocks
+// - Month navigation with preserved state
+// - Interactive editing of room blocks
+// - Session storage of block maps for form processing
 func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	now := time.Now()
 
@@ -799,6 +973,11 @@ func (m *Repository) AdminReservationsCalendar(w http.ResponseWriter, r *http.Re
 	})
 }
 
+// AdminProcessReservation handles GET requests to mark reservations as processed.
+// It extracts the reservation ID from URL parameters, updates the reservation
+// status in the database, and redirects back to the appropriate listing view.
+// The handler preserves navigation context for seamless user experience
+// when working with large reservation lists.
 func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	src := chi.URLParam(r, "src")
@@ -822,6 +1001,11 @@ func (m *Repository) AdminProcessReservation(w http.ResponseWriter, r *http.Requ
 
 }
 
+// AdminDeleteReservation handles GET requests to delete reservations.
+// It extracts the reservation ID from URL parameters, removes the reservation
+// from the database, and redirects back to the appropriate listing view.
+// The handler preserves navigation context and provides user feedback
+// through flash messages.
 func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Request) {
 	id, _ := strconv.Atoi(chi.URLParam(r, "id"))
 	src := chi.URLParam(r, "src")
@@ -842,6 +1026,17 @@ func (m *Repository) AdminDeleteReservation(w http.ResponseWriter, r *http.Reque
 
 }
 
+// AdminPostReservationsCalendar handles POST requests to update room availability blocks.
+// It processes form submissions from the calendar view, managing room blocks
+// (owner-restricted dates) by adding new blocks and removing existing ones
+// based on checkbox selections. The handler compares current form state
+// with stored session data to determine which blocks to add or remove.
+//
+// Processing logic:
+// 1. Retrieves all rooms and their current block states from session
+// 2. Removes blocks that were unchecked (removed checkboxes)
+// 3. Adds new blocks for checked dates (added checkboxes)
+// 4. Redirects back to calendar view with success message
 func (m *Repository) AdminPostReservationsCalendar(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
